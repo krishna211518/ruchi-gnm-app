@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#12365b">
+<title>RUCHI GNM Nursing App</title>
+<style>
+:root{
+ --navy:#12365b;--blue:#1976d2;--light:#edf5ff;
+ --bg:#f4f7fb;--white:#fff;--text:#203047;
+ --muted:#68788d;--green:#16845b;--red:#d64545;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+ font-family:Arial,sans-serif}
+header{background:linear-gradient(130deg,#102c4c,#1976d2);
+ color:white;padding:23px 18px 28px;border-radius:0 0 25px 25px}
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0 0;color:#dbeaff;font-size:13px}
+.container{max-width:900px;margin:auto;padding:15px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:-5px}
+.stat{background:white;padding:14px 8px;border-radius:13px;
+ text-align:center;box-shadow:0 3px 12px #173b6010}
+.stat strong{display:block;font-size:21px;color:var(--blue)}
+.stat span{font-size:11px;color:var(--muted)}
+.section{display:none}
+.section.active{display:block}
+h2{font-size:20px;margin:20px 0 12px}
+h3{font-size:16px;margin:0 0 8px}
+p{line-height:1.55}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.card{background:white;padding:15px;border-radius:14px;
+ box-shadow:0 3px 12px #173b600c;margin-bottom:10px}
+.card .emoji{font-size:24px}
+.card p{font-size:12px;color:var(--muted);margin:6px 0}
+button,select,input,textarea{font:inherit}
+button{border:0;border-radius:10px;padding:11px 14px;
+ background:var(--blue);color:white;cursor:pointer}
+button.secondary{background:var(--light);color:var(--navy)}
+button.danger{background:#fff0f0;color:var(--red)}
+button:disabled{opacity:.5}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d8e0eb;
+ border-radius:10px;background:white;margin:6px 0 12px;color:var(--text)}
+label{font-size:13px;font-weight:bold}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:12px 0;
+ position:sticky;top:0;background:var(--bg);z-index:5}
+.tabs button{white-space:nowrap;padding:10px 13px;font-size:12px}
+.tabs button.selected{background:var(--navy)}
+.item{background:white;border-radius:12px;padding:14px;margin:9px 0}
+.item p{margin:5px 0;color:var(--muted);font-size:13px}
+.progress{height:9px;background:#e2eaf3;border-radius:20px;overflow:hidden}
+.progress div{height:100%;background:var(--green);width:0}
+.option{display:block;text-align:left;width:100%;margin:8px 0;
+ background:#f1f5fa;color:var(--text);border:1px solid #e1e7ef}
+.option.correct{background:#e2f7ed;border-color:#16845b;color:#126342}
+.option.wrong{background:#ffeded;border-color:#d64545;color:#a52c2c}
+.small{font-size:12px;color:var(--muted)}
+.result{padding:12px;background:#edf5ff;border-radius:10px;margin-top:12px}
+footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
+@media(min-width:650px){.grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🩺 RUCHI GNM</h1>
+<p>YOUR COMPLETE NURSING STUDY COMPANION</p>
+<p>Learn • Practice • Revise • Succeed</p>
+</header>
+
+<div class="container">
+<div class="stats">
+ <div class="stat"><strong id="totalQ">0</strong><span>Questions attempted</span></div>
+ <div class="stat"><strong id="accuracy">0%</strong><span>Accuracy</span></div>
+ <div class="stat"><strong id="completed">0</strong><span>Topics completed</span></div>
+</div>
+
+<nav class="tabs">
+ <button class="selected" onclick="show('home',this)">Home</button>
+ <button onclick="show('library',this)">Study</button>
+ <button onclick="show('mcq',this)">MCQ Bank</button>
+ <button onclick="show('exam',this)">Mock Test</button>
+ <button onclick="show('notes',this)">My Notes</button>
+ <button onclick="show('clinical',this)">Clinical</button>
+ <button onclick="show('viva',this)">Viva</button>
+ <button onclick="show('progress',this)">Progress</button>
+ <button onclick="show('add',this)">Add</button>
+</nav>
+
+<section id="home" class="section active">
+<h2>Welcome to your Nursing Study Hub 👋</h2>
+<div class="grid">
+ <div class="card"><div class="emoji">📚</div><h3>Study Library</h3><p>Year-wise subjects and topics.</p><button onclick="go('library')">Open Study</button></div>
+ <div class="card"><div class="emoji">🧠</div><h3>MCQ Practice</h3><p>Test your nursing knowledge.</p><button onclick="go('mcq')">Practice MCQs</button></div>
+ <div class="card"><div class="emoji">📝</div><h3>Mock Test</h3><p>Timed exam practice.</p><button onclick="go('exam')">Start Test</button></div>
+ <div class="card"><div class="emoji">🩻</div><h3>Clinical Learning</h3><p>Skills, safety and care plans.</p><button onclick="go('clinical')">Explore</button></div>
+ <div class="card"><div class="emoji">🎤</div><h3>Viva Practice</h3><p>Important oral questions.</p><button onclick="go('viva')">Start Viva</button></div>
+ <div class="card"><div class="emoji">📊</div><h3>My Progress</h3><p>Track your learning.</p><button onclick="go('progress')">View Progress</button></div>
+</div>
+<h2>Daily Study Target</h2>
+<div class="card">
+<p>Today's completed topics</p>
+<div class="progress"><div id="homeProgress"></div></div>
+<p class="small" id="homeProgressText">Keep learning every day!</p>
+</div>
+</section>
+
+<section id="library" class="section">
+<h2>📚 Study Library</h2>
+<select id="yearFilter" onchange="renderLibrary()">
+<option value="All">All Years</option>
+<option value="First Year">First Year</option>
+<option value="Second Year">Second Year</option>
+<option value="Third Year">Third Year</option>
+</select>
+<input id="searchTopic" placeholder="Search subject or topic..." oninput="renderLibrary()">
+<div id="libraryList"></div>
+</section>
+
+<section id="mcq" class="section">
+<h2>🧠 MCQ Question Bank</h2>
+<p class="small">Choose a subject and difficulty. Questions include explanations.</p>
+<select id="mcqSubject" onchange="startPractice()">
+<option value="All">All Subjects</option>
+</select>
+<select id="difficulty" onchange="startPractice()">
+<option value="All">All Difficulties</option>
+<option>Easy</option><option>Medium</option><option>Hard</option>
+</select>
+<div class="card">
+<div id="questionArea">Select your practice options to begin.</div>
+</div>
+</section>
+
+<section id="exam" class="section">
+<h2>📝 Mock Test</h2>
+<p class="small">A practice test with a timer and score report.</p>
+<label>Number of questions</label>
+<select id="examCount">
+<option>10</option><option>20</option><option>30</option>
+</select>
+<label>Time limit (minutes)</label>
+<select id="examTime">
+<option>10</option><option>20</option><option>30</option><option>45</option>
+</select>
+<button onclick="startExam()">Start Mock Test</button>
+<div id="examArea" class="card" style="margin-top:12px"></div>
+</section>
+
+<section id="notes" class="section">
+<h2>📒 My Notebook</h2>
+<label>Note title</label><input id="noteTitle" placeholder="Enter title">
+<label>Your notes</label><textarea id="noteBody" rows="5" placeholder="Write your study notes..."></textarea>
+<button onclick="saveNote()">Save Note</button>
+<div id="noteList"></div>
+</section>
+
+<section id="clinical" class="section">
+<h2>🩺 Clinical Learning</h2>
+<div id="clinicalList"></div>
+<div class="result small">
+Clinical learning is for education. Follow your college's approved procedures,
+infection-control policies and supervisor's instructions during actual patient care.
+</div>
+</section>
+
+<section id="viva" class="section">
+<h2>🎤 Viva Practice</h2>
+<div id="vivaList"></div>
+</section>
+
+<section id="progress" class="section">
+<h2>📊 Your Progress</h2>
+<div class="card">
+<h3>MCQ performance</h3>
+<p id="progressScore">No attempts yet.</p>
+<div class="progress"><div id="scoreBar"></div></div>
+</div>
+<div class="card">
+<h3>Completed topics</h3>
+<p id="topicStats"></p>
+</div>
+<div class="card">
+<h3>Wrong answers to revise</h3>
+<div id="wrongList"></div>
+</div>
+<button class="danger" onclick="resetProgress()">Reset progress</button>
+</section>
+
+<section id="add" class="section">
+<h2>➕ Add Your Own MCQ</h2>
+<label>Subject</label><input id="newSubject" placeholder="e.g. Anatomy & Physiology">
+<label>Question</label><textarea id="newQuestion" rows="3"></textarea>
+<label>Option A</label><input id="a">
+<label>Option B</label><input id="b">
+<label>Option C</label><input id="c">
+<label>Option D</label><input id="d">
+<label>Correct option</label>
+<select id="answer"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+<label>Explanation</label><textarea id="explanation"></textarea>
+<button onclick="addQuestion()">Add MCQ to Bank</button>
+<hr>
+<h3>Add your own study topic</h3>
+<label>Year</label>
+<select id="newYear"><option>First Year</option><option>Second Year</option><option>Third Year</option></select>
+<label>Subject</label><input id="topicSubject">
+<label>Topic name</label><input id="topicName">
+<label>Short notes</label><textarea id="topicNotes"></textarea>
+<button onclick="addTopic()">Save Topic</button>
+</section>
+</div>
+
+<footer>RUCHI GNM Nursing App • Educational Study Companion</footer>
+
+<script>
+const subjects={
+"First Year":[
+"Anatomy & Physiology","Nursing Foundations","Microbiology",
+"Psychology","Sociology","Nutrition","First Aid",
+"Community Health Nursing I"
+],
+"Second Year":[
+"Medical Surgical Nursing I","Mental Health Nursing",
+"Child Health Nursing","Community Health Nursing II"
+],
+"Third Year":[
+"Midwifery & Gynaecological Nursing","Nursing Research",
+"Nursing Education","Professional Trends & Nursing Management",
+"Community Health Nursing III"
+]};
+
+const topics=[
+{y:"First Year",s:"Anatomy & Physiology",t:"Cell and Tissue",n:"Study cell structure, cell membrane, nucleus, organelles and the four basic tissue types."},
+{y:"First Year",s:"Anatomy & Physiology",t:"Skeletal System",n:"Learn bones, joints, functions of skeleton and major divisions of the human skeleton."},
+{y:"First Year",s:"Anatomy & Physiology",t:"Cardiovascular System",n:"Study heart chambers, valves, blood vessels, circulation and cardiac cycle."},
+{y:"First Year",s:"Anatomy & Physiology",t:"Respiratory System",n:"Study respiratory organs, breathing mechanism and gas exchange."},
+{y:"First Year",s:"Anatomy & Physiology",t:"Digestive System",n:"Learn digestive organs, enzymes, absorption and functions."},
+{y:"First Year",s:"Anatomy & Physiology",t:"Nervous System",n:"Study brain, spinal cord, neurons and peripheral nervous system."},
+{y:"First Year",s:"Nursing Foundations",t:"Introduction to Nursing",n:"Meaning, history, principles, roles and responsibilities of a nurse."},
+{y:"First Year",s:"Nursing Foundations",t:"Vital Signs",n:"Temperature, pulse, respiration, blood pressure and documentation."},
+{y:"First Year",s:"Nursing Foundations",t:"Infection Prevention",n:"Hand hygiene, standard precautions, PPE and safe waste management."},
+{y:"First Year",s:"Nursing Foundations",t:"Patient Hygiene",n:"Personal hygiene, oral care, bed making and patient comfort."},
+{y:"First Year",s:"Microbiology",t:"Introduction to Microbiology",n:"Microorganisms, bacteria, viruses, fungi and their basic characteristics."},
+{y:"First Year",s:"Psychology",t:"Human Behaviour",n:"Learning, memory, motivation, emotion and personality."},
+{y:"First Year",s:"Sociology",t:"Family and Society",n:"Family structure, social groups, culture and social institutions."},
+{y:"First Year",s:"Nutrition",t:"Balanced Diet",n:"Carbohydrates, proteins, fats, vitamins, minerals and water."},
+{y:"First Year",s:"First Aid",t:"Basic First Aid Principles",n:"Scene safety, emergency response and seeking qualified help."},
+{y:"First Year",s:"Community Health Nursing I",t:"Health and Disease",n:"Concepts of health, determinants and levels of prevention."},
+{y:"Second Year",s:"Medical Surgical Nursing I",t:"Preoperative Care",n:"Patient preparation, assessment, communication and safety."},
+{y:"Second Year",s:"Medical Surgical Nursing I",t:"Postoperative Care",n:"Monitoring, comfort, documentation and complication awareness."},
+{y:"Second Year",s:"Medical Surgical Nursing I",t:"Respiratory Disorders",n:"Common respiratory conditions and nursing assessment."},
+{y:"Second Year",s:"Mental Health Nursing",t:"Mental Health Concepts",n:"Mental well-being, stigma, therapeutic communication and support."},
+{y:"Second Year",s:"Mental Health Nursing",t:"Therapeutic Communication",n:"Listening, empathy, respect and professional boundaries."},
+{y:"Second Year",s:"Child Health Nursing",t:"Growth and Development",n:"Growth patterns, developmental milestones and assessment."},
+{y:"Second Year",s:"Child Health Nursing",t:"Immunization",n:"Vaccine concepts, schedule awareness and safe documentation."},
+{y:"Second Year",s:"Community Health Nursing II",t:"Primary Health Care",n:"Primary health care principles and community services."},
+{y:"Third Year",s:"Midwifery & Gynaecological Nursing",t:"Antenatal Care",n:"Antenatal assessment, health education and risk awareness."},
+{y:"Third Year",s:"Midwifery & Gynaecological Nursing",t:"Stages of Labour",n:"Overview of the stages of labour and maternal monitoring."},
+{y:"Third Year",s:"Nursing Research",t:"Research Basics",n:"Research problem, objectives, variables and study designs."},
+{y:"Third Year",s:"Nursing Education",t:"Teaching Methods",n:"Lecture, demonstration, discussion and evaluation."},
+{y:"Third Year",s:"Professional Trends & Nursing Management",t:"Leadership",n:"Leadership styles, teamwork and decision-making."},
+{y:"Third Year",s:"Community Health Nursing III",t:"Health Programme",n:"Study public health programmes and community-level services."}
+];
+
+let questions=[
+["Anatomy & Physiology","Easy","Which organ pumps blood throughout the body?",["Lungs","Heart","Kidney","Liver"],1,"The heart pumps blood through pulmonary and systemic circulation."],
+["Anatomy & Physiology","Easy","How many chambers are present in the human heart?",["Two","Three","Four","Five"],2,"The human heart has two atria and two ventricles."],
+["Anatomy & Physiology","Easy","Which is the largest organ of the human body?",["Liver","Skin","Heart","Lung"],1,"The skin is the largest organ."],
+["Anatomy & Physiology","Medium","Which blood cells mainly carry oxygen?",["WBC","RBC","Platelets","Plasma cells"],1,"Red blood cells contain haemoglobin."],
+["Anatomy & Physiology","Easy","Which organ is mainly responsible for filtering blood to form urine?",["Heart","Kidney","Stomach","Pancreas"],1,"Kidneys filter blood and help form urine."],
+["Anatomy & Physiology","Medium","What is the functional unit of the kidney?",["Neuron","Alveolus","Nephron","Osteon"],2,"The nephron is the functional unit of the kidney."],
+["Nursing Foundations","Easy","What does PPE stand for?",["Patient Protection Equipment","Personal Protective Equipment","Public Prevention Equipment","Personal Patient Examination"],1,"PPE means Personal Protective Equipment."],
+["Nursing Foundations","Easy","Which is an important purpose of hand hygiene?",["Decoration","Infection prevention","Increasing pulse","Improving appetite"],1,"Hand hygiene helps prevent the spread of microorganisms."],
+["Nursing Foundations","Medium","Which instrument is used to measure blood pressure?",["Thermometer","Stethoscope only","Sphygmomanometer","Glucometer"],2,"A sphygmomanometer measures blood pressure."],
+["Nursing Foundations","Easy","Which vital sign measures the number of breaths per minute?",["Pulse","Respiration","Temperature","Blood pressure"],1,"Respiratory rate counts breaths per minute."],
+["Nursing Foundations","Medium","What is the main purpose of nursing documentation?",["Decoration","Continuity of care","Entertainment","Advertising"],1,"Accurate documentation supports safe and continuous care."],
+["Microbiology","Easy","Bacteria are generally classified as:",["Plants","Microorganisms","Organs","Hormones"],1,"Bacteria are microscopic single-celled organisms."],
+["Microbiology","Medium","Which process destroys all forms of microbial life, including spores?",["Cleaning","Sterilization","Dusting","Rinsing"],1,"Sterilization destroys all forms of microbial life."],
+["Nutrition","Easy","Which nutrient is a major source of energy?",["Carbohydrate","Vitamin C","Water","Minerals"],0,"Carbohydrates are a major energy source."],
+["Nutrition","Easy","Which vitamin is important for normal vision?",["Vitamin A","Vitamin B12","Vitamin C","Vitamin K"],0,"Vitamin A supports normal vision."],
+["Psychology","Easy","The process of acquiring knowledge or skills is called:",["Learning","Digestion","Circulation","Excretion"],0,"Learning involves acquiring knowledge, skills or behaviour."],
+["Sociology","Easy","The basic unit of society is commonly considered to be:",["Hospital","Family","Market","School"],1,"Family is a basic social institution."],
+["First Aid","Easy","What should be assessed first at an emergency scene?",["Scene safety","Patient's name","Medical history","Diet"],0,"Scene safety is essential before approaching an emergency."],
+["Community Health Nursing I","Easy","Which is an example of primary prevention?",["Rehabilitation","Vaccination","Disability support","Palliative care"],1,"Vaccination helps prevent disease before it occurs."],
+["Medical Surgical Nursing I","Medium","What is the main purpose of preoperative assessment?",["Entertainment","Identify risks and prepare the patient","Choose a diet only","Discharge immediately"],1,"Assessment helps identify risks and plan safe care."],
+["Medical Surgical Nursing I","Easy","Which position is commonly used to support a patient with breathing difficulty, when appropriate?",["Flat prone","High Fowler's","Trendelenburg","Lithotomy"],1,"High Fowler's may help breathing, depending on the patient's condition."],
+["Mental Health Nursing","Easy","Therapeutic communication requires:",["Judgement","Active listening","Ignoring concerns","Arguing"],1,"Active listening supports therapeutic communication."],
+["Mental Health Nursing","Medium","Confidentiality means:",["Sharing all information publicly","Protecting private patient information","Avoiding documentation","Ignoring consent"],1,"Patient information should be protected and shared appropriately."],
+["Child Health Nursing","Easy","Growth refers mainly to:",["Increase in physical size","Only emotions","Only learning","Social rules"],0,"Growth refers to measurable physical changes."],
+["Child Health Nursing","Medium","Which measurement is commonly used to monitor infant growth?",["Hair length","Weight","Shoe size","Voice"],1,"Weight is an important growth indicator."],
+["Community Health Nursing II","Easy","The first level of contact for many basic health services is:",["Primary health care","Tertiary surgery","Specialist ICU","Research centre"],0,"Primary health care is the first level of contact."],
+["Midwifery & Gynaecological Nursing","Easy","Antenatal care is care provided:",["After menopause","During pregnancy","Only during labour","Only after delivery"],1,"Antenatal care supports maternal and fetal health during pregnancy."],
+["Midwifery & Gynaecological Nursing","Medium","The placenta mainly helps in:",["Gas and nutrient exchange","Chewing","Urine storage","Bone formation"],0,"The placenta supports exchange between maternal and fetal circulation."],
+["Nursing Research","Easy","A research objective describes:",["Study aim","Hospital building","Medicine brand","Patient room"],0,"Objectives state what a study aims to achieve."],
+["Nursing Education","Easy","Demonstration is a teaching method that involves:",["Showing a procedure or skill","Only reading silently","No learner participation","Avoiding explanation"],0,"Demonstration teaches by showing a skill or process."],
+["Professional Trends & Nursing Management","Easy","Delegation means:",["Assigning appropriate tasks","Ignoring responsibilities","Avoiding teamwork","Sharing passwords"],0,"Delegation assigns appropriate tasks while accountability is maintained."],
+["Community Health Nursing III","Easy","Health education aims to:",["Promote informed healthy choices","Replace all treatment","Avoid prevention","Stop communication"],0,"Health education supports informed health decisions."]
+];
+
+let extraQuestions=JSON.parse(localStorage.getItem("ruchi_extra_q")||"[]");
+let customTopics=JSON.parse(localStorage.getItem("ruchi_custom_topics")||"[]");
+let completedTopics=JSON.parse(localStorage.getItem("ruchi_done")||"[]");
+let notes=JSON.parse(localStorage.getItem("ruchi_notes")||"[]");
+let attempts=JSON.parse(localStorage.getItem("ruchi_attempts")||"[]");
+let wrong=JSON.parse(localStorage.getItem("ruchi_wrong")||"[]");
+let practicePool=[],practiceIndex=0,examPool=[],examIndex=0,examAnswers=[];
+let examTimer=null,secondsLeft=0;
+
+function allQuestions(){return questions.concat(extraQuestions)}
+function show(id,btn){
+ document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("selected"));
+ if(btn)btn.classList.add("selected");
+ refreshStats();
+ if(id==="library")renderLibrary();
+ if(id==="notes")renderNotes();
+ if(id==="clinical")renderClinical();
+ if(id==="viva")renderViva();
+ if(id==="progress")renderProgress();
+ if(id==="mcq")startPractice();
+}
+function go(id){
+ let btn=[...document.querySelectorAll(".tabs button")].find(b=>b.getAttribute("onclick").includes("'"+id+"'"));
+ show(id,btn);
+}
+function refreshStats(){
+ document.getElementById("totalQ").textContent=attempts.length;
+ let right=attempts.filter(a=>a.ok).length;
+ document.getElementById("accuracy").textContent=
+ attempts.length?Math.round(right/attempts.length*100)+"%":"0%";
+ document.getElementById("completed").textContent=completedTopics.length;
+ let pct=Math.round(completedTopics.length/Math.max(1,topics.length+customTopics.length)*100);
+ document.getElementById("homeProgress").style.width=pct+"%";
+ document.getElementById("homeProgressText").textContent=pct+"% of listed topics completed";
+}
+function renderLibrary(){
+ let year=document.getElementById("yearFilter").value;
+ let q=document.getElementById("searchTopic").value.toLowerCase();
+ let data=topics.concat(customTopics);
+ let html="";
+ data.forEach((t,i)=>{
+ if(year!=="All"&&t.y!==year)return;
+ if(!(t.s+" "+t.t+" "+t.n).toLowerCase().includes(q))return;
+ let key=t.y+"|"+t.s+"|"+t.t;
+ let done=completedTopics.includes(key);
+ html+=`<div class="item"><b>${t.s}</b><p>${t.y} • ${t.t}</p>
+ <p>${t.n}</p>
+ <button class="${done?"secondary":""}" onclick="toggleTopic('${encodeURIComponent(key)}')">${done?"✓ Completed":"Mark Complete"}</button></div>`;
+ });
+ document.getElementById("libraryList").innerHTML=html||"No topics found.";
+}
+function toggleTopic(encoded){
+ let key=decodeURIComponent(encoded);
+ completedTopics=completedTopics.includes(key)?completedTopics.filter(x=>x!==key):completedTopics.concat(key);
+ localStorage.setItem("ruchi_done",JSON.stringify(completedTopics));
+ renderLibrary();refreshStats();
+}
+function fillSubjects(){
+ let sel=document.getElementById("mcqSubject");
+ subjects["First Year"].concat(subjects["Second Year"],subjects["Third Year"])
+ .forEach(s=>{let o=document.createElement("option");o.textContent=s;o.value=s;sel.appendChild(o)});
+}
+function startPractice(){
+ practicePool=allQuestions().filter(q=>
+ (document.getElementById("mcqSubject").value==="All"||q[0]===document.getElementById("mcqSubject").value)&&
+ (document.getElementById("difficulty").value==="All"||q[1]===document.getElementById("difficulty").value));
+ practicePool.sort(()=>Math.random()-.5);practiceIndex=0;showPractice();
+}
+function showPractice(){
+ let area=document.getElementById("questionArea");
+ if(!practicePool.length){area.innerHTML="No questions available for this filter. Try another subject.";return}
+ if(practiceIndex>=practicePool.length){area.innerHTML="<h3>Practice completed! 🎉</h3><button onclick='startPractice()'>Practice Again</button>";return}
+ let q=practicePool[practiceIndex];
+ area.innerHTML=`<p class="small">${q[0]} • ${q[1]} • Question ${practiceIndex+1}/${practicePool.length}</p>
+ <h3>${q[2]}</h3><div id="options"></div><div id="feedback"></div>`;
+ q[3].forEach((op,i)=>{
+ let b=document.createElement("button");b.className="option";
+ b.textContent=String.fromCharCode(65+i)+". "+op;
+ b.onclick=()=>answerPractice(i,b);document.getElementById("options").appendChild(b);
+ });
+}
+function answerPractice(i,button){
+ let q=practicePool[practiceIndex];
+ let ok=i===q[4];
+ document.querySelectorAll("#options button").forEach((b,j)=>{
+ b.disabled=true;if(j===q[4])b.classList.add("correct");
+ if(j===i&&!ok)b.classList.add("wrong");
+ });
+ recordAnswer(q,i,ok);
+ document.getElementById("feedback").innerHTML=
+ `<div class="result"><b>${ok?"Correct! ✓":"Incorrect"}</b><p>Correct answer: ${q[3][q[4]]}</p><p>${q[5]}</p>
+ <button onclick="practiceIndex++;showPractice()">Next Question</button></div>`;
+}
+function recordAnswer(q,i,ok){
+ attempts.push({q:q[2],ok:ok});
+ if(!ok&&!wrong.some(x=>x.q===q[2]))wrong.push({q:q[2],correct:q[3][q[4]],explain:q[5]});
+ localStorage.setItem("ruchi_attempts",JSON.stringify(attempts));
+ localStorage.setItem("ruchi_wrong",JSON.stringify(wrong));
+ refreshStats();
+}
+function startExam(){
+ clearInterval(examTimer);
+ let count=Number(document.getElementById("examCount").value);
+ examPool=allQuestions().sort(()=>Math.random()-.5).slice(0,count);
+ examIndex=0;examAnswers=[];
+ secondsLeft=Number(document.getElementById("examTime").value)*60;
+ document.getElementById("examArea").innerHTML=
+ `<h3 id="timer">Time: ${formatTime(secondsLeft)}</h3><div id="examQuestion"></div>`;
+ examTimer=setInterval(()=>{
+ secondsLeft--;document.getElementById("timer").textContent="Time: "+formatTime(secondsLeft);
+ if(secondsLeft<=0)finishExam();
+ },1000);
+ showExamQuestion();
+}
+function formatTime(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function showExamQuestion(){
+ if(examIndex>=examPool.length){finishExam();return}
+ let q=examPool[examIndex];
+ let box=document.getElementById("examQuestion");
+ box.innerHTML=`<p class="small">Question ${examIndex+1} of ${examPool.length}</p><h3>${q[2]}</h3><div id="examOptions"></div>`;
+ q[3].forEach((op,i)=>{
+ let b=document.createElement("button");b.className="option";
+ b.textContent=String.fromCharCode(65+i)+". "+op;
+ b.onclick=()=>{examAnswers[examIndex]=i;examIndex++;showExamQuestion()};
+ document.getElementById("examOptions").appendChild(b);
+ });
+}
+function finishExam(){
+ if(!examPool.length)return;
+ clearInterval(examTimer);
+ let score=0;
+ examPool.forEach((q,i)=>{
+ let ans=examAnswers[i];
+ let ok=ans===q[4];if(ok)score++;
+ if(ans!==undefined)recordAnswer(q,ans,ok);
+ });
+ document.getElementById("examArea").innerHTML=
+ `<h3>Test Completed 🎉</h3><h2>${score}/${examPool.length}</h2>
+ <p>Percentage: ${Math.round(score/examPool.length*100)}%</p>
+ <p>${score>=examPool.length*.6?"Good work! Keep revising.":"Keep practising and revise the topics again."}</p>
+ <button onclick="startExam()">Try Again</button>`;
+ examPool=[];
+}
+function saveNote(){
+ let title=document.getElementById("noteTitle").value.trim();
+ let body=document.getElementById("noteBody").value.trim();
+ if(!title||!body){alert("Enter title and notes");return}
+ notes.unshift({title,body});
+ localStorage.setItem("ruchi_notes",JSON.stringify(notes));
+ document.getElementById("noteTitle").value="";
+ document.getElementById("noteBody").value="";
+ renderNotes();
+}
+function renderNotes(){
+ document.getElementById("noteList").innerHTML=notes.map((n,i)=>
+ `<div class="item"><h3>${escapeHTML(n.title)}</h3><p>${escapeHTML(n.body)}</p>
+ <button class="danger" onclick="deleteNote(${i})">Delete</button></div>`).join("")||"No notes saved.";
+}
+function deleteNote(i){notes.splice(i,1);localStorage.setItem("ruchi_notes",JSON.stringify(notes));renderNotes()}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderClinical(){
+ let items=[
+ ["Hand hygiene","Purpose, indications, hand hygiene moments and handwashing principles."],
+ ["Vital signs","Temperature, pulse, respiration, blood pressure and documentation."],
+ ["Patient assessment","History, observation, communication and documentation."],
+ ["Bed making","Comfort, privacy, patient safety and clean linen principles."],
+ ["Infection prevention","Standard precautions, PPE, hand hygiene and waste segregation."],
+ ["Medication safety","Understand prescriptions, patient identification and reporting errors."],
+ ["Nursing care plan","Assessment, nursing diagnosis, goals, interventions and evaluation."],
+ ["Patient education","Clear communication, health literacy and checking understanding."]
+ ];
+ document.getElementById("clinicalList").innerHTML=items.map(x=>
+ `<div class="item"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join("");
+}
+function renderViva(){
+ let qs=[
+ ["What is nursing?","Nursing is the care of individuals, families and communities to promote health, prevent illness and support recovery."],
+ ["What are vital signs?","Temperature, pulse, respiration and blood pressure are commonly measured vital signs."],
+ ["What is asepsis?","Asepsis refers to practices that prevent contamination by microorganisms."],
+ ["What is a nursing diagnosis?","A clinical judgement about a person's responses to actual or potential health conditions."],
+ ["What is health education?","A learning process that helps people make informed health-related decisions."],
+ ["What is communication?","The process of exchanging information, ideas and feelings."],
+ ["What is immunity?","The body's ability to resist or respond to infection and disease."],
+ ["What is a balanced diet?","A diet that provides appropriate amounts of essential nutrients."],
+ ["What is documentation?","Recording relevant patient care information accurately and clearly."],
+ ["What is primary prevention?","Actions that prevent disease before it occurs."]
+ ];
+ document.getElementById("vivaList").innerHTML=qs.map((q,i)=>
+ `<details class="item"><summary><b>${q[0]}</b></summary><p>${q[1]}</p></details>`).join("");
+}
+function renderProgress(){
+ let right=attempts.filter(a=>a.ok).length;
+ let pct=attempts.length?Math.round(right/attempts.length*100):0;
+ document.getElementById("progressScore").textContent=
+ `${right} correct out of ${attempts.length} attempted (${pct}%)`;
+ document.getElementById("scoreBar").style.width=pct+"%";
+ document.getElementById("topicStats").textContent=
+ `${completedTopics.length} of ${topics.length+customTopics.length} listed topics completed.`;
+ document.getElementById("wrongList").innerHTML=wrong.map(w=>
+ `<div class="item"><b>${escapeHTML(w.q)}</b><p>Answer: ${escapeHTML(w.correct)}</p><p>${escapeHTML(w.explain)}</p></div>`).join("")||"No wrong answers recorded.";
+}
+function addQuestion(){
+ let s=document.getElementById("newSubject").value.trim();
+ let q=document.getElementById("newQuestion").value.trim();
+ let opts=["a","b","c","d"].map(x=>document.getElementById(x).value.trim());
+ let ans=Number(document.getElementById("answer").value);
+ let exp=document.getElementById("explanation").value.trim();
+ if(!s||!q||opts.some(x=>!x)||!exp){alert("Please fill all fields");return}
+ extraQuestions.push([s,"Medium",q,opts,ans,exp]);
+ localStorage.setItem("ruchi_extra_q",JSON.stringify(extraQuestions));
+ alert("MCQ added successfully!");
+ document.getElementById("newQuestion").value="";
+ ["a","b","c","d","explanation"].forEach(x=>document.getElementById(x).value="");
+}
+function addTopic(){
+ let y=document.getElementById("newYear").value;
+ let s=document.getElementById("topicSubject").value.trim();
+ let t=document.getElementById("topicName").value.trim();
+ let n=document.getElementById("topicNotes").value.trim();
+ if(!s||!t||!n){alert("Fill all topic fields");return}
+ customTopics.push({y,s,t,n});
+ localStorage.setItem("ruchi_custom_topics",JSON.stringify(customTopics));
+ alert("Topic added!");
+ ["topicSubject","topicName","topicNotes"].forEach(x=>document.getElementById(x).value="");
+}
+function resetProgress(){
+ if(!confirm("Reset all MCQ attempts, wrong answers and completed topics?"))return;
+ attempts=[];wrong=[];completedTopics=[];
+ ["ruchi_attempts","ruchi_wrong","ruchi_done"].forEach(k=>localStorage.removeItem(k));
+ renderProgress();refreshStats();
+}
+fillSubjects();
+refreshStats();
+renderLibrary();
+</script>
+</body>
+</html>
