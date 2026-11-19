@@ -1,5 +1,5 @@
-const CACHE_NAME="ruchi-gnm-shell-v1";
-const APP_FILES=["./","./index.html","./manifest.webmanifest","./icon.svg"];
+const CACHE_NAME="ruchi-gnm-shell-v2";
+const APP_FILES=["./","./index.html","./manifest.webmanifest","./icon.svg","./assets/book-covers/gnm-syllabus.svg","./assets/book-covers/anatomy-physiology.svg","./assets/book-covers/nursing-fundamentals.svg","./assets/book-covers/nursing-skills.svg","./assets/book-covers/nursing-pharmacology.svg"];
 self.addEventListener("install",event=>{
  event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_FILES)).then(()=>self.skipWaiting()));
 });
