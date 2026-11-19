@@ -473,8 +473,25 @@ function renderNotes(){
 }
 function deleteNote(i){notes.splice(i,1);localStorage.setItem("ruchi_notes",JSON.stringify(notes));renderNotes()}
 function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-const recommendedBooks=[["Fundamentals of Nursing","B. T. Basavanthappa","Nursing Foundations"],["Textbook of Medical-Surgical Nursing","B. T. Basavanthappa","Medical-Surgical Nursing"],["Textbook of Midwifery and Reproductive Health Nursing","B. T. Basavanthappa","Midwifery"],["Textbook of Child Health Nursing","B. T. Basavanthappa","Child Health Nursing"],["Textbook of Community Health Nursing","B. T. Basavanthappa","Community Health"],["Psychiatric Mental Health Nursing","B. T. Basavanthappa","Mental Health"],["Park's Textbook of Preventive and Social Medicine","K. Park","Community Health"]];
-function renderBooks(){document.getElementById("recommendedBooks").innerHTML="<h3>Suggested references</h3>"+recommendedBooks.map(b=>'<div class="item"><b>'+escapeHTML(b[0])+'</b><p>'+escapeHTML(b[1])+' · '+escapeHTML(b[2])+'</p><a href="https://www.google.com/search?q='+encodeURIComponent(b[0]+' '+b[1]+' book')+'" target="_blank" rel="noopener">Find listings</a></div>').join("");document.getElementById("myBooks").innerHTML="<h3>My saved books</h3>"+(personalBooks.map((b,i)=>'<div class="item"><b>'+escapeHTML(b.title)+'</b><p>'+escapeHTML(b.author)+' · '+escapeHTML(b.subject)+'</p>'+(b.link?'<a href="'+escapeHTML(b.link)+'" target="_blank" rel="noopener">Open link</a> ' : '')+'<button class="danger" onclick="deleteBook('+i+')">Remove</button></div>').join("")||"No books saved yet.");}
+const recommendedBooks=[
+{title:"GNM Syllabus (3-Year Revised)",author:"Indian Nursing Council curriculum · hosted by AP Nursing Council",type:"Official course syllabus",url:"https://apnc.nic.in/pdf/syllabus/GNM_Syllabus.pdf",format:"pdf",license:"Official syllabus PDF"},
+{title:"Anatomy & Physiology 2e",author:"OpenStax, Rice University",type:"Open textbook · relevant to GNM Bio-Sciences",url:"https://assets.openstax.org/oscms-prodcms/media/documents/Anatomy_and_Physiology_2e_-_WEB_c9nD9QL.pdf",format:"pdf",license:"CC BY-NC-SA 4.0 · attribution required"},
+{title:"Nursing Fundamentals, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · fundamentals",url:"https://www.ncbi.nlm.nih.gov/sites/books/NBK610815/pdf/Bookshelf_NBK610815.pdf",format:"pdf",license:"CC BY 4.0 · attribution required"},
+{title:"Nursing Skills, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · assessment and skills",url:"https://www.ncbi.nlm.nih.gov/sites/books/NBK596735/?report=reader",format:"web",license:"CC BY 4.0 · attribution required"},
+{title:"Nursing Pharmacology, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · pharmacology",url:"https://www.ncbi.nlm.nih.gov/sites/books/NBK595000/?report=reader",format:"web",license:"CC BY 4.0 · attribution required"}
+];
+function renderBooks(){
+ document.getElementById("recommendedBooks").innerHTML="<h3>Real books you can read here</h3><p class=\"small\">Free official or openly licensed resources. GNM chapters are ordered by INC; open nursing textbooks may follow a different curriculum.</p>"+recommendedBooks.map((b,i)=>'<div class="item"><h3>'+escapeHTML(b.title)+'</h3><p>'+escapeHTML(b.author)+'</p><p>'+escapeHTML(b.type)+'</p><p class="small">'+escapeHTML(b.license)+'</p><button onclick="readOpenBook('+i+')">Open book pages</button> <a href="'+escapeHTML(b.url)+'" target="_blank" rel="noopener">Source / download</a></div>').join("");
+ document.getElementById("myBooks").innerHTML="<h3>My saved books</h3>"+(personalBooks.map((b,i)=>'<div class="item"><b>'+escapeHTML(b.title)+'</b><p>'+escapeHTML(b.author)+' · '+escapeHTML(b.subject)+'</p>'+(b.link?'<a href="'+escapeHTML(b.link)+'" target="_blank" rel="noopener">Open link</a> ' : '')+'<button class="danger" onclick="deleteBook('+i+')">Remove</button></div>').join("")||"No books saved yet.");
+}
+function readOpenBook(i){
+ const b=recommendedBooks[i];if(!b)return;
+ const viewer=document.getElementById("pdfBookViewer"),fallback=document.getElementById("pdfBookFallback");
+ viewer.src=b.url;viewer.style.display="block";
+ fallback.href=b.url;fallback.textContent="If the pages do not show here, open the source book";fallback.style.display="inline-block";
+ document.getElementById("pdfBookName").textContent="Reading: "+b.title+" · "+(b.format==="pdf"?"PDF pages":"online book");
+ viewer.scrollIntoView({behavior:"smooth",block:"start"});
+}
 function addBook(){let title=document.getElementById("bookTitle").value.trim(),author=document.getElementById("bookAuthor").value.trim(),subject=document.getElementById("bookSubject").value.trim(),link=document.getElementById("bookLink").value.trim();if(!title||!author||!subject){alert("Enter title, author and subject");return}if(link&&!link.startsWith("https://")){alert("Link should start with https://");return}personalBooks.unshift({title,author,subject,link});localStorage.setItem("ruchi_books",JSON.stringify(personalBooks));["bookTitle","bookAuthor","bookSubject","bookLink"].forEach(id=>document.getElementById(id).value="");renderBooks()}
 function deleteBook(i){personalBooks.splice(i,1);localStorage.setItem("ruchi_books",JSON.stringify(personalBooks));renderBooks()}
 const readerGuides={
