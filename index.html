@@ -118,7 +118,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 <div id="libraryList"></div>
 </section>
 
-<section id="books" class="section"><h2>📚 Bookshelf & Reading List</h2><p class="small">Suggested study references; confirm your college list and current editions. Copyrighted books are not hosted here.</p><div class="card"><h3>Official syllabus</h3><a href="https://indiannursingcouncil.org/publications" target="_blank" rel="noopener">Indian Nursing Council publications</a> · <a href="https://apnc.nic.in/pdf/syllabus/GNM_Syllabus.pdf" target="_blank" rel="noopener">GNM syllabus PDF</a></div><div id="recommendedBooks"></div><div class="card"><h3>Add a book</h3><label>Title</label><input id="bookTitle"><label>Author</label><input id="bookAuthor"><label>Subject</label><input id="bookSubject"><label>Optional https link</label><input id="bookLink" placeholder="https://..."><button onclick="addBook()">Save Book</button></div><div id="myBooks"></div></section>
+<section id="books" class="section"><h2>📚 Bookshelf & Reading List</h2><p class="small">Suggested study references; confirm your college list and current editions. Copyrighted books are not hosted here.</p><div class="card"><h3>Official syllabus</h3><a href="https://indiannursingcouncil.org/publications" target="_blank" rel="noopener">Indian Nursing Council publications</a> · <a href="https://apnc.nic.in/pdf/syllabus/GNM_Syllabus.pdf" target="_blank" rel="noopener">GNM syllabus PDF</a></div><div class="card"><h3>Read your book PDF in the app</h3><p>Select a PDF saved on this device. It opens here in the browser and is not uploaded to GitHub or stored online. Select it again after closing or refreshing the app.</p><label for="pdfBookFile">Choose a PDF book</label><input id="pdfBookFile" type="file" accept="application/pdf" onchange="loadPdfBook()"><p id="pdfBookName" class="small">No PDF selected.</p><iframe id="pdfBookViewer" title="Book PDF reader" style="display:none;width:100%;height:75vh;border:1px solid #d8e0eb;border-radius:10px;background:white"></iframe><a id="pdfBookFallback" style="display:none" target="_blank" rel="noopener">Open PDF in a new tab</a></div><div id="recommendedBooks"></div><div class="card"><h3>Add a book</h3><label>Title</label><input id="bookTitle"><label>Author</label><input id="bookAuthor"><label>Subject</label><input id="bookSubject"><label>Optional https link</label><input id="bookLink" placeholder="https://..."><button onclick="addBook()">Save Book</button></div><div id="myBooks"></div></section>
 <section id="reader" class="section">
 <h2>📖 GNM Chapter Reader</h2>
 <p class="small">Original study notes arranged as readable chapter pages. Use your college notes and current clinical guidance alongside these summaries.</p>
@@ -513,6 +513,18 @@ function openLesson(i){
  const prompts=["What are the main ideas in this chapter?","How does this topic connect with safe, respectful nursing care?","Which terms or points should you review with your teacher?"];
  document.getElementById("readerPage").innerHTML='<article class="card"><p class="small">'+escapeHTML(t.y)+' · '+escapeHTML(t.s)+'</p><h2>'+escapeHTML(t.t)+'</h2><h3>Chapter overview</h3><p>'+escapeHTML(t.n)+'</p><h3>Study notes</h3><p>'+escapeHTML(guide)+'</p><h3>Revision prompts</h3><ol>'+prompts.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol><p class="small">Educational notes only. Clinical practice must follow your college, supervisor and current local protocols.</p></article>';
  document.getElementById("readerPage").scrollIntoView({behavior:"smooth",block:"start"});
+}
+\nlet activeBookPdfUrl="";
+function loadPdfBook(){
+ const file=document.getElementById("pdfBookFile").files[0];
+ if(!file)return;
+ if(file.type!=="application/pdf"){alert("Please choose a PDF file.");return}
+ if(activeBookPdfUrl)URL.revokeObjectURL(activeBookPdfUrl);
+ activeBookPdfUrl=URL.createObjectURL(file);
+ const viewer=document.getElementById("pdfBookViewer"),fallback=document.getElementById("pdfBookFallback");
+ viewer.src=activeBookPdfUrl;viewer.style.display="block";
+ fallback.href=activeBookPdfUrl;fallback.style.display="inline-block";
+ document.getElementById("pdfBookName").textContent=file.name+" · "+Math.max(1,Math.ceil(file.size/1024/1024))+" MB";
 }
 \nfunction renderClinical(){
  let items=[
