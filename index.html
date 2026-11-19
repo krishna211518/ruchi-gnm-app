@@ -71,6 +71,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
  <button class="selected" onclick="show('home',this)">Home</button>
  <button onclick="show('library',this)">Study</button><button onclick="show('reader',this)">Read Chapters</button><button onclick="show('books',this)">Books</button>
  <button onclick="show('mcq',this)">MCQ Bank</button>
+ <button onclick="show('flashcards',this)">Flashcards</button>
  <button onclick="show('exam',this)">Mock Test</button>
  <button onclick="show('notes',this)">My Notes</button>
  <button onclick="show('clinical',this)">Clinical</button>
@@ -85,6 +86,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
 <div class="grid">
  <div class="card"><div class="emoji">📚</div><h3>Study Library</h3><p>Year-wise subjects and topics.</p><button onclick="go('library')">Open Study</button></div>
  <div class="card"><div class="emoji">🧠</div><h3>MCQ Practice</h3><p>Test your nursing knowledge.</p><button onclick="go('mcq')">Practice MCQs</button></div>
+ <div class="card"><div class="emoji">🃏</div><h3>Flashcard Revision</h3><p>Revise answers and explanations, including questions you got wrong.</p><button onclick="go('flashcards')">Study Flashcards</button></div>
  <div class="card"><div class="emoji">📝</div><h3>Mock Test</h3><p>Timed exam practice.</p><button onclick="go('exam')">Start Test</button></div>
  <div class="card"><div class="emoji">🩻</div><h3>Clinical Learning</h3><p>Skills, safety and care plans.</p><button onclick="go('clinical')">Explore</button></div>
  <div class="card"><div class="emoji">🎤</div><h3>Viva Practice</h3><p>Important oral questions.</p><button onclick="go('viva')">Start Viva</button></div>
@@ -128,6 +130,14 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
 <div class="card">
 <div id="questionArea">Select your practice options to begin.</div>
 </div>
+</section>
+
+<section id="flashcards" class="section">
+<h2>🃏 Flashcard Revision</h2>
+<p class="small">Question bank se banaye gaye cards. Pehle answer yaad karo, phir card palat kar answer aur explanation dekho.</p>
+<label for="flashcardMode">Cards to study</label>
+<select id="flashcardMode" onchange="startFlashcards()"><option value="all">All questions</option><option value="wrong">Wrong answers only</option></select>
+<div class="card" id="flashcardArea" aria-live="polite"></div>
 </section>
 
 <section id="exam" class="section">
@@ -328,6 +338,7 @@ let notes=loadJSON("ruchi_notes",[]);
 let attempts=loadJSON("ruchi_attempts",[]);
 let wrong=loadJSON("ruchi_wrong",[]);
 let practicePool=[],practiceIndex=0,examPool=[],examIndex=0,examAnswers=[];
+let flashcardPool=[],flashcardIndex=0,flashcardFlipped=false,flashcardKnown=loadJSON("ruchi_flashcard_known",[]);
 let examTimer=null,secondsLeft=0;
 
 function allQuestions(){return questions.concat(extraQuestions)}
@@ -422,6 +433,29 @@ function recordAnswer(q,i,ok){
  saveJSON("ruchi_wrong",wrong);
  refreshStats();
 }
+function startFlashcards(){
+ const mode=document.getElementById("flashcardMode").value;
+ flashcardPool=allQuestions().filter(q=>mode!=="wrong"||wrong.some(item=>item.q===q[2]));
+ flashcardPool.sort(()=>Math.random()-.5);flashcardIndex=0;flashcardFlipped=false;renderFlashcard();
+}
+function renderFlashcard(){
+ const area=document.getElementById("flashcardArea");area.innerHTML="";
+ if(!flashcardPool.length){area.innerHTML=document.getElementById("flashcardMode").value==="wrong"?"<h3>No wrong answers to revise yet</h3><p>MCQ practice mein questions try karo; galat answers yahan aa jayenge.</p>":"<h3>No questions available</h3>";return}
+ if(flashcardIndex>=flashcardPool.length){area.innerHTML="<h3>Revision round complete 🎉</h3><p>"+flashcardKnown.length+" cards marked as known.</p>";area.appendChild(flashcardButton("Study again",startFlashcards));return}
+ const q=flashcardPool[flashcardIndex],known=flashcardKnown.includes(q[2]);
+ const meta=document.createElement("p");meta.className="small";meta.textContent=q[0]+" · Card "+(flashcardIndex+1)+" of "+flashcardPool.length;area.appendChild(meta);
+ const question=document.createElement("h3");question.textContent=q[2];area.appendChild(question);
+ if(flashcardFlipped){const answer=document.createElement("div");answer.className="result";const label=document.createElement("b");label.textContent="Answer: "+q[3][q[4]];const explanation=document.createElement("p");explanation.textContent=q[5];answer.append(label,explanation);area.appendChild(answer)}else{const hint=document.createElement("p");hint.textContent="Answer yaad karne ki koshish karo, phir neeche tap karo.";area.appendChild(hint)}
+ area.appendChild(flashcardButton(flashcardFlipped?"Hide answer":"Show answer",flipFlashcard));
+ const controls=document.createElement("div");controls.style.cssText="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px";
+ controls.append(flashcardButton("Previous",()=>changeFlashcard(-1),true),flashcardButton(known?"✓ Known — remove mark":"I know this",()=>markFlashcardKnown(flashcardIndex),true),flashcardButton("Revise again",()=>markFlashcardReview(flashcardIndex),true),flashcardButton("Next",()=>changeFlashcard(1),true));area.appendChild(controls);
+}
+function flashcardButton(label,action,secondary){const button=document.createElement("button");button.type="button";button.textContent=label;if(secondary)button.className="secondary";button.onclick=action;return button}
+function flipFlashcard(){flashcardFlipped=!flashcardFlipped;renderFlashcard()}
+function changeFlashcard(step){flashcardIndex=Math.max(0,Math.min(flashcardPool.length,flashcardIndex+step));flashcardFlipped=false;renderFlashcard()}
+function markFlashcardKnown(i){const q=flashcardPool[i];if(!q)return;if(flashcardKnown.includes(q[2]))flashcardKnown=flashcardKnown.filter(text=>text!==q[2]);else flashcardKnown.push(q[2]);saveJSON("ruchi_flashcard_known",flashcardKnown);renderFlashcard()}
+function markFlashcardReview(i){const q=flashcardPool[i];if(!q)return;flashcardKnown=flashcardKnown.filter(text=>text!==q[2]);saveJSON("ruchi_flashcard_known",flashcardKnown);changeFlashcard(1)}
+
 function startExam(){
  clearInterval(examTimer);
  let count=Number(document.getElementById("examCount").value);
