@@ -303,7 +303,7 @@ function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSO
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function reviewWrongAnswers(){const missed=allQuestions().filter(q=>wrong.some(item=>item.q===q[2]));if(!missed.length){document.getElementById("questionArea").textContent="No wrong answers to review yet. Try some questions first.";return}practicePool=missed.sort(()=>Math.random()-.5);practiceIndex=0;showPractice()}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_topic_days"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_topic_days","ruchi_topic_days"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -382,7 +382,8 @@ function toggleTopic(encoded){
 }
 function fillSubjects(){
  const sel=document.getElementById("mcqSubject"),previous=sel.value||"All";
- const names=[...new Set(allQuestions().map(q=>q[0]))].sort();
+ const topicSubjects=topics.concat(customTopics).map(t=>t.s),courseSubjects=Object.values(subjects).flat();
+ const names=[...new Set(allQuestions().map(q=>q[0]).concat(topicSubjects,courseSubjects))].sort();
  sel.innerHTML='<option value="All">All Subjects</option>'+names.map(name=>'<option value="'+escapeHTML(name)+'">'+escapeHTML(name)+'</option>').join("");
  sel.value=names.includes(previous)?previous:"All";
 }
@@ -532,6 +533,7 @@ function renderReader(){
  document.getElementById("readerIndex").innerHTML=rows.map(x=>'<div class="item"><b>'+escapeHTML(x.t.s)+'</b><p>'+escapeHTML(x.t.y)+' · '+escapeHTML(x.t.t)+'</p><button onclick="openLesson('+x.i+')">Read chapter</button></div>').join("")||"No chapters match your search.";
 }
 function openLesson(i){
+ go("reader");
  const t=topics.concat(customTopics)[i];
  if(!t)return;
  const guide=readerGuides[t.s]||"Read the chapter outline, define its key terms, connect the ideas to the subject, then review your class notes and current approved references. Write a short summary and discuss questions with your teacher.";
@@ -602,7 +604,7 @@ function addQuestion(){
  let exp=document.getElementById("explanation").value.trim();
  if(!s||!q||opts.some(x=>!x)||!exp){alert("Please fill all fields");return}
  extraQuestions.push([s,"Medium",q,opts,ans,exp]);
- saveJSON("ruchi_extra_q",extraQuestions);
+ saveJSON("ruchi_extra_q",extraQuestions);fillSubjects();
  alert("MCQ added successfully!");
  document.getElementById("newQuestion").value="";
  ["a","b","c","d","explanation"].forEach(x=>document.getElementById(x).value="");
@@ -620,8 +622,8 @@ function addTopic(){
 }
 function resetProgress(){
  if(!confirm("Reset all MCQ attempts, wrong answers and completed topics?"))return;
- attempts=[];wrong=[];completedTopics=[];
- ["ruchi_attempts","ruchi_wrong","ruchi_done"].forEach(k=>localStorage.removeItem(k));
+ attempts=[];wrong=[];completedTopics=[];topicDays={};
+ ["ruchi_attempts","ruchi_wrong","ruchi_done","ruchi_topic_days"].forEach(key=>localStorage.removeItem(key));
  renderProgress();refreshStats();
 }
 if(loadJSON("ruchi_theme",false)){document.body.classList.add("dark");document.getElementById("themeToggle").textContent="☀️ Light"}
