@@ -490,19 +490,22 @@ function escapeHTML(value){return String(value??"").replace(/&/g,"&amp;").replac
 const recommendedBooks=[
 {title:"GNM Syllabus (3-Year Revised)",author:"Indian Nursing Council curriculum · hosted by AP Nursing Council",type:"Official course syllabus",url:"https://apnc.nic.in/pdf/syllabus/GNM_Syllabus.pdf",format:"pdf",license:"Official syllabus PDF"},
 {title:"Anatomy & Physiology 2e",author:"OpenStax, Rice University",type:"Open textbook · relevant to GNM Bio-Sciences",url:"https://openstax.org/books/anatomy-and-physiology-2e/pages/1-introduction",format:"web",license:"CC BY-NC-SA 4.0 · attribution required"},
-{title:"Nursing Fundamentals, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · fundamentals",url:"https://www.ncbi.nlm.nih.gov/books/NBK610815/",format:"web",license:"CC BY 4.0 · attribution required"},
+{title:"Nursing Fundamentals, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · fundamentals",url:"https://www.ncbi.nlm.nih.gov/sites/books/NBK610815/pdf/Bookshelf_NBK610815.pdf",format:"pdf",license:"CC BY 4.0 · attribution required"},
 {title:"Nursing Skills, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · assessment and skills",url:"https://www.ncbi.nlm.nih.gov/books/NBK596735/",format:"web",license:"CC BY 4.0 · attribution required"},
 {title:"Nursing Pharmacology, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · pharmacology",url:"https://www.ncbi.nlm.nih.gov/books/NBK595000/",format:"web",license:"CC BY 4.0 · attribution required"}
 ];
 function renderBooks(){
- document.getElementById("recommendedBooks").innerHTML="<h3>Real books you can read here</h3><p class=\"small\">Free official or openly licensed resources. GNM chapters are ordered by INC; open nursing textbooks may follow a different curriculum.</p>"+recommendedBooks.map((b,i)=>'<div class="item"><h3>'+escapeHTML(b.title)+'</h3><p>'+escapeHTML(b.author)+'</p><p>'+escapeHTML(b.type)+'</p><p class="small">'+escapeHTML(b.license)+'</p><button onclick="readOpenBook('+i+')">Read full book</button> <a href="'+escapeHTML(b.url)+'" target="_blank" rel="noopener">Source / download</a></div>').join("");
+ document.getElementById("recommendedBooks").innerHTML="<h3>Real books you can read here</h3><p class=\"small\">Free official or openly licensed resources. GNM chapters are ordered by INC; open nursing textbooks may follow a different curriculum.</p>"+recommendedBooks.map((b,i)=>'<div class="item"><h3>'+escapeHTML(b.title)+'</h3><p>'+escapeHTML(b.author)+'</p><p>'+escapeHTML(b.type)+'</p><p class="small">'+escapeHTML(b.license)+'</p><button onclick="readOpenBook('+i+')">Read in app</button> <a href="'+escapeHTML(b.url)+'" target="_blank" rel="noopener">Source / download</a></div>').join("");
  document.getElementById("myBooks").innerHTML="<h3>My saved books</h3>"+(personalBooks.map((b,i)=>'<div class="item"><b>'+escapeHTML(b.title)+'</b><p>'+escapeHTML(b.author)+' · '+escapeHTML(b.subject)+'</p>'+(b.link?'<a href="'+escapeHTML(b.link)+'" target="_blank" rel="noopener">Open link</a> ' : '')+'<button class="danger" onclick="deleteBook('+i+')">Remove</button></div>').join("")||"No books saved yet.");
 }
 function readOpenBook(i){
- const b=recommendedBooks[i];if(!b)return;
- document.getElementById("pdfBookName").textContent="Opening "+b.title+" from its official free reader.";
- const opened=window.open(b.url,"_blank");
- if(opened)opened.opener=null;else window.location.href=b.url;
+ const book=recommendedBooks[i];if(!book)return;
+ const viewer=document.getElementById("pdfBookViewer"),fallback=document.getElementById("pdfBookFallback");
+ const viewUrl=book.format==="pdf"?"https://docs.google.com/gview?embedded=1&url="+encodeURIComponent(book.url):book.url;
+ viewer.src=viewUrl;viewer.style.display="block";
+ fallback.href=book.url;fallback.target="_self";fallback.textContent="If the embedded reader is blocked, open the official book in this tab";fallback.style.display="inline-block";
+ document.getElementById("pdfBookName").textContent="Reading in app: "+book.title;
+ viewer.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function addBook(){let title=document.getElementById("bookTitle").value.trim(),author=document.getElementById("bookAuthor").value.trim(),subject=document.getElementById("bookSubject").value.trim(),link=document.getElementById("bookLink").value.trim();if(!title||!author||!subject){alert("Enter title, author and subject");return}if(link&&!link.startsWith("https://")){alert("Link should start with https://");return}personalBooks.unshift({title,author,subject,link});saveJSON("ruchi_books",personalBooks);["bookTitle","bookAuthor","bookSubject","bookLink"].forEach(id=>document.getElementById(id).value="");renderBooks()}
 function deleteBook(i){personalBooks.splice(i,1);saveJSON("ruchi_books",personalBooks);renderBooks()}
