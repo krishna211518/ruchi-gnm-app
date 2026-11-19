@@ -124,6 +124,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
 <option>Easy</option><option>Medium</option><option>Hard</option>
 </select>
 <button class="secondary" type="button" onclick="reviewWrongAnswers()">Review wrong answers</button>
+<input id="mcqSearch" placeholder="Search questions..." oninput="startPractice()">
 <div class="card">
 <div id="questionArea">Select your practice options to begin.</div>
 </div>
@@ -304,7 +305,7 @@ function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSO
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_topic_days"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -391,7 +392,8 @@ function fillSubjects(){
 function startPractice(){
  practicePool=allQuestions().filter(q=>
  (document.getElementById("mcqSubject").value==="All"||q[0]===document.getElementById("mcqSubject").value)&&
- (document.getElementById("difficulty").value==="All"||q[1]===document.getElementById("difficulty").value));
+ (document.getElementById("difficulty").value==="All"||q[1]===document.getElementById("difficulty").value)&&
+ (document.getElementById("mcqSearch").value.trim()===""||q[2].toLowerCase().includes(document.getElementById("mcqSearch").value.trim().toLowerCase())));
  practicePool.sort(()=>Math.random()-.5);practiceIndex=0;showPractice();
 }
 function showPractice(){
@@ -619,7 +621,7 @@ function addTopic(){
  let n=document.getElementById("topicNotes").value.trim();
  if(!s||!t||!n){alert("Fill all topic fields");return}
  customTopics.push({y,s,t,n});
- saveJSON("ruchi_custom_topics",customTopics);
+ saveJSON("ruchi_custom_topics",customTopics);fillSubjects();renderLibrary();refreshStats();
  alert("Topic added!");
  ["topicSubject","topicName","topicNotes"].forEach(x=>document.getElementById(x).value="");
 }
