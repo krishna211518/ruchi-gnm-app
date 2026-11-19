@@ -51,6 +51,11 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
 @media(max-width:600px){header{padding:23px 16px 25px;border-radius:0 0 22px 22px}.container{padding:13px}.stats{gap:7px}.stat{padding:12px 6px}.stat strong{font-size:20px}.stat span{font-size:10px}.tabs{top:0;border-radius:0 0 14px 14px;margin:0 -13px 15px;padding:9px 11px}.tabs button{padding:10px 12px}.card{padding:15px}.book-frame{height:68vh;min-height:380px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 .recommended-book{display:flex;align-items:center;gap:16px}.book-cover{display:block;width:112px;aspect-ratio:3/4;flex:0 0 auto;object-fit:cover;border-radius:9px;box-shadow:0 7px 18px #173b6030}.recommended-book-info{min-width:0;flex:1}.recommended-book-info h3{margin-bottom:6px}@media(max-width:600px){.recommended-book{gap:12px;align-items:flex-start}.book-cover{width:82px}}
+
+#pullRefreshHint{position:fixed;z-index:1001;top:8px;left:50%;transform:translate(-50%,-150%);transition:transform .18s ease,opacity .18s ease;opacity:0;padding:9px 15px;border-radius:999px;background:var(--navy);color:#fff;font-size:13px;box-shadow:0 6px 20px #12365b35;pointer-events:none}
+body.pull-refresh-visible #pullRefreshHint{transform:translate(-50%,0);opacity:1}
+.book-cover{background:linear-gradient(145deg,#12365b,#168c91)}
+
 </style>
 </head>
 <body>
@@ -116,7 +121,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
 <p class="small">Original study notes arranged as readable chapter pages. Use your college notes and current clinical guidance alongside these summaries.</p>
 <select id="readerYear" onchange="renderReader()"><option value="All">All Years</option><option>First Year</option><option>Second Year</option><option>Third Year</option></select>
 <input id="readerSearch" placeholder="Search chapters or subjects..." oninput="renderReader()">
-<div id="readerIndex"></div><div id="readerPage"></div>
+<div class="card" id="bookmarksPanel"><h3>🔖 Saved chapters</h3><div id="bookmarkList"></div></div><div id="readerIndex"></div><div id="readerPage"></div>
 </section>
 <section id="mcq" class="section">
 <h2>🧠 MCQ Question Bank</h2>
@@ -230,6 +235,7 @@ infection-control policies and supervisor's instructions during actual patient c
 </div>
 
 <footer>RUCHI GNM • GNM Study Companion • Your study data stays in this browser</footer>
+<div id="pullRefreshHint" role="status" aria-live="polite">Pull down to refresh</div>
 
 <script>
 const subjects={
@@ -326,7 +332,7 @@ function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSO
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -336,7 +342,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -351,6 +357,7 @@ let wrong=loadJSON("ruchi_wrong",[]);
 let practicePool=[],practiceIndex=0,examPool=[],examIndex=0,examAnswers=[];
 let flashcardPool=[],flashcardIndex=0,flashcardFlipped=false,flashcardKnown=loadJSON("ruchi_flashcard_known",[]);
 let studyPlan=loadJSON("ruchi_study_plan",[]);
+let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 
 function allQuestions(){return questions.concat(extraQuestions)}
@@ -542,10 +549,8 @@ const recommendedBooks=[
 {title:"Nursing Pharmacology, 2nd Edition",author:"Open RN · Kimberly Ernstmeyer and Elizabeth Christman (editors)",type:"Open nursing textbook · pharmacology",url:"https://www.ncbi.nlm.nih.gov/sites/books/NBK595000/pdf/Bookshelf_NBK595000.pdf",format:"pdf",license:"CC BY 4.0 · attribution required"}
 ];
 function bookCoverImage(i,title){
- const colors=[["#12365b","#28a8a1"],["#16355f","#45a2d5"],["#145943","#71bd8e"],["#086d78","#4cc5bd"],["#493174","#a778d4"]];
- const labels=["GNM","A&P","NURSING","SKILLS","Rx"],pair=colors[i%colors.length],label=labels[i%labels.length];
- const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+pair[0]+'"/><stop offset="1" stop-color="'+pair[1]+'"/></linearGradient></defs><rect width="240" height="320" rx="14" fill="url(#g)"/><circle cx="190" cy="62" r="68" fill="#ffffff" opacity=".1"/><circle cx="38" cy="260" r="82" fill="#ffffff" opacity=".08"/><rect x="54" y="105" width="132" height="93" rx="9" fill="#ffffff" opacity=".14"/><path d="M120 117c-18-14-39-14-55-7v67c18-8 37-7 55 7 18-14 37-15 55-7v-67c-16-7-37-7-55 7z" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><path d="M120 118v66" stroke="#fff" stroke-width="5"/><text x="120" y="246" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="30" font-weight="700">'+label+'</text><text x="120" y="285" text-anchor="middle" fill="#e9f7ff" font-family="Arial,sans-serif" font-size="14" letter-spacing="2">RUCHI GNM</text></svg>';
- return '<img class="book-cover" src="data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg)+'" alt="Illustrated cover preview for '+escapeHTML(title)+'" loading="lazy">';
+ const covers=["gnm-syllabus.svg","anatomy-physiology.svg","nursing-fundamentals.svg","nursing-skills.svg","nursing-pharmacology.svg"];
+ return '<img class="book-cover" src="./assets/book-covers/'+covers[i%covers.length]+'" alt="Illustrated cover preview for '+escapeHTML(title)+'" loading="lazy" onerror="this.onerror=null;this.src=\'./assets/book-covers/gnm-syllabus.svg\'">';
 }
 function renderBooks(){
  document.getElementById("recommendedBooks").innerHTML="<h3>Real books you can read here</h3><p class=\"small\">Free official or openly licensed resources. GNM chapters are ordered by INC; open nursing textbooks may follow a different curriculum. Cover pictures are app-made previews; each title opens the listed book.</p>"+recommendedBooks.map((b,i)=>'<div class="item recommended-book">'+bookCoverImage(i,b.title)+'<div class="recommended-book-info"><h3>'+escapeHTML(b.title)+'</h3><p>'+escapeHTML(b.author)+'</p><p>'+escapeHTML(b.type)+'</p><p class="small">'+escapeHTML(b.license)+'</p><button onclick="readOpenBook('+i+')">Read in app</button></div></div>').join("");
@@ -589,12 +594,25 @@ const readerGuides={
 "Computer Education":"Use digital tools responsibly. Protect passwords and personal health information, verify reliable sources, follow institutional rules for electronic records and avoid sharing identifiable information through unauthorised channels."
 };
 function resumeLesson(){const key=loadJSON("ruchi_last_lesson",null);if(!key){go("library");return}const i=topics.concat(customTopics).findIndex(t=>t.y===key.y&&t.s===key.s&&t.t===key.t);if(i<0){go("library");return}openLesson(i)}
+function chapterBookmarkKey(t){return t.y+"|"+t.s+"|"+t.t}
+function toggleChapterBookmark(i){
+ const t=topics.concat(customTopics)[i];if(!t)return;
+ const key=chapterBookmarkKey(t);
+ bookmarkedChapters=bookmarkedChapters.includes(key)?bookmarkedChapters.filter(x=>x!==key):bookmarkedChapters.concat(key);
+ saveJSON("ruchi_bookmarks",bookmarkedChapters);renderReader();
+}
+function renderBookmarkedChapters(){
+ const data=topics.concat(customTopics);
+ const saved=data.map((t,i)=>({t,i})).filter(x=>bookmarkedChapters.includes(chapterBookmarkKey(x.t)));
+ document.getElementById("bookmarkList").innerHTML=saved.map(x=>'<div class="item"><b>'+escapeHTML(x.t.s)+'</b><p>'+escapeHTML(x.t.y)+' · '+escapeHTML(x.t.t)+'</p><button onclick="openLesson('+x.i+')">Open chapter</button> <button class="secondary" onclick="toggleChapterBookmark('+x.i+')">Remove bookmark</button></div>').join("")||'<p class="small">Abhi koi chapter save nahi hai. Chapter list mein “☆ Save” dabao.</p>';
+}
 function renderReader(){
  const year=document.getElementById("readerYear").value;
  const query=document.getElementById("readerSearch").value.trim().toLowerCase();
  const data=topics.concat(customTopics);
  const rows=data.map((t,i)=>({t,i})).filter(x=>(year==="All"||x.t.y===year)&&((x.t.s+" "+x.t.t+" "+x.t.n).toLowerCase().includes(query)));
- document.getElementById("readerIndex").innerHTML=rows.map(x=>'<div class="item"><b>'+escapeHTML(x.t.s)+'</b><p>'+escapeHTML(x.t.y)+' · '+escapeHTML(x.t.t)+'</p><button onclick="openLesson('+x.i+')">Read chapter</button></div>').join("")||"No chapters match your search.";
+ document.getElementById("readerIndex").innerHTML=rows.map(x=>{const saved=bookmarkedChapters.includes(chapterBookmarkKey(x.t));return '<div class="item"><b>'+escapeHTML(x.t.s)+'</b><p>'+escapeHTML(x.t.y)+' · '+escapeHTML(x.t.t)+'</p><button onclick="openLesson('+x.i+')">Read chapter</button> <button class="secondary" onclick="toggleChapterBookmark('+x.i+')">'+(saved?'★ Saved':'☆ Save')+'</button></div>'}).join("")||"No chapters match your search.";
+ renderBookmarkedChapters();
 }
 function openLesson(i){
  go("reader");
@@ -603,9 +621,11 @@ function openLesson(i){
  saveJSON("ruchi_last_lesson",{y:t.y,s:t.s,t:t.t});
  const guide=readerGuides[t.s]||"Read the chapter outline, define its key terms, connect the ideas to the subject, then review your class notes and current approved references. Write a short summary and discuss questions with your teacher.";
  const prompts=["What are the main ideas in this chapter?","How does this topic connect with safe, respectful nursing care?","Which terms or points should you review with your teacher?"];
- document.getElementById("readerPage").innerHTML='<article class="card"><p class="small">'+escapeHTML(t.y)+' · '+escapeHTML(t.s)+'</p><h2>'+escapeHTML(t.t)+'</h2><h3>Chapter overview</h3><p>'+escapeHTML(t.n)+'</p><h3>Study notes</h3><p>'+escapeHTML(guide)+'</p><h3>Revision prompts</h3><ol>'+prompts.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol><p class="small">Educational notes only. Clinical practice must follow your college, supervisor and current local protocols.</p></article>';
+ const saved=bookmarkedChapters.includes(chapterBookmarkKey(t));
+ document.getElementById("readerPage").innerHTML='<article class="card"><p class="small">'+escapeHTML(t.y)+' · '+escapeHTML(t.s)+'</p><h2>'+escapeHTML(t.t)+'</h2><button class="secondary" onclick="toggleChapterBookmark('+i+')">'+(saved?'★ Remove bookmark':'☆ Save chapter')+'</button><h3>Chapter overview</h3><p>'+escapeHTML(t.n)+'</p><h3>Study notes</h3><p>'+escapeHTML(guide)+'</p><h3>Revision prompts</h3><ol>'+prompts.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol><p class="small">Educational notes only. Clinical practice must follow your college, supervisor and current local protocols.</p></article>';
  document.getElementById("readerPage").scrollIntoView({behavior:"smooth",block:"start"});
 }
+
 
 let activeBookPdfUrl="";
 function loadPdfBook(){
@@ -722,6 +742,31 @@ window.addEventListener("online",updateConnection);window.addEventListener("offl
 window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;document.getElementById("installApp").style.display="inline-flex"});
 async function installApp(){if(!deferredInstallPrompt){alert("Use your browser menu and choose Add to Home Screen or Install app.");return}deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;document.getElementById("installApp").style.display="none"}
 if("serviceWorker" in navigator&&location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+
+let pullRefreshStartY=0,pullRefreshDistance=0,pullRefreshTracking=false;
+function clearPullRefresh(){
+ pullRefreshTracking=false;pullRefreshDistance=0;document.body.classList.remove("pull-refresh-visible");
+}
+document.addEventListener("touchstart",event=>{
+ if(event.touches.length!==1||window.scrollY>0){clearPullRefresh();return}
+ pullRefreshStartY=event.touches[0].clientY;pullRefreshDistance=0;pullRefreshTracking=true;
+},{passive:true});
+document.addEventListener("touchmove",event=>{
+ if(!pullRefreshTracking||event.touches.length!==1)return;
+ const dy=event.touches[0].clientY-pullRefreshStartY,dx=Math.abs(event.touches[0].clientX-(event.changedTouches[0]?.clientX||event.touches[0].clientX));
+ if(window.scrollY>0||dy<=0||dy<dx){clearPullRefresh();return}
+ pullRefreshDistance=Math.min(dy,150);
+ if(pullRefreshDistance>8){if(event.cancelable)event.preventDefault();document.body.classList.add("pull-refresh-visible");document.getElementById("pullRefreshHint").textContent=pullRefreshDistance>=85?"Release to refresh":"Pull down to refresh"}
+},{passive:false});
+document.addEventListener("touchend",()=>{
+ if(!pullRefreshTracking)return;
+ const shouldRefresh=pullRefreshDistance>=85;
+ const hint=document.getElementById("pullRefreshHint");
+ if(shouldRefresh){hint.textContent="Refreshing app…";document.body.classList.add("pull-refresh-visible");setTimeout(()=>window.location.reload(),120)}
+ else clearPullRefresh();
+},{passive:true});
+document.addEventListener("touchcancel",clearPullRefresh,{passive:true});
+
 
 </script>
 </body>
