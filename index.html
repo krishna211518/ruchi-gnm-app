@@ -81,6 +81,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
 
 <section id="home" class="section active">
 <h2>Welcome to your Nursing Study Hub 👋</h2>
+<button class="secondary" type="button" onclick="resumeLesson()">Continue last chapter</button>
 <div class="grid">
  <div class="card"><div class="emoji">📚</div><h3>Study Library</h3><p>Year-wise subjects and topics.</p><button onclick="go('library')">Open Study</button></div>
  <div class="card"><div class="emoji">🧠</div><h3>MCQ Practice</h3><p>Test your nursing knowledge.</p><button onclick="go('mcq')">Practice MCQs</button></div>
@@ -300,10 +301,10 @@ function saveJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value))
 let dailyGoal=Number(loadJSON("ruchi_daily_goal",3));
 let topicDays=loadJSON("ruchi_topic_days",{});
 function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSON("ruchi_theme",dark);document.getElementById("themeToggle").textContent=dark?"☀️ Light":"🌙 Dark"}
+function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
-function reviewWrongAnswers(){const missed=allQuestions().filter(q=>wrong.some(item=>item.q===q[2]));if(!missed.length){document.getElementById("questionArea").textContent="No wrong answers to review yet. Try some questions first.";return}practicePool=missed.sort(()=>Math.random()-.5);practiceIndex=0;showPractice()}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_topic_days","ruchi_topic_days"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_topic_days"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -356,7 +357,7 @@ function refreshStats(){
  const total=topics.length+customTopics.length,pct=Math.round(completedTopics.length/Math.max(1,total)*100);
  document.getElementById("homeProgress").style.width=pct+"%";
  document.getElementById("homeProgressText").textContent=completedTopics.length+" of "+total+" topics completed ("+pct+"%).";
- const today=new Date().toISOString().slice(0,10),doneToday=Object.values(topicDays).filter(day=>day===today).length;
+ const today=localDateKey(),doneToday=Object.values(topicDays).filter(day=>day===today).length;
  document.getElementById("dailyProgress").style.width=Math.min(100,Math.round(doneToday/Math.max(1,dailyGoal)*100))+"%";
  document.getElementById("dailyProgressText").textContent=doneToday+" of "+dailyGoal+" topics completed today.";
  const input=document.getElementById("dailyGoal");if(input&&document.activeElement!==input)input.value=dailyGoal;
@@ -374,7 +375,7 @@ function renderLibrary(){
 }
 function toggleTopicIndex(i){const t=topics.concat(customTopics)[i];if(t)toggleTopic(encodeURIComponent(t.y+"|"+t.s+"|"+t.t))}
 function toggleTopic(encoded){
- const key=decodeURIComponent(encoded),today=new Date().toISOString().slice(0,10);
+ const key=decodeURIComponent(encoded),today=localDateKey();
  completedTopics=completedTopics.includes(key)?completedTopics.filter(x=>x!==key):completedTopics.concat(key);
  if(completedTopics.includes(key))topicDays[key]=today;else delete topicDays[key];
  saveJSON("ruchi_done",completedTopics);saveJSON("ruchi_topic_days",topicDays);
@@ -502,7 +503,7 @@ function readOpenBook(i){
  if(opened)opened.opener=null;else window.location.href=b.url;
 }
 function addBook(){let title=document.getElementById("bookTitle").value.trim(),author=document.getElementById("bookAuthor").value.trim(),subject=document.getElementById("bookSubject").value.trim(),link=document.getElementById("bookLink").value.trim();if(!title||!author||!subject){alert("Enter title, author and subject");return}if(link&&!link.startsWith("https://")){alert("Link should start with https://");return}personalBooks.unshift({title,author,subject,link});saveJSON("ruchi_books",personalBooks);["bookTitle","bookAuthor","bookSubject","bookLink"].forEach(id=>document.getElementById(id).value="");renderBooks()}
-function deleteBook(i){personalBooks.splice(i,1);localStorage.setItem("ruchi_books",JSON.stringify(personalBooks));renderBooks()}
+function deleteBook(i){personalBooks.splice(i,1);saveJSON("ruchi_books",personalBooks);renderBooks()}
 const readerGuides={
 "Anatomy & Physiology":"Start with the relationship between structure and function. Cells form tissues, tissues form organs, and organs work together in systems. For each chapter, learn the main parts, their normal role, how the system maintains internal balance, and how it connects with other systems. Use labelled diagrams and explain the process in your own words before memorising terms.",
 "Microbiology":"Organise learning around microorganisms, how infection spreads, and how transmission can be interrupted. Link each organism group to its general characteristics, routes of spread, host response and prevention. In care settings, follow standard precautions and facility policy; hand hygiene is needed at the appropriate moments in care.",
@@ -525,6 +526,7 @@ const readerGuides={
 "English":"Practise concise, respectful communication in speaking and writing. Use clear terminology, organise information logically and proofread records or assignments. Clinical documentation should be factual and follow institutional standards.",
 "Computer Education":"Use digital tools responsibly. Protect passwords and personal health information, verify reliable sources, follow institutional rules for electronic records and avoid sharing identifiable information through unauthorised channels."
 };
+function resumeLesson(){const key=loadJSON("ruchi_last_lesson",null);if(!key){go("library");return}const i=topics.concat(customTopics).findIndex(t=>t.y===key.y&&t.s===key.s&&t.t===key.t);if(i<0){go("library");return}openLesson(i)}
 function renderReader(){
  const year=document.getElementById("readerYear").value;
  const query=document.getElementById("readerSearch").value.trim().toLowerCase();
@@ -534,8 +536,9 @@ function renderReader(){
 }
 function openLesson(i){
  go("reader");
- const t=topics.concat(customTopics)[i];
+ const data=topics.concat(customTopics),t=data[i];
  if(!t)return;
+ saveJSON("ruchi_last_lesson",{y:t.y,s:t.s,t:t.t});
  const guide=readerGuides[t.s]||"Read the chapter outline, define its key terms, connect the ideas to the subject, then review your class notes and current approved references. Write a short summary and discuss questions with your teacher.";
  const prompts=["What are the main ideas in this chapter?","How does this topic connect with safe, respectful nursing care?","Which terms or points should you review with your teacher?"];
  document.getElementById("readerPage").innerHTML='<article class="card"><p class="small">'+escapeHTML(t.y)+' · '+escapeHTML(t.s)+'</p><h2>'+escapeHTML(t.t)+'</h2><h3>Chapter overview</h3><p>'+escapeHTML(t.n)+'</p><h3>Study notes</h3><p>'+escapeHTML(guide)+'</p><h3>Revision prompts</h3><ol>'+prompts.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol><p class="small">Educational notes only. Clinical practice must follow your college, supervisor and current local protocols.</p></article>';
