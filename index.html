@@ -78,6 +78,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
  <button onclick="show('clinical',this)">Clinical</button>
  <button onclick="show('viva',this)">Viva</button>
  <button onclick="show('progress',this)">Progress</button>
+ <button onclick="show('planner',this)">Study Plan</button>
  <button onclick="show('add',this)">Add</button>
 </nav>
 
@@ -92,6 +93,7 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}footer{text-align:cen
  <div class="card"><div class="emoji">🩻</div><h3>Clinical Learning</h3><p>Skills, safety and care plans.</p><button onclick="go('clinical')">Explore</button></div>
  <div class="card"><div class="emoji">🎤</div><h3>Viva Practice</h3><p>Important oral questions.</p><button onclick="go('viva')">Start Viva</button></div>
  <div class="card"><div class="emoji">📊</div><h3>My Progress</h3><p>Track your learning.</p><button onclick="go('progress')">View Progress</button></div>
+ <div class="card"><div class="emoji">🗓️</div><h3>Weekly Study Plan</h3><p>Plan topics by date and mark them done.</p><button onclick="go('planner')">Open Plan</button></div>
 </div>
 <h2>Study goals</h2><div class="card"><label for="dailyGoal">Topics to complete today</label><input id="dailyGoal" type="number" min="1" max="20" value="3" onchange="setDailyGoal(this.value)"><div class="progress"><div id="dailyProgress"></div></div><p class="small" id="dailyProgressText">Mark a topic complete to track today’s goal.</p></div><div class="card"><h3>Overall topic progress</h3><div class="progress"><div id="homeProgress"></div></div><p class="small" id="homeProgressText">Start with one topic today.</p></div>
 </section>
@@ -193,7 +195,15 @@ infection-control policies and supervisor's instructions during actual patient c
 <h3>Wrong answers to revise</h3>
 <div id="wrongList"></div>
 </div>
+<div class="card"><h3>Weak subjects</h3><p class="small">Subjects with the most wrong MCQs appear first.</p><div id="weakTopics"></div><button class="secondary" onclick="openWeakRevision()">Revise weak topics</button></div>
 <div class="card"><h3>Backup your study data</h3><p>Save your notes, progress and custom questions to a file so you can move them to another device.</p><button class="secondary" onclick="downloadBackup()">Export backup</button><label for="restoreFile">Restore a backup</label><input id="restoreFile" type="file" accept="application/json,.json" onchange="restoreBackup(this.files[0])"></div><button class="danger" onclick="resetProgress()">Reset progress</button>
+</section>
+
+<section id="planner" class="section">
+<h2>🗓️ Weekly Study Plan</h2>
+<p class="small">Date, subject aur topic add karo. Plan isi device par save rahega.</p>
+<div class="card"><label for="planDate">Study date</label><input id="planDate" type="date"><label for="planSubject">Subject</label><input id="planSubject" placeholder="e.g. Nursing Foundations"><label for="planTopic">Topic</label><input id="planTopic" placeholder="e.g. Hand hygiene"><button onclick="addPlanTask()">Add to plan</button></div>
+<div id="studyPlanList"></div>
 </section>
 
 <section id="add" class="section">
@@ -316,7 +326,7 @@ function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSO
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -326,7 +336,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -340,6 +350,7 @@ let attempts=loadJSON("ruchi_attempts",[]);
 let wrong=loadJSON("ruchi_wrong",[]);
 let practicePool=[],practiceIndex=0,examPool=[],examIndex=0,examAnswers=[];
 let flashcardPool=[],flashcardIndex=0,flashcardFlipped=false,flashcardKnown=loadJSON("ruchi_flashcard_known",[]);
+let studyPlan=loadJSON("ruchi_study_plan",[]);
 let examTimer=null,secondsLeft=0;
 
 function allQuestions(){return questions.concat(extraQuestions)}
@@ -356,6 +367,7 @@ function show(id,btn){
  if(id==="clinical")renderClinical();
  if(id==="viva")renderViva();
  if(id==="progress")renderProgress();
+ if(id==="planner")renderPlanner();
  if(id==="mcq")startPractice();
 }
 function go(id){
@@ -648,7 +660,28 @@ function renderProgress(){
  `${completedTopics.length} of ${topics.length+customTopics.length} listed topics completed.`;
  document.getElementById("wrongList").innerHTML=wrong.map(w=>
  `<div class="item"><b>${escapeHTML(w.q)}</b><p>Answer: ${escapeHTML(w.correct)}</p><p>${escapeHTML(w.explain)}</p></div>`).join("")||"No wrong answers recorded.";
+ renderWeakTopics();
 }
+function renderPlanner(){
+ const list=document.getElementById("studyPlanList");
+ const ordered=studyPlan.map((task,index)=>({task,index})).sort((a,b)=>a.task.date.localeCompare(b.task.date));
+ list.innerHTML=ordered.map(({task,index})=>{const [y,m,d]=task.date.split("-").map(Number),date=new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});return '<div class="item"><label style="display:flex;align-items:flex-start;gap:10px"><input type="checkbox" '+(task.done?"checked":"")+' onchange="togglePlanTask('+index+',this.checked)" style="width:auto;margin-top:5px"><span><b>'+escapeHTML(date)+' · '+escapeHTML(task.subject)+'</b><br>'+escapeHTML(task.topic)+(task.done?'<br><span class="small">Completed ✓</span>':"")+"</span></label><button class=\"danger\" onclick=\"deletePlanTask("+index+")\">Remove</button></div>"}).join("")||"<div class=\"card\">Plan mein abhi kuch nahi hai. Upar se pehla topic add karo.</div>";
+}
+function addPlanTask(){
+ const date=document.getElementById("planDate").value,subject=document.getElementById("planSubject").value.trim(),topic=document.getElementById("planTopic").value.trim();
+ if(!date||!subject||!topic){alert("Date, subject aur topic teeno bharo.");return}
+ studyPlan.push({date,subject,topic,done:false});saveJSON("ruchi_study_plan",studyPlan);renderPlanner();document.getElementById("planSubject").value="";document.getElementById("planTopic").value="";
+}
+function togglePlanTask(i,done){if(!studyPlan[i])return;studyPlan[i].done=done;saveJSON("ruchi_study_plan",studyPlan);renderPlanner()}
+function deletePlanTask(i){studyPlan.splice(i,1);saveJSON("ruchi_study_plan",studyPlan);renderPlanner()}
+function renderWeakTopics(){
+ const subjectByQuestion=new Map(allQuestions().map(q=>[q[2],q[0]])),counts={};
+ wrong.forEach(item=>{const subject=subjectByQuestion.get(item.q)||"Other";counts[subject]=(counts[subject]||0)+1});
+ const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+ document.getElementById("weakTopics").innerHTML=ranked.slice(0,5).map(([subject,count])=>'<div class="item"><b>'+escapeHTML(subject)+'</b><p>'+count+' question(s) to revise</p></div>').join("")||"<p>No weak subjects yet. Try MCQs and missed subjects will show here.</p>";
+}
+function openWeakRevision(){go("flashcards");document.getElementById("flashcardMode").value="wrong";startFlashcards()}
+
 function addQuestion(){
  let s=document.getElementById("newSubject").value.trim();
  let q=document.getElementById("newQuestion").value.trim();
