@@ -514,7 +514,8 @@ function openLesson(i){
  document.getElementById("readerPage").innerHTML='<article class="card"><p class="small">'+escapeHTML(t.y)+' · '+escapeHTML(t.s)+'</p><h2>'+escapeHTML(t.t)+'</h2><h3>Chapter overview</h3><p>'+escapeHTML(t.n)+'</p><h3>Study notes</h3><p>'+escapeHTML(guide)+'</p><h3>Revision prompts</h3><ol>'+prompts.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol><p class="small">Educational notes only. Clinical practice must follow your college, supervisor and current local protocols.</p></article>';
  document.getElementById("readerPage").scrollIntoView({behavior:"smooth",block:"start"});
 }
-\nlet activeBookPdfUrl="";
+
+let activeBookPdfUrl="";
 function loadPdfBook(){
  const file=document.getElementById("pdfBookFile").files[0];
  if(!file)return;
@@ -526,7 +527,8 @@ function loadPdfBook(){
  fallback.href=activeBookPdfUrl;fallback.style.display="inline-block";
  document.getElementById("pdfBookName").textContent=file.name+" · "+Math.max(1,Math.ceil(file.size/1024/1024))+" MB";
 }
-\nfunction renderClinical(){
+
+function renderClinical(){
  let items=[
  ["Hand hygiene","Purpose, indications, hand hygiene moments and handwashing principles."],
  ["Vital signs","Temperature, pulse, respiration, blood pressure and documentation."],
