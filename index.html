@@ -78,7 +78,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 
 <nav class="tabs">
  <button class="selected" onclick="show('home',this)">Home</button>
- <button onclick="show('library',this)">Study</button><button onclick="show('books',this)">Books</button>
+ <button onclick="show('library',this)">Study</button><button onclick="show('reader',this)">Read Chapters</button><button onclick="show('books',this)">Books</button>
  <button onclick="show('mcq',this)">MCQ Bank</button>
  <button onclick="show('exam',this)">Mock Test</button>
  <button onclick="show('notes',this)">My Notes</button>
@@ -119,6 +119,13 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 </section>
 
 <section id="books" class="section"><h2>📚 Bookshelf & Reading List</h2><p class="small">Suggested study references; confirm your college list and current editions. Copyrighted books are not hosted here.</p><div class="card"><h3>Official syllabus</h3><a href="https://indiannursingcouncil.org/publications" target="_blank" rel="noopener">Indian Nursing Council publications</a> · <a href="https://apnc.nic.in/pdf/syllabus/GNM_Syllabus.pdf" target="_blank" rel="noopener">GNM syllabus PDF</a></div><div id="recommendedBooks"></div><div class="card"><h3>Add a book</h3><label>Title</label><input id="bookTitle"><label>Author</label><input id="bookAuthor"><label>Subject</label><input id="bookSubject"><label>Optional https link</label><input id="bookLink" placeholder="https://..."><button onclick="addBook()">Save Book</button></div><div id="myBooks"></div></section>
+<section id="reader" class="section">
+<h2>📖 GNM Chapter Reader</h2>
+<p class="small">Original study notes arranged as readable chapter pages. Use your college notes and current clinical guidance alongside these summaries.</p>
+<select id="readerYear" onchange="renderReader()"><option value="All">All Years</option><option>First Year</option><option>Second Year</option><option>Third Year</option></select>
+<input id="readerSearch" placeholder="Search chapters or subjects..." oninput="renderReader()">
+<div id="readerIndex"></div><div id="readerPage"></div>
+</section>
 <section id="mcq" class="section">
 <h2>🧠 MCQ Question Bank</h2>
 <p class="small">Choose a subject and difficulty. Questions include explanations.</p>
@@ -320,6 +327,7 @@ function show(id,btn){
  refreshStats();
  if(id==="library")renderLibrary();
  if(id==="notes")renderNotes();
+ if(id==="reader")renderReader();
  if(id==="books")renderBooks();
  if(id==="clinical")renderClinical();
  if(id==="viva")renderViva();
@@ -469,7 +477,44 @@ const recommendedBooks=[["Fundamentals of Nursing","B. T. Basavanthappa","Nursin
 function renderBooks(){document.getElementById("recommendedBooks").innerHTML="<h3>Suggested references</h3>"+recommendedBooks.map(b=>'<div class="item"><b>'+escapeHTML(b[0])+'</b><p>'+escapeHTML(b[1])+' · '+escapeHTML(b[2])+'</p><a href="https://www.google.com/search?q='+encodeURIComponent(b[0]+' '+b[1]+' book')+'" target="_blank" rel="noopener">Find listings</a></div>').join("");document.getElementById("myBooks").innerHTML="<h3>My saved books</h3>"+(personalBooks.map((b,i)=>'<div class="item"><b>'+escapeHTML(b.title)+'</b><p>'+escapeHTML(b.author)+' · '+escapeHTML(b.subject)+'</p>'+(b.link?'<a href="'+escapeHTML(b.link)+'" target="_blank" rel="noopener">Open link</a> ' : '')+'<button class="danger" onclick="deleteBook('+i+')">Remove</button></div>').join("")||"No books saved yet.");}
 function addBook(){let title=document.getElementById("bookTitle").value.trim(),author=document.getElementById("bookAuthor").value.trim(),subject=document.getElementById("bookSubject").value.trim(),link=document.getElementById("bookLink").value.trim();if(!title||!author||!subject){alert("Enter title, author and subject");return}if(link&&!link.startsWith("https://")){alert("Link should start with https://");return}personalBooks.unshift({title,author,subject,link});localStorage.setItem("ruchi_books",JSON.stringify(personalBooks));["bookTitle","bookAuthor","bookSubject","bookLink"].forEach(id=>document.getElementById(id).value="");renderBooks()}
 function deleteBook(i){personalBooks.splice(i,1);localStorage.setItem("ruchi_books",JSON.stringify(personalBooks));renderBooks()}
-function renderClinical(){
+const readerGuides={
+"Anatomy & Physiology":"Start with the relationship between structure and function. Cells form tissues, tissues form organs, and organs work together in systems. For each chapter, learn the main parts, their normal role, how the system maintains internal balance, and how it connects with other systems. Use labelled diagrams and explain the process in your own words before memorising terms.",
+"Microbiology":"Organise learning around microorganisms, how infection spreads, and how transmission can be interrupted. Link each organism group to its general characteristics, routes of spread, host response and prevention. In care settings, follow standard precautions and facility policy; hand hygiene is needed at the appropriate moments in care.",
+"Psychology":"Focus on how people think, feel, learn and respond to illness. Consider individual differences, development, stress and coping. In nursing interactions, listen without judgement, check understanding and respect the person's preferences and privacy.",
+"Sociology":"Connect family, culture, community, social groups and social conditions to health and access to services. Consider how income, education, housing, work and social support may shape health choices. Use respectful communication and avoid assumptions about individuals or communities.",
+"Nursing Foundations":"Use the nursing process to organise care: assess, identify needs, plan, implement within your role, and evaluate. Pair this with communication, dignity, safety, infection prevention, accurate records and teamwork. Practical actions must follow your training, supervision and local policy.",
+"First Aid":"Learn how to recognise an emergency, check scene safety, activate the local response and get qualified help. First aid actions depend on the person's condition and current certified training. Follow emergency services and institutional protocols; do not attempt procedures outside your competence.",
+"Community Health Nursing I":"Study health in the context of families and communities. Organise notes around community assessment, determinants of health, primary health care, prevention, health education, referral and the health team's role. Use current local programme guidance for schedules and service details.",
+"Community Health Nursing II":"Build on community assessment by planning, delivering and evaluating appropriate activities with people and local services. Review records, follow-up and referral pathways. Programme details can change, so check current Ministry, state and facility guidance.",
+"Community Health Nursing III":"Review community-level programme implementation, service coordination and follow-up. Connect needs assessment to measurable objectives and evaluation. Use the latest official operational guidance rather than relying on old schedules or summaries.",
+"Nutrition":"Learn the main nutrient groups, their general functions and common food sources. Apply this to balanced meal planning and nutrition across life stages. Individual needs vary with age, health and circumstances; use qualified assessment and local guidance for care decisions.",
+"Medical Surgical Nursing I":"For each disorder, organise revision into causes and changes in body function, common features, assessment priorities, investigations, treatment overview, nursing concerns, patient education and when to escalate. Keep care person-centred and within assigned scope.",
+"Medical Surgical Nursing II":"Use the same clinical reasoning pattern across specialty areas: understand the condition, identify important observations and safety risks, plan supportive care with the team, document changes and escalate deterioration promptly. Follow the patient's care plan and facility protocol.",
+"Mental Health Nursing":"Study mental health conditions through a recovery-oriented and person-centred lens. Practise therapeutic communication, observation, confidentiality, rights, safety planning and family support. If immediate risk is suspected, involve the qualified clinical team promptly.",
+"Child Health Nursing":"Consider the child’s age, development, family context, nutrition, growth and safety. Communicate in an age-appropriate way and involve caregivers respectfully. Recognise concerning changes early and follow current referral and immunisation guidance.",
+"Midwifery & Gynaecological Nursing":"Organise study around reproductive health, antenatal, intrapartum and postnatal care, newborn wellbeing and common gynaecological concerns. Respectful communication, observation and timely escalation are central. Clinical care must follow supervision and current local protocols.",
+"Nursing Research":"Move from a clear research question to objectives, design, sampling, ethical safeguards, data collection and interpretation. Keep participant privacy and voluntary informed consent central. Treat statistics as a way to describe data, not as a substitute for sound study design.",
+"Nursing Education":"Begin with learner needs and specific objectives. Choose a suitable method, prepare materials, deliver a clear lesson and check learning. Reflection and feedback help improve teaching.",
+"Professional Trends & Nursing Management":"Review professional conduct, accountability, confidentiality, teamwork, communication, delegation principles, records and quality improvement. Apply current laws, professional standards and institutional policy; ask a supervisor when responsibilities are unclear.",
+"English":"Practise concise, respectful communication in speaking and writing. Use clear terminology, organise information logically and proofread records or assignments. Clinical documentation should be factual and follow institutional standards.",
+"Computer Education":"Use digital tools responsibly. Protect passwords and personal health information, verify reliable sources, follow institutional rules for electronic records and avoid sharing identifiable information through unauthorised channels."
+};
+function renderReader(){
+ const year=document.getElementById("readerYear").value;
+ const query=document.getElementById("readerSearch").value.trim().toLowerCase();
+ const data=topics.concat(customTopics);
+ const rows=data.map((t,i)=>({t,i})).filter(x=>(year==="All"||x.t.y===year)&&((x.t.s+" "+x.t.t+" "+x.t.n).toLowerCase().includes(query)));
+ document.getElementById("readerIndex").innerHTML=rows.map(x=>'<div class="item"><b>'+escapeHTML(x.t.s)+'</b><p>'+escapeHTML(x.t.y)+' · '+escapeHTML(x.t.t)+'</p><button onclick="openLesson('+x.i+')">Read chapter</button></div>').join("")||"No chapters match your search.";
+}
+function openLesson(i){
+ const t=topics.concat(customTopics)[i];
+ if(!t)return;
+ const guide=readerGuides[t.s]||"Read the chapter outline, define its key terms, connect the ideas to the subject, then review your class notes and current approved references. Write a short summary and discuss questions with your teacher.";
+ const prompts=["What are the main ideas in this chapter?","How does this topic connect with safe, respectful nursing care?","Which terms or points should you review with your teacher?"];
+ document.getElementById("readerPage").innerHTML='<article class="card"><p class="small">'+escapeHTML(t.y)+' · '+escapeHTML(t.s)+'</p><h2>'+escapeHTML(t.t)+'</h2><h3>Chapter overview</h3><p>'+escapeHTML(t.n)+'</p><h3>Study notes</h3><p>'+escapeHTML(guide)+'</p><h3>Revision prompts</h3><ol>'+prompts.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol><p class="small">Educational notes only. Clinical practice must follow your college, supervisor and current local protocols.</p></article>';
+ document.getElementById("readerPage").scrollIntoView({behavior:"smooth",block:"start"});
+}
+\nfunction renderClinical(){
  let items=[
  ["Hand hygiene","Purpose, indications, hand hygiene moments and handwashing principles."],
  ["Vital signs","Temperature, pulse, respiration, blood pressure and documentation."],
