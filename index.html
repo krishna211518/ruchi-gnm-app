@@ -298,6 +298,7 @@ questions.push(...[["Anatomy & Physiology","Easy","Which blood component mainly 
 function loadJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw===null?fallback:JSON.parse(raw)}catch(e){return fallback}}
 function saveJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(e){alert("Could not save data on this device. Export a backup or free storage.");return false}}
 let dailyGoal=Number(loadJSON("ruchi_daily_goal",3));
+let topicDays=loadJSON("ruchi_topic_days",{});
 function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSON("ruchi_theme",dark);document.getElementById("themeToggle").textContent=dark?"☀️ Light":"🌙 Dark"}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function reviewWrongAnswers(){const missed=allQuestions().filter(q=>wrong.some(item=>item.q===q[2]));if(!missed.length){document.getElementById("questionArea").textContent="No wrong answers to review yet. Try some questions first.";return}practicePool=missed.sort(()=>Math.random()-.5);practiceIndex=0;showPractice()}
@@ -358,31 +359,29 @@ function refreshStats(){
  document.getElementById("homeProgressText").textContent=pct+"% of listed topics completed";
 }
 function renderLibrary(){
- let year=document.getElementById("yearFilter").value;
- let q=document.getElementById("searchTopic").value.toLowerCase();
- let data=topics.concat(customTopics);
+ const year=document.getElementById("yearFilter").value,query=document.getElementById("searchTopic").value.toLowerCase(),data=topics.concat(customTopics);
  let html="";
  data.forEach((t,i)=>{
- if(year!=="All"&&t.y!==year)return;
- if(!(t.s+" "+t.t+" "+t.n).toLowerCase().includes(q))return;
- let key=t.y+"|"+t.s+"|"+t.t;
- let done=completedTopics.includes(key);
- html+=`<div class="item"><b>${t.s}</b><p>${t.y} • ${t.t}</p>
- <p>${t.n}</p>
- <button class="${done?"secondary":""}" onclick="toggleTopic('${encodeURIComponent(key)}')">${done?"✓ Completed":"Mark Complete"}</button></div>`;
+  if(year!=="All"&&t.y!==year)return;
+  if(!(t.s+" "+t.t+" "+t.n).toLowerCase().includes(query))return;
+  const key=t.y+"|"+t.s+"|"+t.t,done=completedTopics.includes(key);
+  html+='<div class="item"><b>'+escapeHTML(t.s)+'</b><p>'+escapeHTML(t.y)+' · '+escapeHTML(t.t)+'</p><p>'+escapeHTML(t.n)+'</p><button class="'+(done?"secondary":"")+'" onclick="toggleTopicIndex('+i+')">'+(done?"✓ Completed":"Mark Complete")+'</button> <button class="secondary" onclick="openLesson('+i+')">Read chapter</button></div>';
  });
  document.getElementById("libraryList").innerHTML=html||"No topics found.";
 }
+function toggleTopicIndex(i){const t=topics.concat(customTopics)[i];if(t)toggleTopic(encodeURIComponent(t.y+"|"+t.s+"|"+t.t))}
 function toggleTopic(encoded){
- let key=decodeURIComponent(encoded);
+ const key=decodeURIComponent(encoded),today=new Date().toISOString().slice(0,10);
  completedTopics=completedTopics.includes(key)?completedTopics.filter(x=>x!==key):completedTopics.concat(key);
- localStorage.setItem("ruchi_done",JSON.stringify(completedTopics));
+ if(completedTopics.includes(key))topicDays[key]=today;else delete topicDays[key];
+ saveJSON("ruchi_done",completedTopics);saveJSON("ruchi_topic_days",topicDays);
  renderLibrary();refreshStats();
 }
 function fillSubjects(){
- let sel=document.getElementById("mcqSubject");
- subjects["First Year"].concat(subjects["Second Year"],subjects["Third Year"])
- .forEach(s=>{let o=document.createElement("option");o.textContent=s;o.value=s;sel.appendChild(o)});
+ const sel=document.getElementById("mcqSubject"),previous=sel.value||"All";
+ const names=[...new Set(allQuestions().map(q=>q[0]))].sort();
+ sel.innerHTML='<option value="All">All Subjects</option>'+names.map(name=>'<option value="'+escapeHTML(name)+'">'+escapeHTML(name)+'</option>').join("");
+ sel.value=names.includes(previous)?previous:"All";
 }
 function startPractice(){
  practicePool=allQuestions().filter(q=>
@@ -391,29 +390,23 @@ function startPractice(){
  practicePool.sort(()=>Math.random()-.5);practiceIndex=0;showPractice();
 }
 function showPractice(){
- let area=document.getElementById("questionArea");
- if(!practicePool.length){area.innerHTML="No questions available for this filter. Try another subject.";return}
+ const area=document.getElementById("questionArea");
+ if(!practicePool.length){area.textContent="No questions available for this filter. Try another subject.";return}
  if(practiceIndex>=practicePool.length){area.innerHTML="<h3>Practice completed! 🎉</h3><button onclick='startPractice()'>Practice Again</button>";return}
- let q=practicePool[practiceIndex];
- area.innerHTML=`<p class="small">${q[0]} • ${q[1]} • Question ${practiceIndex+1}/${practicePool.length}</p>
- <h3>${q[2]}</h3><div id="options"></div><div id="feedback"></div>`;
- q[3].forEach((op,i)=>{
- let b=document.createElement("button");b.className="option";
- b.textContent=String.fromCharCode(65+i)+". "+op;
- b.onclick=()=>answerPractice(i,b);document.getElementById("options").appendChild(b);
- });
+ const q=practicePool[practiceIndex];
+ area.innerHTML='<p class="small">'+escapeHTML(q[0])+' · '+escapeHTML(q[1])+' · Question '+(practiceIndex+1)+'/'+practicePool.length+'</p><h3>'+escapeHTML(q[2])+'</h3><div id="options"></div><div id="feedback"></div>';
+ q[3].forEach((op,i)=>{const button=document.createElement("button");button.className="option";button.textContent=String.fromCharCode(65+i)+". "+op;button.onclick=()=>answerPractice(i);document.getElementById("options").appendChild(button)});
 }
-function answerPractice(i,button){
- let q=practicePool[practiceIndex];
- let ok=i===q[4];
- document.querySelectorAll("#options button").forEach((b,j)=>{
- b.disabled=true;if(j===q[4])b.classList.add("correct");
- if(j===i&&!ok)b.classList.add("wrong");
- });
+function answerPractice(i){
+ const q=practicePool[practiceIndex],ok=i===q[4];
+ document.querySelectorAll("#options button").forEach((button,j)=>{button.disabled=true;if(j===q[4])button.classList.add("correct");if(j===i&&!ok)button.classList.add("wrong")});
  recordAnswer(q,i,ok);
- document.getElementById("feedback").innerHTML=
- `<div class="result"><b>${ok?"Correct! ✓":"Incorrect"}</b><p>Correct answer: ${q[3][q[4]]}</p><p>${q[5]}</p>
- <button onclick="practiceIndex++;showPractice()">Next Question</button></div>`;
+ document.getElementById("feedback").innerHTML='<div class="result"><b>'+(ok?"Correct! ✓":"Incorrect")+'</b><p>Correct answer: '+escapeHTML(q[3][q[4]])+'</p><p>'+escapeHTML(q[5])+'</p><button onclick="practiceIndex++;showPractice()">Next Question</button></div>';
+}
+function reviewWrongAnswers(){
+ const missed=allQuestions().filter(q=>wrong.some(item=>item.q===q[2]));
+ if(!missed.length){document.getElementById("questionArea").textContent="No wrong answers to review yet. Try some questions first.";return}
+ practicePool=missed.sort(()=>Math.random()-.5);practiceIndex=0;showPractice();
 }
 function recordAnswer(q,i,ok){
  attempts.push({q:q[2],ok:ok});
@@ -481,7 +474,7 @@ function renderNotes(){
  <button class="danger" onclick="deleteNote(${i})">Delete</button></div>`).join("")||"No notes saved.";
 }
 function deleteNote(i){notes.splice(i,1);localStorage.setItem("ruchi_notes",JSON.stringify(notes));renderNotes()}
-function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function escapeHTML(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 const recommendedBooks=[
 {title:"GNM Syllabus (3-Year Revised)",author:"Indian Nursing Council curriculum · hosted by AP Nursing Council",type:"Official course syllabus",url:"https://apnc.nic.in/pdf/syllabus/GNM_Syllabus.pdf",format:"pdf",license:"Official syllabus PDF"},
 {title:"Anatomy & Physiology 2e",author:"OpenStax, Rice University",type:"Open textbook · relevant to GNM Bio-Sciences",url:"https://openstax.org/books/anatomy-and-physiology-2e/pages/1-introduction",format:"web",license:"CC BY-NC-SA 4.0 · attribution required"},
