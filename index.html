@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#12365b"><meta name="description" content="GNM study topics, chapter notes, MCQ practice, mock tests, books and progress tracking."><link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#102a43"><meta name="description" content="GNM study topics, chapter notes, MCQ practice, mock tests, books and progress tracking."><link rel="manifest" href="./manifest.webmanifest">
 <title>RUCHI GNM Nursing App</title>
 <style>
 :root{--navy:#12365b;--blue:#1976d2;--light:#edf5ff;--bg:#f5f8fc;--white:#fff;--text:#203047;--muted:#66788c;--green:#16845b;--red:#c93b3b;--line:#dce5ef;--shadow:0 8px 28px #173b6010}
@@ -147,12 +147,30 @@ body.dark{background:radial-gradient(ellipse at 8% 0%,#152e4b 0,transparent 36%)
  .stat,.card,.tabs button{transition:none}
 }
 
+
+/* RUCHI GNM brand + launch screen */
+.brand-lockup{display:flex;align-items:center;justify-content:center;gap:13px;max-width:1050px;margin:0 auto 10px}
+.brand-lockup img{width:58px;height:58px;filter:drop-shadow(0 5px 12px #061a3040)}
+.brand-lockup h1{margin:0}
+.launch-screen{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;padding:24px;background:radial-gradient(circle at 50% 36%,#245b8d 0,#153b60 38%,#0b1d31 100%);color:#fff;opacity:1;visibility:visible;transition:opacity .45s ease,visibility .45s ease}
+.launch-screen.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.launch-logo{width:118px;height:118px;filter:drop-shadow(0 12px 24px #0005);animation:launchPop .75s cubic-bezier(.2,.8,.2,1) both}
+.launch-title{font-size:clamp(28px,7vw,38px);font-weight:850;letter-spacing:.12em;animation:launchRise .7s .12s both}
+.launch-subtitle{font-size:12px;letter-spacing:.2em;color:#c5e1ff;animation:launchRise .7s .22s both}
+.launch-loader{width:82px;height:3px;border-radius:9px;background:#ffffff30;overflow:hidden;margin-top:10px}
+.launch-loader:after{content:"";display:block;width:38%;height:100%;border-radius:9px;background:#8bd8ff;animation:launchLoad 1.05s ease-in-out infinite}
+@keyframes launchPop{0%{opacity:0;transform:scale(.72) rotate(-8deg)}70%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes launchRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes launchLoad{from{transform:translateX(-110%)}to{transform:translateX(280%)}}
+@media(max-width:600px){.brand-lockup{justify-content:flex-start}.brand-lockup img{width:48px;height:48px}}
+@media(prefers-reduced-motion:reduce){.launch-screen,.launch-logo,.launch-title,.launch-subtitle,.launch-loader:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div id="launchScreen" class="launch-screen" role="status" aria-label="Opening RUCHI GNM study app"><img class="launch-logo" src="./icon.svg" alt=""><div class="launch-title">RUCHI GNM</div><div class="launch-subtitle">NURSING STUDY COMPANION</div><div class="launch-loader" aria-hidden="true"></div></div>
 
 <header>
-<h1>🩺 RUCHI GNM</h1>
+<div class="brand-lockup"><img src="./icon.svg" alt="RUCHI GNM logo"><h1>RUCHI GNM</h1></div>
 <p>YOUR COMPLETE NURSING STUDY COMPANION</p>
 <p>Learn • Practice • Revise • Succeed</p><div class="header-tools"><span id="connectionStatus" role="status">Checking connection…</span><button id="themeToggle" type="button" onclick="toggleTheme()">🌙 Theme</button><button id="installApp" type="button" style="display:none" onclick="installApp()">Install app</button></div>
 </header>
@@ -931,6 +949,9 @@ document.addEventListener("touchend",()=>{
 document.addEventListener("touchcancel",clearPullRefresh,{passive:true});
 
 
+
+// Show a short branded opening animation, then reveal the app.
+(()=>{const splash=document.getElementById("launchScreen");if(!splash)return;const hide=()=>{splash.classList.add("is-hidden");setTimeout(()=>splash.remove(),500)};splash.addEventListener("click",hide,{once:true});window.setTimeout(hide,1500)})();
 </script>
 </body>
 </html>
