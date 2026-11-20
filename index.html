@@ -124,6 +124,16 @@ body.dark{background:radial-gradient(ellipse at 8% 0%,#152e4b 0,transparent 36%)
 .dark h2{color:#c8e1ff}
 .dark .tabs{background:#142338;border-color:#2a3d55}
 .dark .tabs button.selected{background:linear-gradient(120deg,#1b4b78,#2563eb)}
+.dark button.secondary{background:#294563;color:#f0f6ff;border-color:#46627f}
+.dark button.secondary:hover{background:#355779}
+#home>button.secondary{min-height:46px;font-weight:750}
+.tabs button{min-height:44px;touch-action:manipulation}
+.app-lock{position:fixed;inset:0;z-index:2000;place-items:center;padding:20px;background:rgba(5,13,25,.94);backdrop-filter:blur(10px)}
+.app-lock-panel{width:min(100%,390px);padding:24px;border:1px solid #3b5675;border-radius:20px;background:#142338;color:#e8f1fb;box-shadow:0 20px 70px #0008}
+.app-lock-panel h2{margin-top:0;color:#d8eaff}
+.app-lock-panel input{background:#0d1726;color:#fff;border-color:#45617f}
+.app-lock-panel button{width:100%;min-height:48px}
+#security .card li{margin:7px 0}
 @media(max-width:600px){
  header{padding:27px 16px 29px}
  .container{padding:14px}
@@ -166,6 +176,7 @@ body.dark{background:radial-gradient(ellipse at 8% 0%,#152e4b 0,transparent 36%)
  <button onclick="show('progress',this)">Progress</button>
  <button onclick="show('planner',this)">Study Plan</button>
  <button onclick="show('add',this)">Add</button>
+ <button onclick="show('security',this)">🔐 Security</button>
 </nav>
 
 <section id="home" class="section active">
@@ -292,6 +303,12 @@ infection-control policies and supervisor's instructions during actual patient c
 <div id="studyPlanList"></div>
 </section>
 
+<section id="security" class="section">
+<h2>🔐 Privacy & Security</h2>
+<div class="card"><h3>App PIN lock</h3><p class="small">Set a 6–12 digit PIN to add a lock screen when this app opens. PIN verification uses a salted password hash in this browser. This is a casual privacy lock, not an online account or encryption; someone with technical access to this device/browser may still access locally saved data. Never save real patient-identifying information here.</p><label for="securityPin">New PIN (6–12 digits)</label><input id="securityPin" type="password" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="Enter a PIN"><label for="securityPinConfirm">Confirm PIN</label><input id="securityPinConfirm" type="password" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="Re-enter PIN"><button onclick="setAppPin()">Set / Change PIN</button> <button class="secondary" onclick="lockApp()">Lock now</button> <button class="danger" onclick="removeAppPin()">Remove PIN</button><p id="securityStatus" class="small" aria-live="polite">No PIN is set.</p></div>
+<div class="card"><h3>Safe data habits</h3><ul><li>Use Export backup to keep a copy of your study progress.</li><li>Do not share your device unlock PIN or app PIN.</li><li>Only open trusted study links and keep your browser updated.</li><li>Study notes stay in this browser unless you export them.</li></ul></div>
+</section>
+
 <section id="add" class="section">
 <h2>➕ Add Your Own MCQ</h2>
 <label>Subject</label><input id="newSubject" placeholder="e.g. Anatomy & Physiology">
@@ -317,6 +334,7 @@ infection-control policies and supervisor's instructions during actual patient c
 
 <footer>RUCHI GNM • GNM Study Companion • Your study data stays in this browser</footer>
 <div id="pullRefreshHint" role="status" aria-live="polite">Pull down to refresh</div>
+<div id="appLock" class="app-lock" role="dialog" aria-modal="true" aria-labelledby="appLockTitle" style="display:none"><div class="app-lock-panel"><h2 id="appLockTitle">🔒 RUCHI GNM is locked</h2><p class="small">Enter your app PIN to continue.</p><input id="unlockPin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" placeholder="Enter PIN"><button onclick="unlockApp()">Unlock app</button><p id="unlockMessage" class="small" role="status"></p></div></div>
 
 <script>
 const subjects={
@@ -446,7 +464,7 @@ function show(id,btn){
  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
  document.getElementById(id).classList.add("active");
  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("selected"));
- if(btn)btn.classList.add("selected");
+ if(btn){btn.classList.add("selected");btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
  refreshStats();
  if(id==="library")renderLibrary();
  if(id==="notes")renderNotes();
@@ -456,6 +474,7 @@ function show(id,btn){
  if(id==="viva")renderViva();
  if(id==="progress")renderProgress();
  if(id==="planner")renderPlanner();
+ if(id==="security")renderSecurity();
  if(id==="mcq")startPractice();
 }
 function go(id){
@@ -482,9 +501,25 @@ function renderLibrary(){
   if(year!=="All"&&t.y!==year)return;
   if(!(t.s+" "+t.t+" "+t.n).toLowerCase().includes(query))return;
   const key=t.y+"|"+t.s+"|"+t.t,done=completedTopics.includes(key);
-  html+='<div class="item"><b>'+escapeHTML(t.s)+'</b><p>'+escapeHTML(t.y)+' · '+escapeHTML(t.t)+'</p><p>'+escapeHTML(t.n)+'</p><button class="'+(done?"secondary":"")+'" onclick="toggleTopicIndex('+i+')">'+(done?"✓ Completed":"Mark Complete")+'</button> <button class="secondary" onclick="openLesson('+i+')">Read chapter</button></div>';
+  html+='<div class="item"><b>'+escapeHTML(t.s)+'</b><p>'+escapeHTML(t.y)+' · '+escapeHTML(t.t)+'</p><p>'+escapeHTML(t.n)+'</p><button class="'+(done?"secondary":"")+'" onclick="toggleTopicIndex('+i+')">'+(done?"✓ Completed":"Mark Complete")+'</button> <button class="secondary" onclick="openLesson('+i+')">Read chapter</button> '+(i>=topics.length?'<button class="secondary" onclick="editCustomTopic('+(i-topics.length)+')">Edit</button>':'')+'</div>';
  });
  document.getElementById("libraryList").innerHTML=html||"No topics found.";
+}
+function editCustomTopic(i){
+ const t=customTopics[i];if(!t)return;
+ const year=prompt("Edit year (First Year / Second Year / Third Year)",t.y);if(year===null)return;
+ if(!["First Year","Second Year","Third Year"].includes(year.trim())){alert("Please enter First Year, Second Year or Third Year.");return}
+ const subject=prompt("Edit subject",t.s);if(subject===null)return;
+ const title=prompt("Edit topic name",t.t);if(title===null)return;
+ const notesText=prompt("Edit short notes",t.n);if(notesText===null)return;
+ if(!subject.trim()||!title.trim()||!notesText.trim()){alert("Fields cannot be empty.");return}
+ const oldKey=t.y+"|"+t.s+"|"+t.t,newTopic={y:year.trim(),s:subject.trim(),t:title.trim(),n:notesText.trim()},newKey=newTopic.y+"|"+newTopic.s+"|"+newTopic.t;
+ customTopics[i]=newTopic;
+ if(completedTopics.includes(oldKey)){completedTopics=completedTopics.map(k=>k===oldKey?newKey:k);saveJSON("ruchi_done",completedTopics)}
+ if(topicDays[oldKey]){topicDays[newKey]=topicDays[oldKey];delete topicDays[oldKey];saveJSON("ruchi_topic_days",topicDays)}
+ if(bookmarkedChapters.includes(oldKey)){bookmarkedChapters=bookmarkedChapters.map(k=>k===oldKey?newKey:k);saveJSON("ruchi_bookmarks",bookmarkedChapters)}
+ const last=loadJSON("ruchi_last_lesson",null);if(last&&last.y===t.y&&last.s===t.s&&last.t===t.t)saveJSON("ruchi_last_lesson",newTopic);
+ saveJSON("ruchi_custom_topics",customTopics);fillSubjects();renderLibrary();renderReader();refreshStats();
 }
 function toggleTopicIndex(i){const t=topics.concat(customTopics)[i];if(t)toggleTopic(encodeURIComponent(t.y+"|"+t.s+"|"+t.t))}
 function toggleTopic(encoded){
@@ -635,7 +670,7 @@ function bookCoverImage(i,title){
 }
 function renderBooks(){
  document.getElementById("recommendedBooks").innerHTML="<h3>Real books you can read here</h3><p class=\"small\">Free official or openly licensed resources. GNM chapters are ordered by INC; open nursing textbooks may follow a different curriculum. Cover pictures are app-made previews; each title opens the listed book.</p>"+recommendedBooks.map((b,i)=>'<div class="item recommended-book">'+bookCoverImage(i,b.title)+'<div class="recommended-book-info"><h3>'+escapeHTML(b.title)+'</h3><p>'+escapeHTML(b.author)+'</p><p>'+escapeHTML(b.type)+'</p><p class="small">'+escapeHTML(b.license)+'</p><button onclick="readOpenBook('+i+')">Read in app</button></div></div>').join("");
- document.getElementById("myBooks").innerHTML="<h3>My saved books</h3>"+(personalBooks.map((b,i)=>'<div class="item"><b>'+escapeHTML(b.title)+'</b><p>'+escapeHTML(b.author)+' · '+escapeHTML(b.subject)+'</p>'+(b.link?'<button class="secondary" onclick="readPersonalBook('+i+')">Read in app</button> ' : '')+'<button class="danger" onclick="deleteBook('+i+')">Remove</button></div>').join("")||"No books saved yet.");
+ document.getElementById("myBooks").innerHTML="<h3>My saved books</h3>"+(personalBooks.map((b,i)=>'<div class="item"><b>'+escapeHTML(b.title)+'</b><p>'+escapeHTML(b.author)+' · '+escapeHTML(b.subject)+'</p>'+(b.link?'<button class="secondary" onclick="readPersonalBook('+i+')">Read in app</button> ' : '')+'<button class="secondary" onclick="editBook('+i+')">Edit</button> <button class="danger" onclick="deleteBook('+i+')">Remove</button></div>').join("")||"No books saved yet.");
 }
 function displayBookInApp(url,title,isPdf){
  const viewer=document.getElementById("pdfBookViewer"),fallback=document.getElementById("pdfBookFallback");
@@ -649,6 +684,16 @@ function readOpenBook(i){const book=recommendedBooks[i];if(book)displayBookInApp
 function readPersonalBook(i){
  const book=personalBooks[i];if(!book||!book.link)return;
  displayBookInApp(book.link,book.title,/\.pdf(?:$|[?#])/i.test(book.link));
+}
+function editBook(i){
+ const b=personalBooks[i];if(!b)return;
+ const title=prompt("Edit book title",b.title);if(title===null)return;
+ const author=prompt("Edit author",b.author);if(author===null)return;
+ const subject=prompt("Edit subject",b.subject);if(subject===null)return;
+ const link=prompt("Edit HTTPS link (optional)",b.link||"");if(link===null)return;
+ if(!title.trim()||!author.trim()||!subject.trim()){alert("Title, author and subject cannot be empty.");return}
+ if(link.trim()&&!link.trim().startsWith("https://")){alert("Link should start with https://");return}
+ personalBooks[i]={title:title.trim(),author:author.trim(),subject:subject.trim(),link:link.trim()};saveJSON("ruchi_books",personalBooks);renderBooks();
 }
 function addBook(){let title=document.getElementById("bookTitle").value.trim(),author=document.getElementById("bookAuthor").value.trim(),subject=document.getElementById("bookSubject").value.trim(),link=document.getElementById("bookLink").value.trim();if(!title||!author||!subject){alert("Enter title, author and subject");return}if(link&&!link.startsWith("https://")){alert("Link should start with https://");return}personalBooks.unshift({title,author,subject,link});saveJSON("ruchi_books",personalBooks);["bookTitle","bookAuthor","bookSubject","bookLink"].forEach(id=>document.getElementById(id).value="");renderBooks()}
 function deleteBook(i){personalBooks.splice(i,1);saveJSON("ruchi_books",personalBooks);renderBooks()}
@@ -808,6 +853,41 @@ function addTopic(){
  alert("Topic added!");
  ["topicSubject","topicName","topicNotes"].forEach(x=>document.getElementById(x).value="");
 }
+async function makePinHash(pin,salt){
+ const enc=new TextEncoder(),key=await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveBits"]);
+ const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode(salt),iterations:150000,hash:"SHA-256"},key,256);
+ return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function renderSecurity(){
+ const status=document.getElementById("securityStatus");
+ if(status)status.textContent=loadJSON("ruchi_pin",null)?"A local app PIN is enabled on this browser.":"No PIN is set. Set one if you want a lock screen on next app opening.";
+}
+async function setAppPin(){
+ if(!window.crypto||!crypto.subtle){alert("Secure PIN setup is not supported by this browser. Please update your browser.");return}
+ const pin=document.getElementById("securityPin").value,confirmPin=document.getElementById("securityPinConfirm").value;
+ if(!/^\d{6,12}$/.test(pin)){alert("PIN must be 6–12 digits.");return}
+ if(pin!==confirmPin){alert("PINs do not match.");return}
+ const salt=Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b=>b.toString(16).padStart(2,"0")).join("");
+ const hash=await makePinHash(pin,salt);saveJSON("ruchi_pin",{salt,hash});
+ document.getElementById("securityPin").value="";document.getElementById("securityPinConfirm").value="";renderSecurity();alert("App PIN set. The app will ask for it when opened again.");
+}
+async function unlockApp(){
+ const record=loadJSON("ruchi_pin",null),pin=document.getElementById("unlockPin").value;
+ if(!record){document.getElementById("appLock").style.display="none";return}
+ if(!/^\d{6,12}$/.test(pin)){document.getElementById("unlockMessage").textContent="Enter your 6–12 digit PIN.";return}
+ const hash=await makePinHash(pin,record.salt);
+ if(hash!==record.hash){document.getElementById("unlockMessage").textContent="Incorrect PIN. Try again.";document.getElementById("unlockPin").value="";return}
+ document.getElementById("appLock").style.display="none";document.getElementById("unlockPin").value="";document.getElementById("unlockMessage").textContent="";
+}
+function lockApp(){
+ if(!loadJSON("ruchi_pin",null)){go("security");alert("Set an app PIN first.");return}
+ document.getElementById("unlockPin").value="";document.getElementById("unlockMessage").textContent="";document.getElementById("appLock").style.display="grid";document.getElementById("unlockPin").focus();
+}
+function removeAppPin(){
+ if(!loadJSON("ruchi_pin",null)){alert("No PIN is set.");return}
+ if(!confirm("Remove the app PIN lock from this browser?"))return;
+ localStorage.removeItem("ruchi_pin");renderSecurity();alert("App PIN removed.");
+}
 function resetProgress(){
  if(!confirm("Reset all MCQ attempts, wrong answers and completed topics?"))return;
  attempts=[];wrong=[];completedTopics=[];topicDays={};
@@ -815,6 +895,7 @@ function resetProgress(){
  renderProgress();refreshStats();
 }
 if(loadJSON("ruchi_theme",false)){document.body.classList.add("dark");document.getElementById("themeToggle").textContent="☀️ Light"}
+if(loadJSON("ruchi_pin",null)){document.getElementById("appLock").style.display="grid"}
 fillSubjects();
 refreshStats();
 renderLibrary();
