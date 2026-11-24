@@ -256,6 +256,104 @@ body.dark{background:radial-gradient(ellipse at 78% 0%,#1b3552 0,transparent 36%
 }
 @media(prefers-reduced-motion:reduce){.card,.tabs button{transition:none!important}}
 
+
+
+/* RUCHI GNM — KR-X NEBULA-style dark dashboard, nursing-blue identity */
+:root{
+ --navy:#12365b;--blue:#1976d2;--light:#183653;--bg:#07111f;
+ --white:#0d1b2d;--text:#edf6ff;--muted:#9bb0c5;--green:#58d6a2;
+ --red:#ff8585;--line:#203b55;--shadow:0 18px 55px #0005
+}
+html{background:var(--bg);scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 10% 0%,#12314b 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+header{
+ position:relative;margin-left:252px;padding:22px 30px 18px;
+ border-radius:0 0 0 20px;background:linear-gradient(120deg,#102c4c,#12365b 55%,#1976d2);
+ box-shadow:0 8px 28px #0004;overflow:hidden
+}
+header:after{content:"";position:absolute;right:25px;top:-125px;width:260px;height:260px;border:1px solid #ffffff25;border-radius:50%;box-shadow:0 0 0 30px #ffffff09,0 0 0 60px #ffffff06;pointer-events:none}
+.brand-lockup{justify-content:flex-start;max-width:none;margin:0 0 5px;position:relative;z-index:1}
+.brand-lockup img{width:44px;height:44px}
+.brand-lockup h1{font-size:24px;letter-spacing:.08em;color:#fff}
+header>p{margin:2px 0 0;max-width:none;font-size:11px;letter-spacing:1.4px;color:#c5ddf5;position:relative;z-index:1}
+.header-tools{margin:11px 0 0;max-width:none;position:relative;z-index:1}
+.header-tools button{background:#ffffff16;border:1px solid #ffffff35;color:#fff}
+#connectionStatus{color:#c9e2ff}
+.container{max-width:none;margin:0 0 0 252px;padding:22px 30px 48px}
+.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.stat{background:linear-gradient(145deg,#10243a,#0d1b2d);border:1px solid var(--line);border-radius:15px;padding:17px 15px;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow)}
+.stat strong{font-size:25px;color:#d8ebff;font-weight:800}
+.stat span{font-size:12px;color:var(--muted);font-weight:650}
+.tabs{
+ position:fixed;z-index:50;left:14px;top:14px;bottom:14px;width:220px;
+ display:flex;flex-direction:column;align-items:stretch;gap:5px;overflow-y:auto;
+ padding:16px 12px;margin:0;border-radius:18px;background:#081523ef;
+ border:1px solid #203b55;box-shadow:0 16px 42px #0005;
+ backdrop-filter:blur(18px);scrollbar-width:thin
+}
+.tabs:before{content:"RUCHI • NURSING HUB";display:block;padding:8px 10px 13px;color:#7891a8;font-size:10px;font-weight:850;letter-spacing:1.7px}
+.tabs button{width:100%;min-height:43px;flex:0 0 auto;text-align:left;padding:10px 12px;border-radius:10px;background:transparent;color:#b8cadd;border:1px solid transparent;font-size:13px;font-weight:700;box-shadow:none}
+.tabs button:hover{background:#142b42;color:#fff;border-color:#244b68}
+.tabs button.selected{background:linear-gradient(120deg,#12365b,#1976d2);color:#fff;border-color:#2d6da5;box-shadow:0 7px 18px #12365b55}
+.section{animation:fadein .2s ease}
+.section>h2{margin:5px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line);color:#d8ebff;font-size:25px}
+h2,h3{color:#e7f2ff}
+.grid{gap:14px}
+.card,.item{background:linear-gradient(145deg,#10243a,#0d1b2d);border:1px solid var(--line);border-radius:15px;box-shadow:0 10px 28px #0003;color:var(--text)}
+.card{padding:19px}
+#home .grid .card{position:relative;overflow:hidden}
+#home .grid .card:after{content:"";position:absolute;width:110px;height:110px;right:-55px;top:-55px;border-radius:50%;background:#1976d21c;pointer-events:none}
+#home .grid .card:hover{transform:translateY(-3px);box-shadow:0 16px 32px #0005;border-color:#315878}
+.card .emoji{background:#173653;color:#cce5ff;border-radius:13px}
+p,.small,.card p,.item p{color:var(--muted)}
+button{border-radius:10px;font-weight:700;box-shadow:none}
+button:not(.secondary):not(.danger):not(.option){background:linear-gradient(120deg,#174b78,#1976d2);color:#fff;border:1px solid #2a6396}
+button:not(.secondary):not(.danger):not(.option):hover{filter:brightness(1.12);box-shadow:0 5px 16px #1976d244}
+button.secondary{background:#142b42;color:#d8ebff;border:1px solid #294b68}
+button.secondary:hover{background:#1b3a58}
+button.danger{background:#3a202b;color:#ffb6b6;border:1px solid #693b48}
+input,select,textarea{border-radius:9px;border:1px solid #29445d;background:#071523;color:var(--text)}
+input::placeholder,textarea::placeholder{color:#718aa2}
+input:focus,select:focus,textarea:focus{border-color:#1976d2;box-shadow:0 0 0 3px #1976d222;outline:0}
+label{color:#b8cadd}
+.item{padding:15px}
+.progress{background:#20384c}
+.progress div{background:linear-gradient(90deg,#16845b,#58d6a2)}
+.option{background:#0a1b2b;color:var(--text);border:1px solid #29445d}
+.option:hover{background:#142b42}
+.option.correct{background:#123c35;border-color:#16845b;color:#aaf0d2}
+.option.wrong{background:#40232b;border-color:#c93b3b;color:#ffc2c2}
+.result{background:#102b43;border:1px solid #2b526b;color:#d9ebfb}
+.book-frame{border-color:#29445d;background:#071523}
+footer{margin-left:252px;padding:18px 25px 28px;color:#7891a8}
+#pullRefreshHint{background:#12365b}
+body.dark{background:radial-gradient(ellipse at 10% 0%,#12314b 0,transparent 34%),#07111f}
+.dark .tabs{background:#081523ef;border-color:#203b55}
+.dark .tabs:before{color:#7891a8}
+.dark .tabs button{color:#b8cadd}
+.dark .tabs button:hover{background:#142b42;border-color:#244b68}
+.dark .tabs button.selected{background:linear-gradient(120deg,#12365b,#1976d2);color:#fff}
+.dark .stat,.dark .card,.dark .item{background:linear-gradient(145deg,#10243a,#0d1b2d);border-color:#203b55}
+.dark input,.dark select,.dark textarea{background:#071523;border-color:#29445d;color:#edf6ff}
+.dark .result{background:#102b43;border-color:#2b526b;color:#d9ebfb}
+.dark .option{background:#0a1b2b;border-color:#29445d;color:#edf6ff}
+@media(max-width:760px){
+ header{margin-left:0;padding:22px 17px 19px;border-radius:0 0 20px 20px}
+ .brand-lockup{justify-content:flex-start}
+ .container{margin:0;padding:14px 13px 32px}
+ .stats{gap:8px}
+ .stat{display:block;padding:13px 9px;text-align:center}
+ .stat strong{font-size:21px}
+ .stat span{font-size:10px}
+ .tabs{position:sticky;left:auto;top:0;bottom:auto;width:auto;max-height:none;flex-direction:row;align-items:center;overflow-x:auto;overflow-y:hidden;margin:0 -13px 16px;padding:9px 11px;border-radius:0 0 14px 14px;gap:7px;z-index:60;background:#081523f2}
+ .tabs:before{display:none}
+ .tabs button{width:auto;min-height:42px;text-align:center;white-space:nowrap;padding:9px 12px}
+ footer{margin-left:0}
+ .section>h2{font-size:22px}
+}
+@media(max-width:420px){.header-tools{gap:7px}.header-tools button{padding:9px 11px;font-size:12px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{font-size:19px}.stat span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.card,.tabs button{transition:none!important}}
+
 </style>
 </head>
 <body>
