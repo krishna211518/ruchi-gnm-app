@@ -164,6 +164,98 @@ body.dark{background:radial-gradient(ellipse at 8% 0%,#152e4b 0,transparent 36%)
 @keyframes launchLoad{from{transform:translateX(-110%)}to{transform:translateX(280%)}}
 @media(max-width:600px){.brand-lockup{justify-content:flex-start}.brand-lockup img{width:48px;height:48px}}
 @media(prefers-reduced-motion:reduce){.launch-screen,.launch-logo,.launch-title,.launch-subtitle,.launch-loader:after{animation:none!important;transition:none!important}}
+
+/* KR-X inspired RUCHI dashboard layout — preserve RUCHI navy/blue identity */
+:root{
+ --navy:#12365b;--blue:#1976d2;--light:#edf5ff;--bg:#f4f7fb;
+ --white:#fff;--text:#203047;--muted:#66788c;--green:#16845b;
+ --red:#d64545;--line:#dce5ef;--shadow:0 16px 40px rgba(18,54,91,.08)
+}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 78% 0%,#e7f1fc 0,transparent 36%),var(--bg);min-height:100vh}
+header{
+ position:relative;margin-left:252px;padding:22px 30px 18px;
+ border-radius:0 0 0 22px;box-shadow:0 8px 28px rgba(18,54,91,.10);
+ background:linear-gradient(120deg,#102c4c 0%,#12365b 52%,#1976d2 100%);
+}
+header:after{content:"";position:absolute;right:24px;top:-120px;width:260px;height:260px;border:1px solid #ffffff24;border-radius:50%;box-shadow:0 0 0 30px #ffffff09,0 0 0 60px #ffffff06;pointer-events:none}
+.brand-lockup{justify-content:flex-start;max-width:none;margin:0 0 5px}
+.brand-lockup img{width:44px;height:44px}
+.brand-lockup h1{font-size:24px;letter-spacing:.08em}
+header>p{margin:2px 0 0;max-width:none;font-size:11px;letter-spacing:1.4px}
+.header-tools{margin:10px 0 0;max-width:none}
+.container{max-width:none;margin:0 0 0 252px;padding:22px 30px 48px}
+.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.stat{border-radius:16px;padding:17px 14px;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stat strong{font-size:25px;color:var(--navy)}
+.stat span{font-size:12px;font-weight:650}
+.tabs{
+ position:fixed;z-index:20;left:14px;top:14px;bottom:14px;width:220px;
+ display:flex;flex-direction:column;align-items:stretch;gap:5px;overflow-y:auto;
+ padding:16px 12px;margin:0;border-radius:20px;background:rgba(255,255,255,.92);
+ border:1px solid #dce5ef;box-shadow:0 16px 42px rgba(18,54,91,.10);
+ backdrop-filter:blur(18px);scrollbar-width:thin
+}
+.tabs:before{content:"RUCHI • STUDY HUB";display:block;padding:8px 10px 13px;color:#7890a8;font-size:10px;font-weight:850;letter-spacing:1.7px}
+.tabs button{width:100%;min-height:43px;flex:0 0 auto;text-align:left;padding:10px 12px;border-radius:11px;background:transparent;color:#38516b;border:1px solid transparent;font-size:13px;font-weight:700;box-shadow:none}
+.tabs button:hover{background:#edf5ff;color:var(--navy);border-color:#d9e9fb}
+.tabs button.selected{background:linear-gradient(120deg,#12365b,#1976d2);color:#fff;box-shadow:0 7px 18px #12365b2b}
+.section{animation:fadein .2s ease}
+.section>h2{margin:6px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line);color:var(--navy);font-size:25px}
+.grid{gap:14px}
+.card,.item{border-radius:17px;box-shadow:0 10px 28px rgba(18,54,91,.055);border-color:#e0e9f2}
+.card{padding:19px}
+#home .grid .card{position:relative;overflow:hidden}
+#home .grid .card:after{content:"";position:absolute;width:110px;height:110px;right:-55px;top:-55px;border-radius:50%;background:#1976d20a;pointer-events:none}
+#home .grid .card:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(18,54,91,.10)}
+.card .emoji{background:#edf5ff;color:var(--navy);border-radius:14px}
+button{border-radius:11px;font-weight:700}
+button.secondary{background:#edf5ff;color:#12365b;border-color:#d9e9fb}
+input,select,textarea{border-radius:11px;border-color:#d5e0eb;background:var(--white)}
+input:focus,select:focus,textarea:focus{border-color:#1976d2;box-shadow:0 0 0 3px #1976d21a;outline:0}
+.progress{background:#e5edf5}
+.progress div{background:linear-gradient(90deg,#16845b,#38b98a)}
+footer{margin-left:252px;padding:18px 25px 28px}
+#pullRefreshHint{z-index:1002}
+body.dark{background:radial-gradient(ellipse at 78% 0%,#1b3552 0,transparent 36%),#101a29}
+.dark .tabs{background:rgba(20,35,56,.94);border-color:#2a3b51}
+.dark .tabs:before{color:#91a8c0}
+.dark .tabs button{color:#c2d2e2}
+.dark .tabs button:hover{background:#20354b;border-color:#35516d}
+.dark .tabs button.selected{background:linear-gradient(120deg,#12365b,#1976d2);color:#fff}
+.dark .stat,.dark .card,.dark .item{background:var(--white);border-color:#2a3b51}
+.dark .stat strong,.dark .section>h2{color:#d7eaff}
+.dark .card .emoji{background:#20354b}
+.dark input,.dark select,.dark textarea{background:#132236;border-color:#3a4e67;color:var(--text)}
+.dark footer{color:#afbed0}
+@media(max-width:760px){
+ header{margin-left:0;padding:22px 17px 19px;border-radius:0 0 22px 22px}
+ .brand-lockup{justify-content:flex-start}
+ .container{margin:0;padding:14px 13px 32px}
+ .stats{gap:8px}
+ .stat{display:block;padding:13px 9px;text-align:center}
+ .stat strong{font-size:21px}
+ .stat span{font-size:10px}
+ .tabs{
+  position:sticky;left:auto;top:0;bottom:auto;width:auto;max-height:none;
+  flex-direction:row;align-items:center;overflow-x:auto;overflow-y:hidden;
+  margin:0 -13px 16px;padding:9px 11px;border-radius:0 0 15px 15px;
+  gap:7px;z-index:30
+ }
+ .tabs:before{display:none}
+ .tabs button{width:auto;min-height:42px;text-align:center;white-space:nowrap;padding:9px 12px}
+ footer{margin-left:0}
+ .section>h2{font-size:22px}
+}
+@media(max-width:420px){
+ .header-tools{gap:7px}
+ .header-tools button{padding:9px 11px;font-size:12px}
+ .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .stat strong{font-size:19px}
+ .stat span{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.card,.tabs button{transition:none!important}}
+
 </style>
 </head>
 <body>
