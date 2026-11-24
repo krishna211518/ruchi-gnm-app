@@ -259,30 +259,29 @@ body.dark{background:radial-gradient(ellipse at 78% 0%,#1b3552 0,transparent 36%
 
 
 
-/* RUCHI GNM — KR-X workspace shell */
-:root{--bg:#07111f;--panel:#0d1b2d;--panel2:#10243a;--line:#203b55;--text:#edf6ff;--muted:#9bb0c5;--cyan:#48d9e8;--blue:#5597ff;--green:#6ce6b0;--red:#ff8585;--shadow:0 18px 55px #0005}
-*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#12314b 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
-.app{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:100vh}
-.sidebar{background:#081523ef;border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;overflow-y:auto;scrollbar-width:thin}
-.brand{display:flex;align-items:center;gap:12px;padding:0 8px}.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,var(--cyan),var(--blue));display:grid;place-items:center;overflow:hidden;box-shadow:0 0 25px #48d9e855}.brand-mark img{width:100%;height:100%;object-fit:contain;padding:5px}.brand strong{font-size:20px;letter-spacing:3px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.5px}
-.nav-label{color:#6f8ba5;font-size:10px;font-weight:800;letter-spacing:1.8px;padding:0 12px;margin:4px 0}.nav{display:grid;gap:5px}.nav button{border:1px solid transparent!important;background:transparent!important;color:#b8cadd!important;text-align:left;padding:11px 12px;border-radius:10px;display:flex;gap:12px;align-items:center;width:100%;min-height:42px;font-size:13px;box-shadow:none!important}.nav button:hover,.nav button.selected{background:#142b42!important;color:white!important;border-color:#244b68!important}.nav button.selected{box-shadow:inset 3px 0 var(--cyan)!important}.side-bottom{margin-top:auto;color:#7891a8;font-size:12px;padding:12px}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px}.connection-label{color:var(--green);font-weight:700}
+/* RUCHI GNM — KR-X matching workspace interface; retain RUCHI navy/blue identity */
+:root{--bg:#f3f7fb;--panel:#fff;--panel2:#fff;--line:#dce5ef;--text:#203047;--muted:#66788c;--cyan:#1976d2;--blue:#12365b;--green:#16845b;--red:#d64545;--shadow:0 12px 32px rgba(18,54,91,.08)}
+*{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth;overscroll-behavior-y:contain;-webkit-text-size-adjust:100%}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#e7f1fc 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;overflow-y:auto;scrollbar-width:thin}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(140deg,#12365b,#1976d2);display:grid;place-items:center;overflow:hidden;box-shadow:0 0 22px #1976d230}.brand-mark img{width:100%;height:100%;object-fit:contain;padding:5px}.brand strong{font-size:20px;letter-spacing:3px;color:#12365b}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.5px}
+.nav-label{color:#7890a8;font-size:10px;font-weight:800;letter-spacing:1.8px;padding:0 12px;margin:4px 0}.nav{display:grid;gap:5px}.nav button{border:1px solid transparent!important;background:transparent!important;color:#38516b!important;text-align:left;padding:11px 12px;border-radius:10px;display:flex;gap:12px;align-items:center;width:100%;min-height:42px;font-size:13px;box-shadow:none!important}.nav button:hover,.nav button.selected{background:#edf5ff!important;color:#12365b!important;border-color:#d9e9fb!important}.nav button.selected{box-shadow:inset 3px 0 #1976d2!important}.nav .ico{width:20px;flex:none;text-align:center;font-size:17px}.side-bottom{margin-top:auto;color:#7891a8;font-size:12px;padding:12px}.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px}.connection-label{color:var(--green);font-weight:700}
 .workspace{min-width:0;width:100%;max-width:1600px;margin:0 auto}.workspace>header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:28px clamp(16px,3vw,42px) 12px;margin:0;background:transparent;border:0;border-radius:0;box-shadow:none;position:relative;overflow:visible}.workspace>header:after{display:none}.brand-lockup{display:flex;align-items:center;gap:12px;justify-content:flex-start;max-width:none;margin:0}.brand-lockup img{width:42px;height:42px;border-radius:13px}.brand-lockup h1{font-size:clamp(25px,4vw,34px);margin:0;letter-spacing:-1px;color:var(--text)}.workspace>header>p{display:none}.header-tools{margin:0;max-width:none;display:flex;align-items:center;gap:9px;flex-wrap:wrap}.header-tools #connectionStatus{color:var(--green);font-size:12px}
 .container{max-width:none;width:100%;margin:0;padding:16px clamp(16px,3vw,42px) 48px}
-.tabs{position:static;display:none}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:4px 0 18px}.stat{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow);text-align:left}.stat strong{font-size:28px;color:var(--text);font-weight:800;letter-spacing:-1px}.stat span{font-size:12px;color:var(--muted);font-weight:600}
-.section{animation:fade .2s ease}.section>h2{margin:5px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line);color:var(--text);font-size:25px}
-.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;margin-top:18px}.grid>.card{grid-column:span 4}.card,.item{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;box-shadow:0 10px 28px #0003;color:var(--text)}.card{padding:18px;min-width:0}.card h3{color:var(--text);font-size:15px;margin:0 0 12px}.card .emoji{display:grid;place-items:center;width:42px;height:42px;margin-bottom:10px;background:#173653;color:#cce5ff;border-radius:13px;font-size:22px}
-#home .grid .card{position:relative;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s}#home .grid .card:after{content:"";position:absolute;width:110px;height:110px;right:-55px;top:-55px;border-radius:50%;background:#48d9e81b;pointer-events:none}#home .grid .card:hover{transform:translateY(-3px);border-color:#315878;box-shadow:0 16px 32px #0005}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:4px 0 18px}.stat{background:linear-gradient(145deg,#fff,#f8fbff);border:1px solid var(--line);border-radius:15px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:var(--shadow);text-align:left}.stat strong{font-size:28px;color:var(--blue);font-weight:800;letter-spacing:-1px}.stat span{font-size:12px;color:var(--muted);font-weight:600}
+.section{animation:fade .2s ease}.section>h2{margin:5px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line);color:var(--blue);font-size:25px}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;margin-top:18px}.grid>.card{grid-column:span 4}.card,.item{background:linear-gradient(145deg,#fff,#fbfdff);border:1px solid var(--line);border-radius:15px;box-shadow:0 10px 28px rgba(18,54,91,.055);color:var(--text)}.card{padding:18px;min-width:0}.card h3{color:var(--text);font-size:15px;margin:0 0 12px}.card .emoji{display:grid;place-items:center;width:42px;height:42px;margin-bottom:10px;background:#edf5ff;color:#12365b;border-radius:13px;font-size:22px}
+#home .grid .card{position:relative;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s}#home .grid .card:after{content:"";position:absolute;width:110px;height:110px;right:-55px;top:-55px;border-radius:50%;background:#1976d20d;pointer-events:none}#home .grid .card:hover{transform:translateY(-3px);border-color:#b9d5f1;box-shadow:0 16px 32px rgba(18,54,91,.10)}
 h2,h3{color:var(--text)}p,.small,.card p,.item p{color:var(--muted)}
-button{border-radius:9px;font-weight:700;cursor:pointer;box-shadow:none}button:not(.secondary):not(.danger):not(.option){background:linear-gradient(120deg,#42d5df,#5c9bff);color:#05121e;border:0}button:not(.secondary):not(.danger):not(.option):hover{filter:brightness(1.1);box-shadow:0 5px 16px #48d9e833}button.secondary{background:#142b42;color:#d8ebff;border:1px solid #294b68}button.secondary:hover{background:#1b3a58}button.danger{background:#3a202b;color:#ffb6b6;border:1px solid #693b48}
-input,select,textarea{border-radius:9px;border:1px solid #29445d;background:#071523;color:var(--text);padding:10px 11px}input::placeholder,textarea::placeholder{color:#718aa2}input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #48d9e81b;outline:0}label{color:#b8cadd}
-.item{padding:15px}.progress{height:8px;background:#20384c;border-radius:20px;overflow:hidden}.progress div{height:100%;background:linear-gradient(90deg,#42d5df,#6ce6b0);border-radius:20px}.option{background:#0a1b2b;color:var(--text);border:1px solid #29445d}.option:hover{background:#142b42}.option.correct{background:#123c35;border-color:#16845b;color:#aaf0d2}.option.wrong{background:#40232b;border-color:#c93b3b;color:#ffc2c2}.result{background:#102b43;border:1px solid #2b526b;color:#d9ebfb;border-radius:10px;padding:12px}.book-frame{border-color:#29445d;background:#071523}
+button{border-radius:9px;font-weight:700;cursor:pointer;box-shadow:none}button:not(.secondary):not(.danger):not(.option){background:linear-gradient(120deg,#12365b,#1976d2);color:#fff;border:0}button:not(.secondary):not(.danger):not(.option):hover{filter:brightness(1.08);box-shadow:0 5px 16px #1976d229}button.secondary{background:#edf5ff;color:#12365b;border:1px solid #d9e9fb}button.secondary:hover{background:#dcecff}button.danger{background:#fff1f1;color:#b52f38;border:1px solid #f0d4d6}
+input,select,textarea{border-radius:9px;border:1px solid #cbd7e4;background:#fff;color:var(--text);padding:10px 11px}input::placeholder,textarea::placeholder{color:#8293a5}input:focus,select:focus,textarea:focus{border-color:#1976d2;box-shadow:0 0 0 3px #1976d21b;outline:0}label{color:#38516b}
+.item{padding:15px}.progress{height:8px;background:#e5edf5;border-radius:20px;overflow:hidden}.progress div{height:100%;background:linear-gradient(90deg,#1976d2,#16845b);border-radius:20px}.option{background:#f5f8fc;color:var(--text);border:1px solid #dce5ef}.option:hover{background:#e9f2fc}.option.correct{background:#e2f7ed;border-color:#16845b;color:#126342}.option.wrong{background:#ffeded;border-color:#c93b3b;color:#a52c2c}.result{background:#edf5ff;border:1px solid #d9e9fb;color:#203047;border-radius:10px;padding:12px}.book-frame{border-color:#dce5ef;background:#fff}
 .workspace footer{margin:22px 0 0;padding:18px clamp(16px,3vw,42px) 28px;border-top:1px solid var(--line);color:#7891a8}
-#pullRefreshHint{background:#12365b;color:#d8ebff}
+#pullRefreshHint{background:#12365b;color:#fff}
+.dark{--bg:#101a29;--panel:#18273a;--panel2:#18273a;--line:#2a3b51;--text:#e8f0fa;--muted:#afbed0;--blue:#d7eaff;--shadow:0 10px 28px #0003;background:var(--bg);color:var(--text)}.dark .sidebar{background:#0b1726;border-color:var(--line)}.dark .brand strong{color:#e8f0fa}.dark .nav button{color:#c2d2e2!important}.dark .nav button:hover,.dark .nav button.selected{background:#20354b!important;color:#fff!important;border-color:#35516d!important}.dark .stat,.dark .card,.dark .item{background:linear-gradient(145deg,#1b2b40,#142338);border-color:var(--line)}.dark .stat strong,.dark .section>h2{color:#d7eaff}.dark .card .emoji{background:#20354b;color:#d8ebff}.dark input,.dark select,.dark textarea{background:#132236;border-color:#3a4e67;color:var(--text)}.dark .option{background:#1b2b40;border-color:#3a4e67;color:var(--text)}.dark .result{background:#1a3048;border-color:#2b4967;color:var(--text)}
 @media(max-width:760px){.app{display:block}.sidebar{position:sticky;top:0;z-index:70;width:100%;height:auto;padding:10px 12px 8px;gap:8px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}.brand{display:none}.sidebar>div:first-of-type{min-width:0}.nav-label{display:none}.nav{display:flex;overflow-x:auto;overflow-y:hidden;gap:7px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav button{width:auto;flex:0 0 auto;white-space:nowrap;min-height:40px;padding:9px 12px}.side-bottom{display:none}.workspace>header{padding:18px 14px 8px;align-items:flex-start;flex-direction:column;gap:10px}.brand-lockup h1{font-size:25px}.container{padding:12px 13px 32px}.stats{gap:8px}.stat{display:block;padding:13px 9px;text-align:center}.stat strong{font-size:21px}.stat span{font-size:10px}.grid>.card{grid-column:span 6}.section>h2{font-size:22px}.workspace footer{padding:16px 13px 25px}}
 @media(max-width:420px){.header-tools{gap:7px}.header-tools button{padding:9px 11px;font-size:12px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{font-size:19px}.stat span{font-size:9px}.grid>.card{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){.section,.card,.nav button{animation:none!important;transition:none!important}}
-
 </style>
 </head>
 <body>
@@ -290,18 +289,18 @@ input,select,textarea{border-radius:9px;border:1px solid #29445d;background:#071
 <aside class="sidebar">
  <div class="brand"><div class="brand-mark"><img src="./icon.svg" alt="" aria-hidden="true"></div><div><strong>RUCHI</strong><small>GNM NURSING HUB</small></div></div>
  <div><div class="nav-label">STUDY WORKSPACE</div><nav class="nav" id="navigation" aria-label="Main app sections">
- <button class="selected" onclick="show('home',this)">Home</button>
- <button onclick="show('library',this)">Study</button><button onclick="show('reader',this)">Read Chapters</button><button onclick="show('books',this)">Books</button>
- <button onclick="show('mcq',this)">MCQ Bank</button>
- <button onclick="show('flashcards',this)">Flashcards</button>
- <button onclick="show('exam',this)">Mock Test</button>
- <button onclick="show('notes',this)">My Notes</button>
- <button onclick="show('clinical',this)">Clinical</button>
- <button onclick="show('viva',this)">Viva</button>
- <button onclick="show('progress',this)">Progress</button>
- <button onclick="show('planner',this)">Study Plan</button>
- <button onclick="show('add',this)">Add</button>
- <button onclick="show('security',this)">🔐 Security</button>
+ <button class="selected" onclick="show('home',this)"><span class="ico" aria-hidden="true">⌂</span><span>Home</span></button>
+ <button onclick="show('library',this)"><span class="ico" aria-hidden="true">▤</span><span>Study</span></button><button onclick="show('reader',this)"><span class="ico" aria-hidden="true">▣</span><span>Read Chapters</span></button><button onclick="show('books',this)"><span class="ico" aria-hidden="true">▧</span><span>Books</span></button>
+ <button onclick="show('mcq',this)"><span class="ico" aria-hidden="true">✧</span><span>MCQ Bank</span></button>
+ <button onclick="show('flashcards',this)"><span class="ico" aria-hidden="true">▦</span><span>Flashcards</span></button>
+ <button onclick="show('exam',this)"><span class="ico" aria-hidden="true">◷</span><span>Mock Test</span></button>
+ <button onclick="show('notes',this)"><span class="ico" aria-hidden="true">▤</span><span>My Notes</span></button>
+ <button onclick="show('clinical',this)"><span class="ico" aria-hidden="true">⚕</span><span>Clinical</span></button>
+ <button onclick="show('viva',this)"><span class="ico" aria-hidden="true">◉</span><span>Viva</span></button>
+ <button onclick="show('progress',this)"><span class="ico" aria-hidden="true">▥</span><span>Progress</span></button>
+ <button onclick="show('planner',this)"><span class="ico" aria-hidden="true">▦</span><span>Study Plan</span></button>
+ <button onclick="show('add',this)"><span class="ico" aria-hidden="true">＋</span><span>Add</span></button>
+ <button onclick="show('security',this)"><span class="ico" aria-hidden="true">♙</span><span>🔐 Security</span></button>
 </nav></div>
  <div class="side-bottom"><span class="status-dot"></span><span class="connection-label">Study workspace</span><div style="margin-top:8px">Learn • Practice • Revise</div></div>
 </aside>
@@ -608,7 +607,7 @@ function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
  document.getElementById(id).classList.add("active");
- document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("selected"));
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("selected"));
  if(btn){btn.classList.add("selected");btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
  refreshStats();
  if(id==="library")renderLibrary();
@@ -623,7 +622,7 @@ function show(id,btn){
  if(id==="mcq")startPractice();
 }
 function go(id){
- let btn=[...document.querySelectorAll(".tabs button")].find(b=>b.getAttribute("onclick").includes("'"+id+"'"));
+ let btn=[...document.querySelectorAll(".nav button")].find(b=>b.getAttribute("onclick").includes("'"+id+"'"));
  show(id,btn);
 }
 function refreshStats(){
