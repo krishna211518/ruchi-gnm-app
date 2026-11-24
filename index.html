@@ -282,6 +282,42 @@ input,select,textarea{border-radius:9px;border:1px solid #cbd7e4;background:#fff
 @media(max-width:760px){.app{display:block}.sidebar{position:sticky;top:0;z-index:70;width:100%;height:auto;padding:10px 12px 8px;gap:8px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}.brand{display:none}.sidebar>div:first-of-type{min-width:0}.nav-label{display:none}.nav{display:flex;overflow-x:auto;overflow-y:hidden;gap:7px;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav button{width:auto;flex:0 0 auto;white-space:nowrap;min-height:40px;padding:9px 12px}.side-bottom{display:none}.workspace>header{padding:18px 14px 8px;align-items:flex-start;flex-direction:column;gap:10px}.brand-lockup h1{font-size:25px}.container{padding:12px 13px 32px}.stats{gap:8px}.stat{display:block;padding:13px 9px;text-align:center}.stat strong{font-size:21px}.stat span{font-size:10px}.grid>.card{grid-column:span 6}.section>h2{font-size:22px}.workspace footer{padding:16px 13px 25px}}
 @media(max-width:420px){.header-tools{gap:7px}.header-tools button{padding:9px 11px;font-size:12px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{font-size:19px}.stat span{font-size:9px}.grid>.card{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){.section,.card,.nav button{animation:none!important;transition:none!important}}
+
+/* KR-X CURRENT NEBULA + LIQUID GLASS INTERFACE */
+:root{--bg:#050b17;--panel:#0b1729;--panel2:#10213a;--line:#1c3858;--text:#f2f8ff;--muted:#91a7c2;--cyan:#35e6ff;--blue:#588bff;--green:#48e6b0;--red:#ff718e;--shadow:0 24px 70px #0009;--glass-line:rgba(157,205,255,.22);--glass-shadow:0 18px 42px rgba(0,8,24,.28),inset 0 1px 0 rgba(255,255,255,.12)}
+html{scroll-padding-top:22px}body{background:radial-gradient(ellipse at 12% -8%,#0878a944 0,transparent 32%),radial-gradient(ellipse at 88% 4%,#6045c633 0,transparent 30%),radial-gradient(ellipse at 55% 105%,#007e7840 0,transparent 38%),linear-gradient(145deg,#050b17,#081326 48%,#090f20);background-attachment:fixed;color:var(--text)}
+.sidebar{background:linear-gradient(155deg,rgba(12,34,66,.82),rgba(4,15,34,.88))!important;border-color:rgba(128,181,255,.22)!important;box-shadow:8px 0 38px rgba(0,0,0,.24),inset -1px 0 rgba(255,255,255,.08)!important;-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%)}
+.brand-mark{background:linear-gradient(135deg,#42f5d4,#24c9ff 48%,#7868ff)!important;box-shadow:0 0 22px #27dfff55,0 0 48px #655dff22,inset 0 1px #ffffff88!important}.brand strong{background:linear-gradient(90deg,#fff,#8ceeff 65%,#b8aaff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.nav button{border-radius:12px!important;transition:all .2s ease}.nav button:hover{background:#0d2945!important;border-color:#24547b!important;color:#fff!important}.nav button.selected,.nav button.active{background:linear-gradient(105deg,#0ca9d52a,#6259d522)!important;border-color:#2b6687!important;color:#fff!important;box-shadow:inset 3px 0 #3be8ff,0 7px 22px #00172b66!important}
+.workspace{max-width:none;background:transparent}.workspace>header.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0;padding:26px clamp(16px,3vw,42px) 20px;background:transparent;border:0;border-radius:0;box-shadow:none;position:relative;overflow:visible}.workspace>header.topbar:after{display:none}.topbar .eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:2px}.topbar h1{font-size:clamp(25px,4vw,34px);margin:4px 0 0;letter-spacing:-1px;color:var(--text)}.topbar p{display:none}.top-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.top-actions #connectionStatus{font-size:12px;color:var(--green)}
+.container{max-width:1100px;margin:0 auto;padding:8px clamp(16px,3vw,42px) 48px}.stats{display:none}
+.section>h2{color:var(--text)}.card,.item{background:linear-gradient(145deg,rgba(20,53,91,.68),rgba(7,24,48,.76))!important;border:1px solid var(--glass-line)!important;border-radius:17px!important;box-shadow:var(--glass-shadow)!important;-webkit-backdrop-filter:blur(20px) saturate(155%);backdrop-filter:blur(20px) saturate(155%);color:var(--text)}.card h3{color:var(--text)}.card p,.item p,.small{color:var(--muted)}
+button{transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease}.workspace button:not(.secondary):not(.danger):not(.option){background:linear-gradient(115deg,#00dfc0,#00b9f2 52%,#397bff);color:#03121d;border:1px solid #38eaff88;box-shadow:0 5px 24px #00bfff3b}.workspace button:not(.secondary):not(.danger):not(.option):hover{filter:brightness(1.1);box-shadow:0 8px 24px #008dff33;transform:translateY(-1px)}.workspace button.secondary{background:rgba(9,31,58,.58);border:1px solid rgba(145,190,245,.2);color:#eaf6ff}.workspace button.danger{background:#351e2b;color:#ffb6c2;border:1px solid #693b58}
+input,select,textarea{background:rgba(3,16,34,.68)!important;border-color:rgba(137,187,241,.24)!important;color:#edf7ff!important;border-radius:10px!important}input:focus,select:focus,textarea:focus{border-color:var(--cyan)!important;box-shadow:0 0 0 3px #00d5ff20!important}label{color:#c3d9ee!important}
+.progress{background:#1b3850}.progress div{background:linear-gradient(90deg,#00e6a0,#00d5ff,#168bff)}
+/* RUCHI welcome screen follows the current KR-X onboarding composition */
+#welcome.section{padding:0}.welcome-screen{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 20px);width:100%;overflow:hidden;padding:40px 24px;background:radial-gradient(ellipse at 0 0,rgba(30,102,255,.35),transparent 40%),radial-gradient(ellipse at 100% 100%,rgba(145,54,255,.28),transparent 38%),#040611;border:1px solid rgba(120,170,255,.16);border-radius:22px}.welcome-screen:before,.welcome-screen:after{content:"";position:absolute;z-index:-1;width:120%;height:36%;border:1px solid rgba(65,164,255,.38);border-radius:50%;transform:rotate(-25deg);filter:drop-shadow(0 0 15px #1c7cff)}.welcome-screen:before{top:-18%;left:-25%;box-shadow:0 0 50px rgba(23,108,255,.2)}.welcome-screen:after{bottom:-18%;right:-30%;border-color:rgba(159,77,255,.42)}.welcome-orbit{position:absolute;width:76vw;height:30vw;max-height:300px;border:2px solid transparent;border-top-color:#39dfff;border-bottom-color:#a05cff;border-radius:50%;transform:rotate(-22deg);filter:drop-shadow(0 0 12px #168cff) drop-shadow(0 0 26px #7a35ff);pointer-events:none}.welcome-logo{font-size:clamp(66px,17vw,116px);font-weight:950;font-style:italic;letter-spacing:-7px;line-height:1;background:linear-gradient(120deg,#fff 5%,#69cfff 32%,#3974ff 58%,#bd5aff 92%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 20px rgba(49,107,255,.5))}.welcome-tagline{margin-top:66px;font-size:11px;letter-spacing:4px;color:#cbd7f7}.welcome-tagline i{font-style:normal;color:#8b9cff;padding:0 8px}.welcome-bottom{position:absolute;bottom:7%;display:flex;flex-direction:column;align-items:center;gap:17px;width:min(88%,360px);text-align:center}.welcome-bottom p{align-self:flex-start;text-align:left;margin:0 0 18px 20%;color:#aab8dc;font-size:14px;line-height:1.5}.welcome-primary{width:100%;border:1px solid rgba(190,215,255,.65)!important;border-radius:999px!important;padding:15px 22px!important;color:white!important;font-weight:750;font-size:16px;background:linear-gradient(105deg,#167bff,#315dff 58%,#913dff)!important;box-shadow:0 0 20px rgba(38,124,255,.55),0 0 42px rgba(136,61,255,.28),inset 0 1px rgba(255,255,255,.45)!important}.welcome-signin{border:0!important;background:transparent!important;color:#d4dfff!important;text-decoration:underline;text-underline-offset:4px;padding:6px}
+body:has(#welcome.active) .workspace>header,body:has(#welcome.active) .sidebar,body:has(#welcome.active) .krx-mobile-nav,body:has(#welcome.active) .ruchi-more-menu,body:has(#welcome.active) .workspace footer{display:none!important}body:has(#welcome.active) .workspace{padding:0!important}body:has(#welcome.active) .container{padding:0!important;max-width:none!important}body:has(#welcome.active) .stats{display:none!important}
+/* Reference-style RUCHI dashboard */
+.ref-dashboard{max-width:780px;margin:0 auto;padding:0 0 34px}.ref-greeting{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:22px 20px;margin:0 0 16px;border-radius:20px;background:radial-gradient(circle at 85% 40%,rgba(20,93,255,.3),transparent 34%),linear-gradient(120deg,rgba(23,39,91,.82),rgba(8,14,32,.82) 70%,rgba(45,19,83,.68));border:1px solid rgba(157,205,255,.22);box-shadow:0 18px 42px rgba(0,8,24,.28),inset 0 1px rgba(255,255,255,.12)}.ref-eyebrow{font-size:9px;letter-spacing:2px;color:#64dfff}.ref-greeting h2{font-size:23px;margin:8px 0 4px;color:#f2f8ff}.ref-greeting p{font-size:12px;color:#b3c1e3;margin:0}.ref-cube{width:78px;height:78px;display:grid;place-items:center;font-size:57px;color:#43dfff;text-shadow:0 0 12px #00aaff,0 0 28px #963dff}
+.ref-search{display:flex;align-items:center;gap:9px;padding:0 14px;height:50px;border:1px solid rgba(132,160,255,.27);border-radius:999px;background:rgba(8,13,32,.7);box-shadow:inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(18px)}.ref-search>span{font-size:24px;color:#b4caff}.ref-search input{flex:1;min-width:0;background:transparent!important;border:0!important;outline:0;color:white;font-size:13px}.ref-search button{border:0!important;background:transparent!important;color:#9bb9ef;font-size:18px;box-shadow:none!important}
+.ref-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 4px}.ref-shortcuts button{min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:17px!important;color:#e9f0ff!important;font-size:11px;background:linear-gradient(145deg,rgba(20,53,91,.68),rgba(7,24,48,.76))!important;border:1px solid var(--glass-line)!important}.ref-shortcuts button span{font-size:25px;color:#7adfff;text-shadow:0 0 13px #347bff}
+.ref-quick-head{display:flex;align-items:center;justify-content:space-between;margin:18px 3px 10px}.ref-quick-head h3{font-size:14px;margin:0}.ref-quick-head button{border:0!important;background:transparent!important;color:#9bbcff!important;font-size:11px;box-shadow:none!important}
+.ref-quick-list{display:grid;gap:9px}.ref-quick-list>button{display:flex;align-items:center;gap:12px;text-align:left;padding:12px;border-radius:16px!important;color:#f4f7ff!important;background:linear-gradient(145deg,rgba(20,53,91,.68),rgba(7,24,48,.76))!important;border:1px solid var(--glass-line)!important}.ref-quick-icon{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(108,161,255,.4);border-radius:12px;background:rgba(29,63,131,.45);color:#71dcff;font-size:20px}.ref-quick-list>button span:nth-child(2){flex:1}.ref-quick-list strong{display:block;font-size:12px}.ref-quick-list small{display:block;color:#b2bfdf;font-size:10px;margin-top:3px}.ref-quick-list b{font-size:23px;color:#a8c2ff}
+.ref-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.ref-stats>div{padding:12px 6px;text-align:center;border-radius:12px;background:rgba(9,31,58,.58);border:1px solid rgba(145,190,245,.2)}.ref-stats strong{display:block;color:#64dfff;font-size:18px}.ref-stats small{font-size:9px;color:#aebcdb}
+.home-module-card{transition:transform .18s,border-color .18s,box-shadow .18s}.home-module-card:hover{transform:translateY(-2px);border-color:rgba(88,202,255,.48)!important}
+.home-module-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.home-progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.ruchi-more-menu{display:none;position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:1490;padding:14px;border:1px solid rgba(136,167,255,.3);border-radius:20px;background:rgba(8,12,31,.90);box-shadow:0 16px 42px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.14);backdrop-filter:blur(28px) saturate(165%);-webkit-backdrop-filter:blur(28px) saturate(165%);grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:55vh;overflow:auto}.ruchi-more-menu.open{display:grid}.ruchi-more-menu button{min-height:44px;padding:8px 5px;border-radius:11px!important;font-size:11px;background:rgba(9,31,58,.58)!important;border:1px solid rgba(145,190,245,.2)!important;color:#eaf6ff!important;box-shadow:none!important}
+.krx-mobile-nav{display:none}
+@media(max-width:700px){
+ .app{display:block}.sidebar{display:none!important}.workspace>header.topbar{padding:17px 14px 13px;align-items:flex-start;flex-direction:column;gap:10px}.top-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.container{padding:5px 14px calc(112px + env(safe-area-inset-bottom))}
+ .krx-mobile-nav{position:fixed!important;left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;z-index:1500!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:8px 9px!important;border:1px solid rgba(136,167,255,.3)!important;border-radius:23px!important;background:rgba(8,12,31,.76)!important;box-shadow:0 16px 42px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.14)!important;backdrop-filter:blur(28px) saturate(165%)!important;-webkit-backdrop-filter:blur(28px) saturate(165%)!important}
+ .krx-mobile-nav button{min-width:0;min-height:52px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0!important;border-radius:13px!important;background:transparent!important;color:#b8c9e8!important;font-size:9px;box-shadow:none!important}.krx-mobile-nav .nav-icon{font-size:19px;line-height:1}.krx-mobile-nav button.active{background:linear-gradient(145deg,rgba(20,95,160,.42),rgba(75,55,155,.30))!important;color:#fff!important;box-shadow:inset 0 1px rgba(255,255,255,.16),0 0 18px rgba(35,149,255,.14)!important}.krx-mobile-nav .krx-center{background:linear-gradient(135deg,#00dfc0,#168bff 58%,#7667ff)!important;color:#04111c!important;border-radius:16px!important;box-shadow:0 0 20px #168bff66!important}
+ .welcome-screen{min-height:100svh;border-radius:0}.ref-dashboard{max-width:none}.ref-greeting{padding:19px 16px}.ref-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:14px 0}.ref-shortcuts button{min-height:78px;padding:6px 3px;font-size:9px}.ref-stats{gap:6px}.ref-stats strong{font-size:16px}.ref-stats small{font-size:8px}.home-module-grid,.home-progress-grid{grid-template-columns:1fr}.ruchi-more-menu{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:380px){.container{padding-left:11px;padding-right:11px}.krx-mobile-nav{left:8px!important;right:8px!important}.ref-greeting h2{font-size:20px}.ref-shortcuts{gap:5px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -304,13 +340,31 @@ input,select,textarea{border-radius:9px;border:1px solid #cbd7e4;background:#fff
 </nav></div>
  <div class="side-bottom"><span class="status-dot"></span><span class="connection-label">Study workspace</span><div style="margin-top:8px">Learn • Practice • Revise</div></div>
 </aside>
+<nav class="krx-mobile-nav" aria-label="Main navigation">
+ <button type="button" data-page="home" class="active" onclick="show('home',this)"><span class="nav-icon">⌂</span><span>Home</span></button>
+ <button type="button" data-page="library" onclick="show('library',this)"><span class="nav-icon">▤</span><span>Study</span></button>
+ <button type="button" data-page="mcq" class="krx-center" onclick="show('mcq',this)"><span class="nav-icon">✦</span><span>Practice</span></button>
+ <button type="button" data-page="notes" onclick="show('notes',this)"><span class="nav-icon">▧</span><span>Notes</span></button>
+ <button type="button" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>More</span></button>
+</nav>
+<div class="ruchi-more-menu" id="ruchiMoreMenu" aria-label="More nursing sections">
+ <button type="button" onclick="go('reader')">📖 Chapters</button><button type="button" onclick="go('books')">📚 Books</button><button type="button" onclick="go('flashcards')">🃏 Flashcards</button><button type="button" onclick="go('exam')">📝 Mock Test</button><button type="button" onclick="go('clinical')">🩺 Clinical</button><button type="button" onclick="go('viva')">🎤 Viva</button><button type="button" onclick="go('progress')">📊 Progress</button><button type="button" onclick="go('planner')">🗓️ Planner</button><button type="button" onclick="go('add')">＋ Add MCQ</button><button type="button" onclick="go('security')">🔐 Security</button>
+</div>
 <main class="workspace">
-<header>
-<div class="brand-lockup"><img src="./icon.svg" alt="RUCHI GNM logo"><h1>RUCHI GNM</h1></div>
-<p>YOUR COMPLETE NURSING STUDY COMPANION</p>
-<p>Learn • Practice • Revise • Succeed</p><div class="header-tools"><span id="connectionStatus" role="status">Checking connection…</span><button id="themeToggle" type="button" onclick="toggleTheme()">🌙 Theme</button><button id="installApp" type="button" style="display:none" onclick="installApp()">Install app</button></div>
+<header class="topbar">
+<div><div class="eyebrow">RUCHI GNM • YOUR NURSING HUB</div><h1 id="pageTitle">Dashboard</h1><p>Learn • Practice • Revise • Succeed</p></div>
+<div class="top-actions"><span id="connectionStatus" role="status">Checking connection…</span><button class="btn small" id="themeToggle" type="button" onclick="toggleTheme()">☼ Theme</button><button class="btn small" id="installApp" type="button" style="display:none" onclick="installApp()">↓ Install App</button></div>
 </header>
 <div class="container">
+<section id="welcome" class="section">
+ <div class="welcome-screen">
+  <div class="welcome-orbit"></div><div class="welcome-logo">RUCHI</div>
+  <div class="welcome-tagline">LEARN <i>•</i> PRACTISE <i>•</i> GROW</div>
+  <div class="welcome-bottom"><p>Your GNM Nursing<br>Learning Companion</p>
+   <button class="welcome-primary" type="button" onclick="localStorage.setItem('ruchi_welcome_seen','1');go('home')">Get Started <span>→</span></button>
+  </div>
+ </div>
+</section>
 <div class="stats">
  <div class="stat"><strong id="totalQ">0</strong><span>Questions attempted</span></div>
  <div class="stat"><strong id="accuracy">0%</strong><span>Accuracy</span></div>
@@ -321,19 +375,39 @@ input,select,textarea{border-radius:9px;border:1px solid #cbd7e4;background:#fff
 
 
 <section id="home" class="section active">
-<h2>Welcome to your Nursing Study Hub 👋</h2>
-<button class="secondary" type="button" onclick="resumeLesson()">Continue last chapter</button>
-<div class="grid">
- <div class="card"><div class="emoji">📚</div><h3>Study Library</h3><p>Year-wise subjects and topics.</p><button onclick="go('library')">Open Study</button></div>
- <div class="card"><div class="emoji">🧠</div><h3>MCQ Practice</h3><p>Test your nursing knowledge.</p><button onclick="go('mcq')">Practice MCQs</button></div>
- <div class="card"><div class="emoji">🃏</div><h3>Flashcard Revision</h3><p>Revise answers and explanations, including questions you got wrong.</p><button onclick="go('flashcards')">Study Flashcards</button></div>
- <div class="card"><div class="emoji">📝</div><h3>Mock Test</h3><p>Timed exam practice.</p><button onclick="go('exam')">Start Test</button></div>
- <div class="card"><div class="emoji">🩻</div><h3>Clinical Learning</h3><p>Skills, safety and care plans.</p><button onclick="go('clinical')">Explore</button></div>
- <div class="card"><div class="emoji">🎤</div><h3>Viva Practice</h3><p>Important oral questions.</p><button onclick="go('viva')">Start Viva</button></div>
- <div class="card"><div class="emoji">📊</div><h3>My Progress</h3><p>Track your learning.</p><button onclick="go('progress')">View Progress</button></div>
- <div class="card"><div class="emoji">🗓️</div><h3>Weekly Study Plan</h3><p>Plan topics by date and mark them done.</p><button onclick="go('planner')">Open Plan</button></div>
+<div class="ref-dashboard">
+ <div class="ref-greeting"><div><span class="ref-eyebrow">YOUR PERSONAL NURSING HUB</span><h2>Hello, Future Nurse 👋</h2><p>Ready to learn, practise and grow today?</p></div><div class="ref-cube" aria-hidden="true">✚</div></div>
+ <div class="ref-search"><span>⌕</span><input id="homeModuleSearch" type="search" placeholder="Search your study tools..." aria-label="Search nursing tools" oninput="searchHomeModules(this.value)"><button type="button" onclick="document.getElementById('homeModuleSearch').value='';searchHomeModules('')" aria-label="Clear search">×</button></div>
+ <div class="ref-shortcuts">
+  <button type="button" onclick="go('library')"><span>📚</span>Study</button>
+  <button type="button" onclick="go('mcq')"><span>🧠</span>MCQ Practice</button>
+  <button type="button" onclick="go('exam')"><span>📝</span>Mock Test</button>
+  <button type="button" onclick="go('viva')"><span>🎤</span>Viva</button>
+ </div>
+ <div class="ref-quick-head"><h3>Quick Access</h3><button type="button" onclick="go('planner')">Study Plan →</button></div>
+ <div class="ref-quick-list">
+  <button type="button" onclick="go('reader')"><span class="ref-quick-icon">📖</span><span><strong>Chapter Reader</strong><small>Continue reading nursing chapters</small></span><b>›</b></button>
+  <button type="button" onclick="go('flashcards')"><span class="ref-quick-icon">🃏</span><span><strong>Flashcard Revision</strong><small>Revise key questions and answers</small></span><b>›</b></button>
+  <button type="button" onclick="go('clinical')"><span class="ref-quick-icon">🩺</span><span><strong>Clinical Learning</strong><small>Skills, safety and care plans</small></span><b>›</b></button>
+ </div>
+ <div class="ref-stats">
+  <div><strong id="totalQ">0</strong><small>Questions attempted</small></div><div><strong id="accuracy">0%</strong><small>Accuracy</small></div><div><strong id="completed">0</strong><small>Topics completed</small></div>
+ </div>
+ <div class="home-module-grid" id="homeModuleGrid">
+  <div class="card home-module-card"><div class="emoji">📚</div><h3>Study Library</h3><p>Year-wise subjects and topics.</p><button onclick="go('library')">Open Study</button></div>
+  <div class="card home-module-card"><div class="emoji">🧠</div><h3>MCQ Practice</h3><p>Test your nursing knowledge.</p><button onclick="go('mcq')">Practice MCQs</button></div>
+  <div class="card home-module-card"><div class="emoji">🃏</div><h3>Flashcard Revision</h3><p>Revise answers and explanations.</p><button onclick="go('flashcards')">Study Flashcards</button></div>
+  <div class="card home-module-card"><div class="emoji">📝</div><h3>Mock Test</h3><p>Timed exam practice.</p><button onclick="go('exam')">Start Test</button></div>
+  <div class="card home-module-card"><div class="emoji">🩻</div><h3>Clinical Learning</h3><p>Skills, safety and care plans.</p><button onclick="go('clinical')">Explore</button></div>
+  <div class="card home-module-card"><div class="emoji">🎤</div><h3>Viva Practice</h3><p>Important oral questions.</p><button onclick="go('viva')">Start Viva</button></div>
+  <div class="card home-module-card"><div class="emoji">📊</div><h3>My Progress</h3><p>Track your learning.</p><button onclick="go('progress')">View Progress</button></div>
+  <div class="card home-module-card"><div class="emoji">🗓️</div><h3>Weekly Study Plan</h3><p>Plan topics by date and mark them done.</p><button onclick="go('planner')">Open Plan</button></div>
+ </div>
+ <div class="home-progress-grid">
+  <div class="card"><label for="dailyGoal">Topics to complete today</label><input id="dailyGoal" type="number" min="1" max="20" value="3" onchange="setDailyGoal(this.value)"><div class="progress"><div id="dailyProgress"></div></div><p class="small" id="dailyProgressText">Mark a topic complete to track today’s goal.</p></div>
+  <div class="card"><h3>Overall topic progress</h3><div class="progress"><div id="homeProgress"></div></div><p class="small" id="homeProgressText">Start with one topic today.</p></div>
+ </div>
 </div>
-<h2>Study goals</h2><div class="card"><label for="dailyGoal">Topics to complete today</label><input id="dailyGoal" type="number" min="1" max="20" value="3" onchange="setDailyGoal(this.value)"><div class="progress"><div id="dailyProgress"></div></div><p class="small" id="dailyProgressText">Mark a topic complete to track today’s goal.</p></div><div class="card"><h3>Overall topic progress</h3><div class="progress"><div id="homeProgress"></div></div><p class="small" id="homeProgressText">Start with one topic today.</p></div>
 </section>
 
 <section id="library" class="section">
@@ -571,7 +645,7 @@ function loadJSON(key,fallback){try{const raw=localStorage.getItem(key);return r
 function saveJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(e){alert("Could not save data on this device. Export a backup or free storage.");return false}}
 let dailyGoal=Number(loadJSON("ruchi_daily_goal",3));
 let topicDays=loadJSON("ruchi_topic_days",{});
-function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSON("ruchi_theme",dark);document.getElementById("themeToggle").textContent=dark?"☀️ Light":"🌙 Dark"}
+function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSON("ruchi_theme",dark);document.getElementById("themeToggle").textContent=dark?"☀️ Light":"☼ Theme"}
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
@@ -606,9 +680,12 @@ let examTimer=null,secondsLeft=0;
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
- document.getElementById(id).classList.add("active");
- document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("selected"));
- if(btn){btn.classList.add("selected");btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+ const target=document.getElementById(id);if(!target)return;
+ target.classList.add("active");
+ document.querySelectorAll(".nav button,.krx-mobile-nav button").forEach(x=>{x.classList.remove("selected","active")});
+ if(btn){btn.classList.add("selected","active");}
+ const menu=document.getElementById("ruchiMoreMenu");if(menu)menu.classList.remove("open");
+ const title=document.getElementById("pageTitle");if(title){const label=({home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
  refreshStats();
  if(id==="library")renderLibrary();
  if(id==="notes")renderNotes();
@@ -622,8 +699,13 @@ function show(id,btn){
  if(id==="mcq")startPractice();
 }
 function go(id){
- let btn=[...document.querySelectorAll(".nav button")].find(b=>b.getAttribute("onclick").includes("'"+id+"'"));
+ let btn=[...document.querySelectorAll(".nav button,.krx-mobile-nav button,.ruchi-more-menu button")].find(b=>(b.getAttribute("onclick")||"").includes("'"+id+"'"));
  show(id,btn);
+}
+function toggleMoreMenu(){const menu=document.getElementById("ruchiMoreMenu");if(menu)menu.classList.toggle("open")}
+function searchHomeModules(query){
+ const q=String(query||"").trim().toLowerCase();
+ document.querySelectorAll(".home-module-card").forEach(card=>{card.style.display=!q||card.textContent.toLowerCase().includes(q)?"":"none"});
 }
 function refreshStats(){
  document.getElementById("totalQ").textContent=attempts.length;
@@ -1040,6 +1122,7 @@ function resetProgress(){
 }
 if(loadJSON("ruchi_theme",false)){document.body.classList.add("dark");document.getElementById("themeToggle").textContent="☀️ Light"}
 if(loadJSON("ruchi_pin",null)){document.getElementById("appLock").style.display="grid"}
+if(loadJSON("ruchi_welcome_seen",false)){document.getElementById("welcome").classList.remove("active");document.getElementById("home").classList.add("active")}else{document.getElementById("home").classList.remove("active");document.getElementById("welcome").classList.add("active")}
 fillSubjects();
 refreshStats();
 renderLibrary();
