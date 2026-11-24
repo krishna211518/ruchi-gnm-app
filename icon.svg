@@ -1,15 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs>
- <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102a43"/><stop offset=".58" stop-color="#1761a6"/><stop offset="1" stop-color="#168b91"/></linearGradient>
- <linearGradient id="page" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#d8edff"/></linearGradient>
-</defs>
-<rect width="512" height="512" rx="116" fill="url(#bg)"/>
-<circle cx="405" cy="96" r="90" fill="#fff" opacity=".07"/>
-<circle cx="92" cy="420" r="110" fill="#64d6cf" opacity=".09"/>
-<path d="M104 132Q177 96 256 144Q335 96 408 132V354Q332 318 256 365Q180 318 104 354Z" fill="url(#page)" stroke="#b8dcf5" stroke-width="10" stroke-linejoin="round"/>
-<path d="M256 145V362" stroke="#a9cce7" stroke-width="9"/>
-<path d="M256 184v94m-47-47h94" stroke="#1676c5" stroke-width="27" stroke-linecap="round"/>
-<path d="M256 303c-22 0-40 18-40 40v24h80v-24c0-22-18-40-40-40Z" fill="#168b75"/>
-<path d="M231 344l17 17 35-39" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M136 392h240" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".65"/>
-</svg>
+<defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102a43"/><stop offset=".6" stop-color="#1976d2"/><stop offset="1" stop-color="#168b91"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#b)"/><circle cx="256" cy="245" r="174" fill="#fff" fill-opacity=".09"/>
+<path d="M145 145h166l62 62v172a20 20 0 0 1-20 20H145a20 20 0 0 1-20-20V165a20 20 0 0 1 20-20Z" fill="#fff"/><path d="M311 145v62h62" fill="#dbeafe"/><path d="M311 145v62h62" fill="none" stroke="#bfdbfe" stroke-width="8" stroke-linejoin="round"/>
+<path d="M256 224v118M197 283h118" stroke="#1976d2" stroke-width="34" stroke-linecap="round"/><path d="M256 224v118M197 283h118" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+<path d="M171 379c24 14 52 21 85 21s61-7 85-21" fill="none" stroke="#bdeff0" stroke-width="12" stroke-linecap="round"/>
+<text x="256" y="455" text-anchor="middle" font-family="Arial,sans-serif" font-size="33" font-weight="800" letter-spacing="5" fill="#fff">RUCHI GNM</text></svg>
