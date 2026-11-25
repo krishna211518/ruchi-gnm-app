@@ -733,6 +733,38 @@ infection-control policies and supervisor's instructions during actual patient c
   <div id="lectureLogList" class="tool-list" style="margin-top:12px"></div>
  </div>
  <div class="card">
+  <h3>🗣️ SBAR Communication Practice</h3>
+  <p class="tool-muted">Fictional classroom examples par structured communication practice karo. Assessment field learning summary ke liye hai, diagnosis ya treatment advice ke liye nahi. Real patient details enter mat karo.</p>
+  <input id="sbarPracticeTitle" placeholder="Practice title / fictional scenario" style="width:100%">
+  <textarea id="sbarSituation" rows="2" placeholder="S · Situation: What is the immediate concern in this fictional exercise?" style="width:100%"></textarea>
+  <textarea id="sbarBackground" rows="2" placeholder="B · Background: Relevant context for the exercise" style="width:100%"></textarea>
+  <textarea id="sbarAssessment" rows="2" placeholder="A · Assessment: Your learning summary / observations in the scenario" style="width:100%"></textarea>
+  <textarea id="sbarRecommendation" rows="2" placeholder="R · Recommendation: What clarification or supervisor support would you request?" style="width:100%"></textarea>
+  <button type="button" onclick="saveSbarPractice()">Save SBAR practice</button>
+  <div id="sbarPracticeList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
+  <h3>⚖️ Nursing Ethics Reflection Journal</h3>
+  <p class="tool-muted">Sirf fictional classroom dilemmas use karo. Ethical principles par reflect karo aur appropriate teacher / supervisor guidance identify karo. Real patient ya personal identifying details save mat karo.</p>
+  <input id="ethicsReflectionTitle" placeholder="Fictional situation title" style="width:100%">
+  <textarea id="ethicsReflectionIssue" rows="3" placeholder="What is the ethical question in this fictional situation?" style="width:100%"></textarea>
+  <input id="ethicsReflectionPrinciples" placeholder="Principles to consider (e.g. respect, privacy, fairness)" style="width:100%">
+  <textarea id="ethicsReflectionOptions" rows="3" placeholder="Possible options and their considerations" style="width:100%"></textarea>
+  <textarea id="ethicsReflectionGuidance" rows="2" placeholder="Who should be consulted / what policy should be checked?" style="width:100%"></textarea>
+  <button type="button" onclick="saveEthicsReflection()">Save ethics reflection</button>
+  <div id="ethicsReflectionList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
+  <h3>❓ Nursing Doubt Clearing Queue</h3>
+  <p class="tool-muted">Apne doubts collect karo, pehle khud attempt likho, phir textbook / teacher se verify kiya hua answer add karo.</p>
+  <input id="doubtQueueSubject" placeholder="Subject" style="width:100%">
+  <input id="doubtQueueTopic" placeholder="Topic" style="width:100%">
+  <textarea id="doubtQueueQuestion" rows="2" placeholder="What is your doubt?" style="width:100%"></textarea>
+  <textarea id="doubtQueueAttempt" rows="2" placeholder="My first attempt / what I think" style="width:100%"></textarea>
+  <button type="button" onclick="saveNursingDoubt()">Add doubt</button>
+  <div id="nursingDoubtList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
   <h3>📌 Exam Topic Priority Board</h3>
   <p class="tool-muted">Exam revision ke topics ko priority aur confidence ke hisaab se organise karo. Priority sirf tumhari study planning ke liye hai, paper prediction nahi.</p>
   <input id="examPrioritySubject" placeholder="Subject" style="width:100%">
@@ -1215,7 +1247,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans","ruchi_nursing_mnemonics","ruchi_exam_checklist","ruchi_reading_progress","ruchi_learning_confidence","ruchi_concept_comparisons","ruchi_medical_word_breakdowns","ruchi_study_reflections","ruchi_exam_priority_topics","ruchi_learning_objectives","ruchi_peer_study_sessions"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans","ruchi_nursing_mnemonics","ruchi_exam_checklist","ruchi_reading_progress","ruchi_learning_confidence","ruchi_concept_comparisons","ruchi_medical_word_breakdowns","ruchi_doubt_queue","ruchi_ethics_reflections","ruchi_sbar_practice","ruchi_study_reflections","ruchi_exam_priority_topics","ruchi_learning_objectives","ruchi_peer_study_sessions"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -1225,7 +1257,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans","ruchi_nursing_mnemonics","ruchi_exam_checklist","ruchi_reading_progress","ruchi_learning_confidence","ruchi_concept_comparisons","ruchi_medical_word_breakdowns","ruchi_study_reflections","ruchi_exam_priority_topics","ruchi_learning_objectives","ruchi_peer_study_sessions"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans","ruchi_nursing_mnemonics","ruchi_exam_checklist","ruchi_reading_progress","ruchi_learning_confidence","ruchi_concept_comparisons","ruchi_medical_word_breakdowns","ruchi_doubt_queue","ruchi_ethics_reflections","ruchi_sbar_practice","ruchi_study_reflections","ruchi_exam_priority_topics","ruchi_learning_objectives","ruchi_peer_study_sessions"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -2225,7 +2257,7 @@ function nextStudyQuizQuestion(){
  renderStudyQuizQuestion();
 }
 function renderStudentToolkit(){
- renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();renderSubjectRevisionReport();renderClassQuestions();renderNursingPresentations();renderNursingMnemonics();renderExamChecklist();renderReadingProgress();renderLearningConfidence();renderPeerStudySessions();renderLearningObjectives();renderConceptComparisons();renderExamPriorityTopics();renderStudyReflections();renderMedicalWordBreakdowns();
+ renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();renderSubjectRevisionReport();renderClassQuestions();renderNursingPresentations();renderNursingMnemonics();renderExamChecklist();renderReadingProgress();renderLearningConfidence();renderPeerStudySessions();renderLearningObjectives();renderConceptComparisons();renderExamPriorityTopics();renderStudyReflections();renderMedicalWordBreakdowns();renderSbarPractice();renderEthicsReflections();renderNursingDoubts();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
@@ -2697,6 +2729,50 @@ function deleteMedicalWordBreakdown(id){medicalWordBreakdowns=medicalWordBreakdo
 function renderMedicalWordBreakdowns(){
  const el=document.getElementById("medicalWordBreakdownList");if(!el)return;
  el.innerHTML=medicalWordBreakdowns.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.term)+'</b><p>'+escapeHTML(x.date)+'</p>'+(x.prefix?'<p><b>Prefix:</b> '+escapeHTML(x.prefix)+'</p>':'')+'<p><b>Root:</b> '+escapeHTML(x.root)+'</p>'+(x.suffix?'<p><b>Suffix:</b> '+escapeHTML(x.suffix)+'</p>':'')+'<p><b>Meaning:</b> '+escapeHTML(x.meaning)+'</p><button class="secondary" onclick="deleteMedicalWordBreakdown('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No word breakdowns saved yet.</p>';
+}
+
+
+let sbarPracticeEntries=loadJSON("ruchi_sbar_practice",[]);
+let ethicsReflectionEntries=loadJSON("ruchi_ethics_reflections",[]);
+let nursingDoubtEntries=loadJSON("ruchi_doubt_queue",[]);
+function saveSbarPractice(){
+ const title=document.getElementById("sbarPracticeTitle").value.trim(),situation=document.getElementById("sbarSituation").value.trim(),background=document.getElementById("sbarBackground").value.trim(),assessment=document.getElementById("sbarAssessment").value.trim(),recommendation=document.getElementById("sbarRecommendation").value.trim();
+ if(!title||![situation,background,assessment,recommendation].some(Boolean)){alert("Enter a title and at least one SBAR section.");return}
+ sbarPracticeEntries.unshift({id:Date.now(),title,situation,background,assessment,recommendation,date:localDateKey()});sbarPracticeEntries=sbarPracticeEntries.slice(0,300);
+ if(!saveJSON("ruchi_sbar_practice",sbarPracticeEntries))return;
+ ["sbarPracticeTitle","sbarSituation","sbarBackground","sbarAssessment","sbarRecommendation"].forEach(id=>document.getElementById(id).value="");renderSbarPractice();
+}
+function deleteSbarPractice(id){sbarPracticeEntries=sbarPracticeEntries.filter(x=>x.id!==id);saveJSON("ruchi_sbar_practice",sbarPracticeEntries);renderSbarPractice()}
+function renderSbarPractice(){
+ const el=document.getElementById("sbarPracticeList");if(!el)return;
+ el.innerHTML=sbarPracticeEntries.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.date)+'</p>'+[['S · Situation',x.situation],['B · Background',x.background],['A · Assessment',x.assessment],['R · Recommendation',x.recommendation]].filter(v=>v[1]).map(v=>'<p><b>'+v[0]+':</b> '+escapeHTML(v[1])+'</p>').join("")+'<button class="secondary" onclick="deleteSbarPractice('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No SBAR practice saved yet.</p>';
+}
+function saveEthicsReflection(){
+ const title=document.getElementById("ethicsReflectionTitle").value.trim(),issue=document.getElementById("ethicsReflectionIssue").value.trim(),principles=document.getElementById("ethicsReflectionPrinciples").value.trim(),options=document.getElementById("ethicsReflectionOptions").value.trim(),guidance=document.getElementById("ethicsReflectionGuidance").value.trim();
+ if(!title||!issue){alert("Enter a title and the fictional ethical question.");return}
+ ethicsReflectionEntries.unshift({id:Date.now(),title,issue,principles,options,guidance,date:localDateKey()});ethicsReflectionEntries=ethicsReflectionEntries.slice(0,300);
+ if(!saveJSON("ruchi_ethics_reflections",ethicsReflectionEntries))return;
+ ["ethicsReflectionTitle","ethicsReflectionIssue","ethicsReflectionPrinciples","ethicsReflectionOptions","ethicsReflectionGuidance"].forEach(id=>document.getElementById(id).value="");renderEthicsReflections();
+}
+function deleteEthicsReflection(id){ethicsReflectionEntries=ethicsReflectionEntries.filter(x=>x.id!==id);saveJSON("ruchi_ethics_reflections",ethicsReflectionEntries);renderEthicsReflections()}
+function renderEthicsReflections(){
+ const el=document.getElementById("ethicsReflectionList");if(!el)return;
+ el.innerHTML=ethicsReflectionEntries.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.date)+'</p><p><b>Ethical question:</b> '+escapeHTML(x.issue)+'</p>'+(x.principles?'<p><b>Principles:</b> '+escapeHTML(x.principles)+'</p>':'')+(x.options?'<p><b>Options:</b> '+escapeHTML(x.options)+'</p>':'')+(x.guidance?'<p><b>Guidance:</b> '+escapeHTML(x.guidance)+'</p>':'')+'<button class="secondary" onclick="deleteEthicsReflection('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No ethics reflections saved yet.</p>';
+}
+function saveNursingDoubt(){
+ const subject=document.getElementById("doubtQueueSubject").value.trim(),topic=document.getElementById("doubtQueueTopic").value.trim(),question=document.getElementById("doubtQueueQuestion").value.trim(),attempt=document.getElementById("doubtQueueAttempt").value.trim();
+ if(!subject||!question){alert("Enter subject and doubt.");return}
+ nursingDoubtEntries.unshift({id:Date.now(),subject,topic,question,attempt,answer:"",status:"Pending",date:localDateKey()});nursingDoubtEntries=nursingDoubtEntries.slice(0,400);
+ if(!saveJSON("ruchi_doubt_queue",nursingDoubtEntries))return;
+ ["doubtQueueSubject","doubtQueueTopic","doubtQueueQuestion","doubtQueueAttempt"].forEach(id=>document.getElementById(id).value="");renderNursingDoubts();
+}
+function updateNursingDoubt(id,key,value){
+ const x=nursingDoubtEntries.find(v=>v.id===id);if(!x||!["answer","status"].includes(key))return;x[key]=value;saveJSON("ruchi_doubt_queue",nursingDoubtEntries);renderNursingDoubts();
+}
+function deleteNursingDoubt(id){nursingDoubtEntries=nursingDoubtEntries.filter(x=>x.id!==id);saveJSON("ruchi_doubt_queue",nursingDoubtEntries);renderNursingDoubts()}
+function renderNursingDoubts(){
+ const el=document.getElementById("nursingDoubtList");if(!el)return;
+ el.innerHTML=nursingDoubtEntries.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.topic||"General doubt")+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p><p>'+escapeHTML(x.question)+'</p>'+(x.attempt?'<p><b>My attempt:</b> '+escapeHTML(x.attempt)+'</p>':'')+'<textarea rows="2" aria-label="Verified answer" placeholder="Add answer after checking textbook / asking teacher" onchange="updateNursingDoubt('+x.id+',\'answer\',this.value)">'+escapeHTML(x.answer||"")+'</textarea><select aria-label="Doubt status" onchange="updateNursingDoubt('+x.id+',\'status\',this.value)">'+["Pending","Asked teacher","Verified / cleared"].map(v=>'<option '+(x.status===v?'selected':'')+'>'+v+'</option>').join("")+'</select><button class="secondary" onclick="deleteNursingDoubt('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No doubts in your queue yet.</p>';
 }
 
 </script>
