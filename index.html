@@ -658,6 +658,14 @@ infection-control policies and supervisor's instructions during actual patient c
 <h2>🧰 Student Toolkit</h2>
 <p class="small">College work, attendance, timetable and quick nursing reference. Your entries stay on this device.</p>
 <div class="tool-grid">
+ <div class="card">
+  <h3>📚 Subject-wise Quick Reference</h3>
+  <p class="tool-muted">Fast revision cards for common GNM subjects. Use these as starting notes and match details with your prescribed textbook and college syllabus.</p>
+  <input id="quickRefSearch" type="search" placeholder="Search a topic or keyword..." oninput="renderQuickReferences()" style="width:100%">
+  <select id="quickRefSubject" onchange="renderQuickReferences()" style="width:100%"><option value="All">All subjects</option><option>Anatomy & Physiology</option><option>Nursing Foundations</option><option>Microbiology</option><option>Nutrition</option><option>Psychology</option><option>Community Health Nursing</option></select>
+  <p id="quickRefCount" class="tool-muted" aria-live="polite"></p>
+  <div id="quickRefResults" class="tool-list"></div>
+ </div>
  <div class="card"><h3>🫀 Anatomy & Body Systems Explorer</h3><p class="tool-muted">Select a body system for a short study overview. Educational reference only.</p><select id="bodySystemSelect" onchange="showBodySystem()" style="width:100%"><option value="">Choose a body system</option></select><div id="bodySystemDetail" class="dictionary-result" style="margin-top:10px">Choose a system to explore its main organs and functions.</div></div>
  <div class="card"><h3>🩺 Nursing Instruments Library</h3><input id="instrumentSearch" type="search" placeholder="Search instruments..." oninput="renderInstrumentLibrary()" style="width:100%"><div id="instrumentResults" style="margin-top:10px"></div><p class="tool-muted">Identification and study notes only. Actual use requires instructor training and local protocols.</p></div>
  <div class="card"><h3>🌡️ Vital Signs Learning Centre</h3><input id="vitalSearch" type="search" placeholder="Search vital sign..." oninput="renderVitalLearning()" style="width:100%"><div id="vitalResults" style="margin-top:10px"></div><p class="tool-muted">Interpretation depends on age, condition and context. Follow college teaching and facility policy; this is not a diagnostic tool.</p></div>
@@ -1816,8 +1824,48 @@ function renderStudyStreak(){
  const today=studyLogs.filter(x=>x.date===localDateKey()).reduce((a,x)=>a+(Number(x.minutes)||0),0);
  el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
 }
+
+const quickReferenceData=[
+{subject:"Anatomy & Physiology",topic:"Cell",detail:"The cell is the basic structural and functional unit of the body. Major parts include the cell membrane, cytoplasm and nucleus."},
+{subject:"Anatomy & Physiology",topic:"Tissues",detail:"A tissue is a group of similar cells working together. The four basic types are epithelial, connective, muscle and nervous tissue."},
+{subject:"Anatomy & Physiology",topic:"Skeletal system",detail:"The skeleton supports the body, protects organs, helps movement, stores minerals and contains marrow involved in blood-cell formation."},
+{subject:"Anatomy & Physiology",topic:"Muscular system",detail:"Muscle tissue produces movement and helps maintain posture. The three types are skeletal, smooth and cardiac muscle."},
+{subject:"Anatomy & Physiology",topic:"Cardiovascular system",detail:"The heart and blood vessels circulate blood, transporting oxygen, nutrients, hormones and waste products."},
+{subject:"Anatomy & Physiology",topic:"Respiratory system",detail:"The respiratory system moves air and supports gas exchange. The lungs contain alveoli where oxygen and carbon dioxide are exchanged."},
+{subject:"Nursing Foundations",topic:"Nursing process",detail:"A commonly taught framework: assessment, nursing diagnosis, planning, implementation and evaluation. Follow the terminology used by your course."},
+{subject:"Nursing Foundations",topic:"Communication",detail:"Therapeutic communication uses attentive listening, clear language, respect, empathy and appropriate professional boundaries."},
+{subject:"Nursing Foundations",topic:"Documentation",detail:"Records should be factual, clear, timely, objective and completed according to institutional policy. Never document care that was not provided."},
+{subject:"Nursing Foundations",topic:"Patient dignity",detail:"Respect privacy, preferences, cultural needs, informed choices and confidentiality in every learning and care setting."},
+{subject:"Nursing Foundations",topic:"Standard precautions",detail:"Standard precautions are infection-prevention practices applied according to exposure risk, including hand hygiene and appropriate protective equipment."},
+{subject:"Nursing Foundations",topic:"Informed consent",detail:"Consent is a voluntary and informed decision made by a person with appropriate decision-making capacity, following applicable law and facility policy."},
+{subject:"Microbiology",topic:"Bacteria",detail:"Bacteria are single-celled prokaryotic microorganisms. Some are harmless or useful, while others can cause infection."},
+{subject:"Microbiology",topic:"Viruses",detail:"Viruses are infectious agents that require host cells to replicate. They are structurally different from bacteria."},
+{subject:"Microbiology",topic:"Fungi",detail:"Fungi include yeasts and moulds. Some can cause infections, especially when normal protective barriers or immunity are affected."},
+{subject:"Microbiology",topic:"Sterilization",detail:"Sterilization is a validated process intended to destroy or remove all forms of microbial life, including bacterial spores."},
+{subject:"Microbiology",topic:"Disinfection",detail:"Disinfection reduces or inactivates many disease-causing microorganisms on inanimate objects; it is not always the same as sterilization."},
+{subject:"Nutrition",topic:"Carbohydrates",detail:"Carbohydrates are a major source of energy. Common sources include grains, fruits, pulses and some vegetables."},
+{subject:"Nutrition",topic:"Proteins",detail:"Proteins are made of amino acids and support growth, tissue maintenance, enzymes and many body functions."},
+{subject:"Nutrition",topic:"Fats",detail:"Dietary fats provide energy, help absorb fat-soluble vitamins and form part of cell membranes. Types and food sources matter."},
+{subject:"Nutrition",topic:"Vitamins",detail:"Vitamins are micronutrients needed in small amounts for normal body functions. They are commonly grouped as fat-soluble and water-soluble."},
+{subject:"Nutrition",topic:"Minerals",detail:"Minerals such as calcium, iron, iodine and zinc support different body functions. Needs vary by age and health context."},
+{subject:"Psychology",topic:"Learning",detail:"Learning is a relatively lasting change in knowledge or behaviour through experience, practice or study."},
+{subject:"Psychology",topic:"Memory",detail:"Memory involves encoding, storage and retrieval of information. Attention, practice, sleep and meaningful connections support learning."},
+{subject:"Psychology",topic:"Motivation",detail:"Motivation refers to processes that initiate and direct goal-oriented behaviour. It may be influenced by internal and external factors."},
+{subject:"Community Health Nursing",topic:"Health promotion",detail:"Health promotion helps people and communities increase control over factors affecting health through education, supportive environments and participation."},
+{subject:"Community Health Nursing",topic:"Levels of prevention",detail:"Primary prevention aims to prevent disease; secondary prevention focuses on early detection; tertiary prevention aims to reduce impact and complications."},
+{subject:"Community Health Nursing",topic:"Immunization",detail:"Immunization helps protect individuals and communities against vaccine-preventable diseases. Follow the current national schedule and official guidance."},
+{subject:"Community Health Nursing",topic:"Sanitation",detail:"Safe water, hygienic waste disposal, clean surroundings and food hygiene help reduce environmental health risks."}
+];
+function renderQuickReferences(){
+ const out=document.getElementById("quickRefResults"),count=document.getElementById("quickRefCount");if(!out)return;
+ const q=(document.getElementById("quickRefSearch")?.value||"").trim().toLowerCase(),subject=document.getElementById("quickRefSubject")?.value||"All";
+ const rows=quickReferenceData.filter(x=>(subject==="All"||x.subject===subject)&&(!q||(x.topic+" "+x.detail+" "+x.subject).toLowerCase().includes(q)));
+ if(count)count.textContent="Showing "+rows.length+" of "+quickReferenceData.length+" study cards";
+ out.innerHTML=rows.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x.topic)+'</strong><p class="tool-muted">'+escapeHTML(x.subject)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join("")||'<p class="tool-muted">No matching study card. Try another keyword or subject.</p>';
+}
+
 function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
+ renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
