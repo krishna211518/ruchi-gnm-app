@@ -757,7 +757,30 @@ infection-control policies and supervisor's instructions during actual patient c
   </div>
   <div id="ruchiAssistantStatus" class="tool-muted" style="margin-top:10px" aria-live="polite">Ready — ask a question to search your saved study library.</div>
   <div id="ruchiAssistantResults" class="tool-list" style="margin-top:10px"></div>
-  <p class="tool-muted" style="margin-top:10px">Study support only. Medical topics are for learning, not diagnosis or treatment. Verify important information with your textbook and teacher. Do not enter real patient details.</p>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
+   <button class="secondary" onclick="useRuchiPrompt('Explain the topic in simple words: ')">Simple explanation</button>
+   <button class="secondary" onclick="useRuchiPrompt('Give me revision points about: ')">Revision points</button>
+   <button class="secondary" onclick="useRuchiPrompt('Find study references for: ')">Find references</button>
+  </div>
+  <div class="card" style="margin-top:12px">
+   <h4>🗂️ RUCHI Study Tools</h4>
+   <label for="ruchiNotesInput">Notes summarizer (offline)</label>
+   <textarea id="ruchiNotesInput" rows="4" placeholder="Paste your own notes here to extract key sentences..."></textarea>
+   <button onclick="summarizeRuchiNotes()">Create short revision summary</button>
+   <div id="ruchiNotesSummary" class="tool-list" style="margin-top:8px"></div>
+   <label for="ruchiFlashcardTopic" style="display:block;margin-top:12px">Flashcard maker from app library</label>
+   <input id="ruchiFlashcardTopic" placeholder="Enter a topic, e.g. skeletal system">
+   <button onclick="makeRuchiFlashcards()">Make revision flashcards</button>
+   <div id="ruchiFlashcardResults" class="tool-list" style="margin-top:8px"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+   <h4>💬 Recent Study Chat</h4>
+   <p class="tool-muted">Recent questions and local study matches are saved only on this device.</p>
+   <button class="secondary" onclick="renderRuchiChatHistory()">Show chat history</button>
+   <button class="secondary" onclick="clearRuchiChatHistory()">Clear history</button>
+   <div id="ruchiChatHistory" class="tool-list" style="margin-top:8px"></div>
+  </div>
+  <p class="tool-muted" style="margin-top:10px"> Medical topics are for learning, not diagnosis or treatment. Verify important information with your textbook and teacher. Do not enter real patient details.</p>
  </div>
  <div class="card">
   <h3>🧑‍🏫 Teacher Feedback & Improvement Log</h3>
@@ -2882,8 +2905,50 @@ function askRuchiAssistant(){
  const best=matches.slice(0,6);
  if(!best.length){status.textContent="Is question ka direct match app ki offline study library mein nahi mila. Web search se extra information dekh sakte ho.";out.innerHTML='<p class="tool-muted">No local match found. Try a shorter topic name or use Search on web.</p>';return}
  status.textContent="App library mein "+matches.length+" relevant match mile. Best matches:";
+ const historyText=best.map(x=>x.title+": "+x.detail).join("\n");saveRuchiChatEntry(input.value,historyText);
  out.innerHTML=best.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x.title)+'</strong><p class="tool-muted">'+escapeHTML(x.group)+' · '+escapeHTML(x.kind)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join("");
 }
+
+function useRuchiPrompt(prefix){
+ const input=document.getElementById("ruchiAssistantQuestion");if(!input)return;
+ input.value=prefix;input.focus();
+}
+function saveRuchiChatEntry(question,results){
+ try{
+  const key="ruchi_ai_chat_history",items=JSON.parse(localStorage.getItem(key)||"[]");
+  items.unshift({question:String(question).slice(0,500),results:String(results).slice(0,3000),time:new Date().toLocaleString()});
+  localStorage.setItem(key,JSON.stringify(items.slice(0,20)));
+ }catch(e){}
+}
+function renderRuchiChatHistory(){
+ const out=document.getElementById("ruchiChatHistory");if(!out)return;
+ let items=[];try{items=JSON.parse(localStorage.getItem("ruchi_ai_chat_history")||"[]")}catch(e){}
+ out.innerHTML=items.length?items.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x.question)+'</strong><p class="tool-muted">'+escapeHTML(x.time||"")+'</p><div>'+escapeHTML(x.results||"No local match")+'</div></div>').join(""):'<p class="tool-muted">No saved study chats yet.</p>';
+}
+function clearRuchiChatHistory(){
+ try{localStorage.removeItem("ruchi_ai_chat_history")}catch(e){}
+ renderRuchiChatHistory();
+}
+function summarizeRuchiNotes(){
+ const input=document.getElementById("ruchiNotesInput"),out=document.getElementById("ruchiNotesSummary");
+ if(!input||!out)return;
+ const raw=input.value.trim();if(!raw){out.innerHTML='<p class="tool-muted">Pehle apne notes paste karo.</p>';return}
+ const sentences=raw.replace(/\s+/g," ").match(/[^.!?]+[.!?]?/g)||[raw];
+ const chosen=sentences.map(x=>x.trim()).filter(Boolean);
+ const summary=chosen.length>5?[chosen[0],chosen[Math.floor(chosen.length/2)],chosen[chosen.length-1]]:chosen;
+ out.innerHTML='<div class="dictionary-result"><strong>Key revision sentences</strong><ul>'+summary.map(x=>'<li>'+escapeHTML(x)+'</li>').join("")+'</ul><p class="tool-muted">This is an offline sentence extractor, not an AI-generated summary. Check your original notes.</p></div>';
+}
+function makeRuchiFlashcards(){
+ const input=document.getElementById("ruchiFlashcardTopic"),out=document.getElementById("ruchiFlashcardResults");
+ if(!input||!out)return;
+ const q=input.value.trim().toLowerCase();if(!q){out.innerHTML='<p class="tool-muted">Enter a topic first.</p>';return}
+ const words=q.split(/[^a-z0-9]+/).filter(w=>w.length>2);
+ const matches=(Array.isArray(quickReferenceData)?quickReferenceData:[]).filter(x=>{
+  const hay=(x.topic+" "+x.subject+" "+x.detail).toLowerCase();return words.some(w=>hay.includes(w));
+ }).slice(0,8);
+ out.innerHTML=matches.length?matches.map((x,i)=>'<div class="dictionary-result"><strong>Card '+(i+1)+': '+escapeHTML(x.topic)+'</strong><p class="tool-muted">'+escapeHTML(x.subject)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join(""):'<p class="tool-muted">No matching library cards found. Try a topic name used in Study Library.</p>';
+}
+
 function searchRuchiAssistantWeb(){
  const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),q=input?input.value.trim():"";
  if(!q){if(status)status.textContent="Pehle apna question type karo.";return}
@@ -2895,6 +2960,7 @@ function clearRuchiAssistant(){
  if(input)input.value="";
  if(status)status.textContent="Ready — ask a question to search your saved study library.";
  if(out)out.innerHTML="";
+ const summary=document.getElementById("ruchiNotesSummary"),cards=document.getElementById("ruchiFlashcardResults");if(summary)summary.innerHTML="";if(cards)cards.innerHTML="";
 }
 
 </script>
