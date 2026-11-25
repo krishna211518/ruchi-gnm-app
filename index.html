@@ -755,6 +755,21 @@ infection-control policies and supervisor's instructions during actual patient c
   <input id="resourceSearch" type="search" placeholder="Search saved resources..." oninput="renderStudyResources()" style="width:100%;margin-top:10px">
   <div id="studyResourceList" class="tool-list" style="margin-top:10px"></div>
  </div>
+
+ <div class="card">
+  <h3>🔊 Study Read Aloud</h3>
+  <p class="tool-muted">Paste your own notes or a short lesson and listen using your device's text-to-speech voice. Voice availability depends on your browser and device.</p>
+  <textarea id="readAloudText" class="full" rows="5" placeholder="Paste your study notes here..."></textarea>
+  <div class="tool-form" style="margin-top:8px"><label for="readAloudRate">Speaking speed</label><select id="readAloudRate"><option value="0.8">Slow</option><option value="1" selected>Normal</option><option value="1.15">Fast</option></select><label for="readAloudLang">Voice language</label><select id="readAloudLang"><option value="en-IN">English (India)</option><option value="en-US">English (US)</option><option value="hi-IN">Hindi</option></select></div>
+  <div class="tool-form" style="margin-top:8px"><button type="button" onclick="startReadAloud()">▶ Read aloud</button><button type="button" class="secondary" onclick="pauseReadAloud()">Pause</button><button type="button" class="secondary" onclick="resumeReadAloud()">Resume</button><button type="button" class="secondary" onclick="stopReadAloud()">Stop</button></div>
+  <p id="readAloudStatus" class="tool-muted" aria-live="polite">Ready when you are.</p>
+ </div>
+ <div class="card">
+  <h3>🗓️ Spaced Revision Scheduler</h3>
+  <p class="tool-muted">Plan repeat revisions at gradually increasing intervals: 1, 3, 7, 14 and 30 days. This is a study reminder, not an automatic notification.</p>
+  <div class="tool-form"><input id="spacedSubject" placeholder="Subject"><input id="spacedTopic" placeholder="Topic to revise"><button class="full" type="button" onclick="addSpacedRevision()">＋ Schedule topic</button></div>
+  <div id="spacedRevisionSummary" class="tool-muted" style="margin:8px 0"></div><div id="spacedRevisionList" class="tool-list"></div>
+ </div>
 </div>
 </section>
 
@@ -918,7 +933,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -928,7 +943,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -950,6 +965,7 @@ let focusSessions=loadJSON("ruchi_focus_sessions",[]);
 let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);
 let vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);
 let studyResources=loadJSON("ruchi_study_resources",[]);
+let spacedRevisions=loadJSON("ruchi_spaced_revisions",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1583,6 +1599,46 @@ function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if
 
 
 
+
+function startReadAloud(){
+ const text=document.getElementById("readAloudText")?.value.trim(),status=document.getElementById("readAloudStatus");
+ if(!text){if(status)status.textContent="Paste some study text first.";return}
+ if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){if(status)status.textContent="Text-to-speech is not supported in this browser. Try an updated browser or device accessibility settings.";return}
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(text);
+ utterance.lang=document.getElementById("readAloudLang").value;
+ utterance.rate=Number(document.getElementById("readAloudRate").value)||1;
+ utterance.onstart=()=>{if(status)status.textContent="Reading your notes aloud…"};
+ utterance.onend=()=>{if(status)status.textContent="Finished reading."};
+ utterance.onerror=()=>{if(status)status.textContent="Could not play this text. Check your device's speech voice settings."};
+ window.speechSynthesis.speak(utterance);
+}
+function pauseReadAloud(){if("speechSynthesis" in window){window.speechSynthesis.pause();const s=document.getElementById("readAloudStatus");if(s)s.textContent="Paused."}}
+function resumeReadAloud(){if("speechSynthesis" in window){window.speechSynthesis.resume();const s=document.getElementById("readAloudStatus");if(s)s.textContent="Resumed."}}
+function stopReadAloud(){if("speechSynthesis" in window)window.speechSynthesis.cancel();const s=document.getElementById("readAloudStatus");if(s)s.textContent="Stopped."}
+function addSpacedRevision(){
+ const subject=document.getElementById("spacedSubject").value.trim(),topic=document.getElementById("spacedTopic").value.trim();
+ if(!subject||!topic){alert("Enter both subject and topic.");return}
+ spacedRevisions.unshift({id:Date.now(),subject,topic,stage:0,due:localDateKey(),reviews:0});
+ spacedRevisions=spacedRevisions.slice(0,300);saveJSON("ruchi_spaced_revisions",spacedRevisions);
+ document.getElementById("spacedSubject").value="";document.getElementById("spacedTopic").value="";renderSpacedRevisions();
+}
+function shiftStudyDate(date,days){const d=new Date(date+"T12:00:00");d.setDate(d.getDate()+days);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function completeSpacedRevision(id){
+ const x=spacedRevisions.find(t=>t.id===id);if(!x)return;
+ const intervals=[1,3,7,14,30];x.reviews=(Number(x.reviews)||0)+1;
+ if(x.stage>=intervals.length){x.stage=intervals.length;x.due=shiftStudyDate(localDateKey(),30)}
+ else{x.due=shiftStudyDate(localDateKey(),intervals[x.stage]);x.stage++}
+ saveJSON("ruchi_spaced_revisions",spacedRevisions);renderSpacedRevisions();
+}
+function removeSpacedRevision(id){spacedRevisions=spacedRevisions.filter(x=>x.id!==id);saveJSON("ruchi_spaced_revisions",spacedRevisions);renderSpacedRevisions()}
+function renderSpacedRevisions(){
+ const el=document.getElementById("spacedRevisionList"),sum=document.getElementById("spacedRevisionSummary");if(!el||!sum)return;
+ const today=localDateKey(),ordered=spacedRevisions.slice().sort((a,b)=>String(a.due).localeCompare(String(b.due)));
+ const due=ordered.filter(x=>x.due<=today).length;sum.textContent=spacedRevisions.length+" topic(s) scheduled · "+due+" due today or overdue";
+ el.innerHTML=ordered.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject)+' · Due: '+escapeHTML(x.due)+' · Reviews: '+(Number(x.reviews)||0)+'</p></div><div><button class="secondary" onclick="completeSpacedRevision('+x.id+')">Reviewed</button> <button class="secondary" onclick="removeSpacedRevision('+x.id+')">Remove</button></div></div>').join("")||'<p class="tool-muted">No revision topics scheduled yet.</p>';
+}
+
 function renderWrongNotebook(){
  const el=document.getElementById("wrongNotebookList"),sum=document.getElementById("wrongNotebookSummary");if(!el||!sum)return;
  const q=(document.getElementById("wrongNotebookSearch")?.value||"").trim().toLowerCase();
@@ -1641,7 +1697,7 @@ function renderStudyStreak(){
  el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
 }
 function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
