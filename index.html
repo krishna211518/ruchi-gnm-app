@@ -718,7 +718,9 @@ infection-control policies and supervisor's instructions during actual patient c
  </div>
  <div class="card">
   <h3>🔎 Medical Dictionary & Abbreviations</h3>
-  <input id="medicalSearch" type="search" placeholder="Search term or abbreviation..." oninput="searchMedicalReference()" style="width:100%">
+  <input id="medicalSearch" type="search" placeholder="Search term, meaning or abbreviation..." oninput="searchMedicalReference()" style="width:100%">
+  <select id="medicalCategory" onchange="searchMedicalReference()" style="width:100%;margin-top:8px"><option value="All">All categories</option><option value="Anatomy">Anatomy</option><option value="Abbreviation">Abbreviations</option><option value="Clinical">Clinical terms</option><option value="Microbiology">Microbiology</option><option value="Nutrition">Nutrition</option><option value="Nursing">Nursing concepts</option></select>
+  <p id="medicalCount" class="tool-muted" aria-live="polite"></p>
   <div id="medicalResults" style="margin-top:10px"></div>
   <p class="tool-muted">For learning only. Verify clinical meanings and local approved abbreviations before use.</p>
  </div>
@@ -1502,7 +1504,54 @@ const medicalReference=[
  ["Dyspnea","Dyspnoea / Dyspnea","The sensation of difficult or uncomfortable breathing."],
  ["Tachycardia","Tachycardia","A faster-than-expected heart rate; interpretation depends on age and context."],
  ["Bradycardia","Bradycardia","A slower-than-expected heart rate; interpretation depends on age and context."],
- ["Anemia","Anaemia / Anemia","A condition involving reduced haemoglobin or healthy red blood cells."]
+ ["Anemia","Anaemia / Anemia","A condition involving reduced haemoglobin or healthy red blood cells."],
+ ["Abdomen","Abdomen","The part of the trunk between the chest and pelvis.","Anatomy"],
+ ["Abduction","Abduction","Movement of a body part away from the midline.","Anatomy"],
+ ["Adduction","Adduction","Movement of a body part towards the midline.","Anatomy"],
+ ["Alveoli","Alveoli","Tiny air sacs in the lungs where gas exchange occurs.","Anatomy"],
+ ["Artery","Artery","A blood vessel that carries blood away from the heart.","Anatomy"],
+ ["Capillary","Capillary","A very small blood vessel where exchange with tissues occurs.","Anatomy"],
+ ["Femur","Femur","The thigh bone and the longest bone in the human body.","Anatomy"],
+ ["Neuron","Neuron","A specialised nerve cell that transmits information.","Anatomy"],
+ ["Oesophagus","Esophagus / Oesophagus","The muscular tube that carries food from the throat to the stomach.","Anatomy"],
+ ["Pancreas","Pancreas","An organ with digestive and hormone-producing functions.","Anatomy"],
+ ["Peristalsis","Peristalsis","Wave-like muscular contractions that move contents through a hollow organ.","Anatomy"],
+ ["Pulse","Pulse","The pressure wave felt in an artery as the heart pumps blood.","Clinical"],
+ ["Systole","Systole","The phase when the heart muscle contracts.","Clinical"],
+ ["Diastole","Diastole","The phase when the heart muscle relaxes and fills.","Clinical"],
+ ["Cyanosis","Cyanosis","Bluish discolouration of skin or mucosa; requires clinical assessment in context.","Clinical"],
+ ["Oedema","Edema / Oedema","Swelling caused by excess fluid in body tissues.","Clinical"],
+ ["Inflammation","Inflammation","The body's response to injury or infection; signs and causes vary.","Clinical"],
+ ["Aetiology","Etiology / Aetiology","The cause or origin of a disease or condition.","Clinical"],
+ ["Prognosis","Prognosis","The expected course or outcome of a condition.","Clinical"],
+ ["Diagnosis","Diagnosis","Identification of a condition by an appropriately qualified clinician using assessment and evidence.","Clinical"],
+ ["Pathogen","Pathogen","A microorganism or agent capable of causing disease.","Microbiology"],
+ ["Bacteria","Bacteria","Single-celled microorganisms; some are harmless or useful and others can cause disease.","Microbiology"],
+ ["Virus","Virus","An infectious agent that replicates inside living host cells.","Microbiology"],
+ ["Fungus","Fungus","A group of organisms that includes yeasts and moulds; some can cause infections.","Microbiology"],
+ ["Sterilization","Sterilisation / Sterilization","A validated process intended to destroy all forms of microbial life on an item.","Microbiology"],
+ ["Disinfection","Disinfection","A process that reduces or inactivates many disease-causing microorganisms on surfaces or objects; it is not the same as sterilization.","Microbiology"],
+ ["Immunity","Immunity","The body's ability to resist or respond to infection and other foreign substances.","Microbiology"],
+ ["Carbohydrate","Carbohydrate","A nutrient group that is an important energy source.","Nutrition"],
+ ["Protein","Protein","A nutrient needed for growth, tissue maintenance and many body functions.","Nutrition"],
+ ["Vitamin","Vitamin","An organic micronutrient needed in small amounts for normal body functions.","Nutrition"],
+ ["Mineral","Mineral","An inorganic nutrient required for functions such as bone health and fluid balance.","Nutrition"],
+ ["Dehydration","Dehydration","A state in which the body has lost more fluid than it takes in; assessment depends on context.","Clinical"],
+ ["BMI","Body mass index","A screening measure calculated from weight and height; it does not diagnose health status.","Nutrition"],
+ ["Aseptic technique","Aseptic technique","Methods used to reduce the risk of contamination; follow taught procedures and local policy.","Nursing"],
+ ["Consent","Informed consent","A voluntary decision made after receiving understandable information; follow applicable law and policy.","Nursing"],
+ ["Confidentiality","Confidentiality","The duty to protect private information and share it only when properly authorised.","Nursing"],
+ ["Documentation","Clinical documentation","A clear, timely and factual record made according to professional and institutional standards.","Nursing"],
+ ["Empathy","Empathy","Understanding another person's perspective and responding respectfully.","Nursing"],
+ ["Hand hygiene","Hand hygiene","Cleaning hands using the method recommended by current infection-prevention guidance.","Nursing"],
+ ["Triage","Triage","A structured process for prioritising people according to urgency by trained personnel.","Nursing"],
+ ["WHO","World Health Organization","The United Nations agency concerned with international public health.","Abbreviation"],
+ ["INC","Indian Nursing Council","The statutory body that regulates nursing education and standards in India.","Abbreviation"],
+ ["IM","Intramuscular","Relating to or situated within a muscle; routes and procedures require supervised training.","Abbreviation"],
+ ["SC","Subcutaneous","Relating to the tissue layer beneath the skin; clinical use follows authorised guidance.","Abbreviation"],
+ ["OD","Once daily","An abbreviation sometimes used for once daily; avoid ambiguous abbreviations and follow approved local policy.","Abbreviation"],
+ ["PRN","As needed","A term meaning when required; any use depends on an authorised prescription and policy.","Abbreviation"],
+ ["SOAP","Subjective, Objective, Assessment, Plan","A common structure for organising clinical notes in appropriate settings.","Abbreviation"]
 ];
 
 const practicalSkills=["Hand hygiene principles","Personal protective equipment (PPE) awareness","Medical hand washing steps (college checklist)","Bed making principles","Patient identification and privacy principles","Vital signs equipment identification","Temperature measurement learning","Pulse and respiratory rate assessment learning","Blood pressure equipment and supervised practice","Safe patient communication","Biomedical waste segregation awareness","Basic nursing documentation principles"];
@@ -1812,9 +1861,11 @@ function renderAttendance(){
 }
 function deleteAttendance(id){attendanceEntries=attendanceEntries.filter(x=>x.id!==id);saveJSON("ruchi_attendance",attendanceEntries);renderAttendance()}
 function searchMedicalReference(){
- const input=document.getElementById("medicalSearch"),out=document.getElementById("medicalResults");if(!input||!out)return;
- const q=input.value.trim().toLowerCase(),matches=medicalReference.filter(x=>!q||x.join(" ").toLowerCase().includes(q));
- out.innerHTML=matches.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x[0])+' · '+escapeHTML(x[1])+'</strong><div>'+escapeHTML(x[2])+'</div></div>').join("")||'<p class="tool-muted">No matching term. Check the spelling or try another word.</p>';
+ const input=document.getElementById("medicalSearch"),out=document.getElementById("medicalResults"),category=document.getElementById("medicalCategory"),count=document.getElementById("medicalCount");if(!input||!out)return;
+ const q=input.value.trim().toLowerCase(),cat=category?category.value:"All";
+ const matches=medicalReference.filter(x=>(!q||x.join(" ").toLowerCase().includes(q))&&(cat==="All"||x[3]===cat));
+ if(count)count.textContent="Showing "+matches.length+" of "+medicalReference.length+" terms";
+ out.innerHTML=matches.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x[0])+' · '+escapeHTML(x[1])+'</strong>'+(x[3]?'<p class="tool-muted">'+escapeHTML(x[3])+'</p>':'')+'<div>'+escapeHTML(x[2])+'</div></div>').join("")||'<p class="tool-muted">No matching term. Check the spelling or choose another category.</p>';
 }
 
 function setFocusPreset(minutes,button){
