@@ -746,6 +746,19 @@ infection-control policies and supervisor's instructions during actual patient c
  <div class="card"><h3>🌍 Community Health Awareness Project Planner</h3><p class="tool-muted">Classroom awareness project ko plan aur organize karo.</p><input id="communityProjectTitle" placeholder="Project title / health topic"><input id="communityProjectAudience" placeholder="Intended audience"><textarea id="communityProjectMessage" rows="2" placeholder="Main awareness message"></textarea><textarea id="communityProjectActivities" rows="2" placeholder="Planned activities / materials"></textarea><textarea id="communityProjectSources" rows="2" placeholder="Verified source references"></textarea><button onclick="saveCommunityProject()">Save project plan</button><div id="communityProjectList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>🧩 Exam Error Analysis Journal</h3><p class="tool-muted">Galat ya chhoote hue question ka reason aur next practice step likho.</p><input id="errorSubject" placeholder="Subject"><input id="errorTopic" placeholder="Topic / question reference"><select id="errorReason"><option>Concept not clear</option><option>Forgot the fact</option><option>Misread the question</option><option>Calculation / spelling mistake</option><option>Time management</option><option>Other</option></select><textarea id="errorCorrection" rows="2" placeholder="Correct concept (textbook / teacher verified)"></textarea><textarea id="errorNextStep" rows="2" placeholder="How will I prepare differently next time?"></textarea><button onclick="saveExamError()">Save error analysis</button><div id="examErrorList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>💬 Nursing Communication Roleplay Log</h3><p class="tool-muted">Sirf fictional classroom roleplay. Real patient details enter mat karo.</p><input id="roleplayScenario" placeholder="Fictional scenario title"><input id="roleplayGoal" placeholder="Communication goal"><textarea id="roleplayOpening" rows="2" placeholder="How would you begin respectfully?"></textarea><textarea id="roleplayListening" rows="2" placeholder="What would you listen for / clarify?"></textarea><textarea id="roleplayReflection" rows="2" placeholder="What went well and what can improve?"></textarea><button onclick="saveCommunicationRoleplay()">Save roleplay</button><div id="communicationRoleplayList" class="tool-list" style="margin-top:10px"></div></div>
+ <div class="card" id="ruchiSmartAssistant">
+  <h3>🤖 RUCHI Smart Study Assistant</h3>
+  <p class="tool-muted">Apna nursing ya study topic poochho. Assistant app ki study library aur medical dictionary mein relevant content dhoondhega.</p>
+  <input id="ruchiAssistantQuestion" type="text" placeholder="Example: What is the function of the skeletal system?">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px">
+   <button onclick="askRuchiAssistant()">Ask RUCHI</button>
+   <button class="secondary" onclick="searchRuchiAssistantWeb()">Search on web</button>
+   <button class="secondary" onclick="clearRuchiAssistant()">Clear</button>
+  </div>
+  <div id="ruchiAssistantStatus" class="tool-muted" style="margin-top:10px" aria-live="polite">Ready — ask a question to search your saved study library.</div>
+  <div id="ruchiAssistantResults" class="tool-list" style="margin-top:10px"></div>
+  <p class="tool-muted" style="margin-top:10px">Study support only. Medical topics are for learning, not diagnosis or treatment. Verify important information with your textbook and teacher. Do not enter real patient details.</p>
+ </div>
  <div class="card">
   <h3>🧑‍🏫 Teacher Feedback & Improvement Log</h3>
   <p class="tool-muted">Teacher se mile feedback ko action steps me badlo.</p>
@@ -2850,6 +2863,39 @@ function renderExamErrors(){const el=document.getElementById("examErrorList");if
 function saveCommunicationRoleplay(){const scenario=document.getElementById("roleplayScenario").value.trim(),goal=document.getElementById("roleplayGoal").value.trim(),opening=document.getElementById("roleplayOpening").value.trim(),listening=document.getElementById("roleplayListening").value.trim(),reflection=document.getElementById("roleplayReflection").value.trim();if(!scenario||!opening){alert("Enter a scenario and your opening response.");return}communicationRoleplays.unshift({id:Date.now(),scenario,goal,opening,listening,reflection,date:localDateKey()});communicationRoleplays=communicationRoleplays.slice(0,250);if(!saveJSON("ruchi_communication_roleplays",communicationRoleplays))return;["roleplayScenario","roleplayGoal","roleplayOpening","roleplayListening","roleplayReflection"].forEach(id=>document.getElementById(id).value="");renderCommunicationRoleplays()}
 function deleteCommunicationRoleplay(id){communicationRoleplays=communicationRoleplays.filter(x=>x.id!==id);saveJSON("ruchi_communication_roleplays",communicationRoleplays);renderCommunicationRoleplays()}
 function renderCommunicationRoleplays(){const el=document.getElementById("communicationRoleplayList");if(!el)return;el.innerHTML=communicationRoleplays.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.scenario)+'</b><p>'+escapeHTML(x.date)+(x.goal?' · '+escapeHTML(x.goal):'')+'</p><p><b>Opening:</b> '+escapeHTML(x.opening)+'</p>'+(x.listening?'<p><b>Listening / clarification:</b> '+escapeHTML(x.listening)+'</p>':'')+(x.reflection?'<p><b>Reflection:</b> '+escapeHTML(x.reflection)+'</p>':'')+'<button class="secondary" onclick="deleteCommunicationRoleplay('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No roleplay entries yet.</p>'}
+
+function askRuchiAssistant(){
+ const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),out=document.getElementById("ruchiAssistantResults");
+ if(!input||!status||!out)return;
+ const query=input.value.trim().toLowerCase();
+ if(!query){status.textContent="Pehle apna question type karo.";out.innerHTML="";return}
+ const words=query.split(/[^a-z0-9]+/).filter(w=>w.length>2),matches=[];
+ (Array.isArray(quickReferenceData)?quickReferenceData:[]).forEach(x=>{
+  const hay=(x.topic+" "+x.subject+" "+x.detail).toLowerCase(),score=words.reduce((n,w)=>n+(hay.includes(w)?1:0),0);
+  if(score)matches.push({score,title:x.topic,group:x.subject,detail:x.detail,kind:"Study reference"});
+ });
+ (Array.isArray(medicalReference)?medicalReference:[]).forEach(x=>{
+  const hay=x.join(" ").toLowerCase(),score=words.reduce((n,w)=>n+(hay.includes(w)?1:0),0);
+  if(score)matches.push({score,title:x[0]+" · "+x[1],group:x[3]||"Medical dictionary",detail:x[2],kind:"Dictionary"});
+ });
+ matches.sort((a,b)=>b.score-a.score);
+ const best=matches.slice(0,6);
+ if(!best.length){status.textContent="Is question ka direct match app ki offline study library mein nahi mila. Web search se extra information dekh sakte ho.";out.innerHTML='<p class="tool-muted">No local match found. Try a shorter topic name or use Search on web.</p>';return}
+ status.textContent="App library mein "+matches.length+" relevant match mile. Best matches:";
+ out.innerHTML=best.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x.title)+'</strong><p class="tool-muted">'+escapeHTML(x.group)+' · '+escapeHTML(x.kind)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join("");
+}
+function searchRuchiAssistantWeb(){
+ const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),q=input?input.value.trim():"";
+ if(!q){if(status)status.textContent="Pehle apna question type karo.";return}
+ window.open("https://www.google.com/search?q="+encodeURIComponent(q+" nursing study"),"_blank","noopener,noreferrer");
+ if(status)status.textContent="Browser mein web search khol diya. Sources ko textbook aur teacher se verify karna.";
+}
+function clearRuchiAssistant(){
+ const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),out=document.getElementById("ruchiAssistantResults");
+ if(input)input.value="";
+ if(status)status.textContent="Ready — ask a question to search your saved study library.";
+ if(out)out.innerHTML="";
+}
 
 </script>
 </body>
