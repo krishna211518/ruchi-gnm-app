@@ -703,6 +703,35 @@ infection-control policies and supervisor's instructions during actual patient c
   <div id="assignmentReferencePreview" class="dictionary-result" aria-live="polite" style="margin-top:10px">Your formatted reference will appear here.</div>
   <div id="assignmentReferenceList" class="tool-list" style="margin-top:12px"></div>
  </div>
+ <div class="card">
+  <h3>🧠 Nursing Concept Map Builder</h3>
+  <p class="tool-muted">Kisi topic ko central idea, related concepts aur connections mein organize karo.</p>
+  <label for="conceptTopic">Central topic</label><input id="conceptTopic" placeholder="e.g. Infection prevention" style="width:100%">
+  <label for="conceptSubject">Subject</label><input id="conceptSubject" placeholder="e.g. Nursing Foundations" style="width:100%">
+  <label for="conceptBranches">Related concepts (one per line)</label><textarea id="conceptBranches" rows="5" placeholder="Hand hygiene&#10;PPE&#10;Cleaning&#10;Safe waste disposal" style="width:100%"></textarea>
+  <label for="conceptLinks">How are they connected?</label><textarea id="conceptLinks" rows="3" placeholder="Write short links or explanations..." style="width:100%"></textarea>
+  <button onclick="saveNursingConceptMap()">Save concept map</button>
+  <div id="nursingConceptMapList" class="tool-list" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
+  <h3>✅ Exam Readiness Checklist</h3>
+  <p class="tool-muted">Apne next exam ki preparation ke tasks add karo aur complete mark karo.</p>
+  <label for="readinessExam">Exam / Subject name</label><input id="readinessExam" placeholder="e.g. Anatomy unit test" style="width:100%">
+  <label for="readinessTask">New preparation task</label><div class="tool-form"><input id="readinessTask" placeholder="e.g. Revise chapter 3"><button onclick="addExamReadinessTask()">Add task</button></div>
+  <div id="examReadinessList" class="tool-list" style="margin-top:12px"></div>
+  <button class="secondary" onclick="resetExamReadiness()">Reset completed tasks</button>
+ </div>
+ <div class="card">
+  <h3>📒 Lecture & Class Learning Log</h3>
+  <p class="tool-muted">Class ke baad topic, key learning aur homework note karke save karo.</p>
+  <label for="lectureDate">Class date</label><input id="lectureDate" type="date" style="width:100%">
+  <label for="lectureSubject">Subject</label><input id="lectureSubject" placeholder="e.g. Microbiology" style="width:100%">
+  <label for="lectureTopic">Lecture topic</label><input id="lectureTopic" placeholder="e.g. Types of microorganisms" style="width:100%">
+  <label for="lectureLearning">Key learning points</label><textarea id="lectureLearning" rows="3" placeholder="What did you learn today?" style="width:100%"></textarea>
+  <label for="lectureHomework">Homework / Follow-up</label><textarea id="lectureHomework" rows="2" placeholder="Any work to complete..." style="width:100%"></textarea>
+  <button onclick="saveLectureLog()">Save class log</button>
+  <div id="lectureLogList" class="tool-list" style="margin-top:12px"></div>
+ </div>
  <div class="card"><h3>🫀 Anatomy & Body Systems Explorer</h3><p class="tool-muted">Select a body system for a short study overview. Educational reference only.</p><select id="bodySystemSelect" onchange="showBodySystem()" style="width:100%"><option value="">Choose a body system</option></select><div id="bodySystemDetail" class="dictionary-result" style="margin-top:10px">Choose a system to explore its main organs and functions.</div></div>
  <div class="card"><h3>🩺 Nursing Instruments Library</h3><input id="instrumentSearch" type="search" placeholder="Search instruments..." oninput="renderInstrumentLibrary()" style="width:100%"><div id="instrumentResults" style="margin-top:10px"></div><p class="tool-muted">Identification and study notes only. Actual use requires instructor training and local protocols.</p></div>
  <div class="card"><h3>🌡️ Vital Signs Learning Centre</h3><input id="vitalSearch" type="search" placeholder="Search vital sign..." oninput="renderVitalLearning()" style="width:100%"><div id="vitalResults" style="margin-top:10px"></div><p class="tool-muted">Interpretation depends on age, condition and context. Follow college teaching and facility policy; this is not a diagnostic tool.</p></div>
@@ -1009,7 +1038,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -1019,7 +1048,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -2174,6 +2203,50 @@ function renderAssignmentReferences(){
  el.innerHTML=assignmentReferences.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.type)+' · '+escapeHTML(x.date)+'</p><p>'+escapeHTML(x.formatted||buildAssignmentReference(x))+'</p>'+(x.url?'<p><a href="'+escapeHTML(x.url)+'" target="_blank" rel="noopener noreferrer">Open source ↗</a></p>':'')+'</div><button class="secondary" onclick="deleteAssignmentReference('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No references saved yet.</p>';
 }
 function deleteAssignmentReference(id){assignmentReferences=assignmentReferences.filter(x=>x.id!==id);saveJSON("ruchi_assignment_references",assignmentReferences);renderAssignmentReferences()}
+
+
+let nursingConceptMaps=loadJSON("ruchi_concept_maps",[]);
+let examReadinessTasks=loadJSON("ruchi_exam_readiness",[]);
+let lectureLearningLogs=loadJSON("ruchi_lecture_logs",[]);
+function saveNursingConceptMap(){
+ const topic=document.getElementById("conceptTopic").value.trim(),subject=document.getElementById("conceptSubject").value.trim(),branches=document.getElementById("conceptBranches").value.split("\\n").map(x=>x.trim()).filter(Boolean),links=document.getElementById("conceptLinks").value.trim();
+ if(!topic||!branches.length){alert("Enter a central topic and at least one related concept.");return}
+ nursingConceptMaps.unshift({id:Date.now(),topic,subject,branches,links,date:localDateKey()});nursingConceptMaps=nursingConceptMaps.slice(0,150);
+ if(!saveJSON("ruchi_concept_maps",nursingConceptMaps))return;
+ ["conceptTopic","conceptSubject","conceptBranches","conceptLinks"].forEach(id=>document.getElementById(id).value="");renderNursingConceptMaps();
+}
+function renderNursingConceptMaps(){
+ const el=document.getElementById("nursingConceptMapList");if(!el)return;
+ el.innerHTML=nursingConceptMaps.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+'</p><ul>'+x.branches.map(b=>'<li>'+escapeHTML(b)+'</li>').join("")+'</ul>'+(x.links?'<p>'+escapeHTML(x.links)+'</p>':'')+'</div><button class="secondary" onclick="deleteNursingConceptMap('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No concept maps saved yet.</p>';
+}
+function deleteNursingConceptMap(id){nursingConceptMaps=nursingConceptMaps.filter(x=>x.id!==id);saveJSON("ruchi_concept_maps",nursingConceptMaps);renderNursingConceptMaps()}
+function addExamReadinessTask(){
+ const exam=document.getElementById("readinessExam").value.trim(),task=document.getElementById("readinessTask").value.trim();
+ if(!exam||!task){alert("Enter exam name and preparation task.");return}
+ examReadinessTasks.unshift({id:Date.now(),exam,task,done:false,date:localDateKey()});examReadinessTasks=examReadinessTasks.slice(0,300);
+ if(!saveJSON("ruchi_exam_readiness",examReadinessTasks))return;
+ document.getElementById("readinessTask").value="";renderExamReadiness();
+}
+function toggleExamReadiness(id,checked){const item=examReadinessTasks.find(x=>x.id===id);if(!item)return;item.done=checked;saveJSON("ruchi_exam_readiness",examReadinessTasks);renderExamReadiness()}
+function deleteExamReadinessTask(id){examReadinessTasks=examReadinessTasks.filter(x=>x.id!==id);saveJSON("ruchi_exam_readiness",examReadinessTasks);renderExamReadiness()}
+function resetExamReadiness(){if(!examReadinessTasks.some(x=>x.done))return;if(!confirm("Mark all checklist tasks as pending again?"))return;examReadinessTasks.forEach(x=>x.done=false);saveJSON("ruchi_exam_readiness",examReadinessTasks);renderExamReadiness()}
+function renderExamReadiness(){
+ const el=document.getElementById("examReadinessList");if(!el)return;
+ const groups={};examReadinessTasks.forEach(x=>(groups[x.exam]??=[]).push(x));
+ el.innerHTML=Object.entries(groups).map(([exam,items])=>'<div class="dictionary-result"><b>'+escapeHTML(exam)+'</b><p class="tool-muted">'+items.filter(x=>x.done).length+' / '+items.length+' completed</p>'+items.map(x=>'<div class="tool-row"><label><input type="checkbox" '+(x.done?'checked':'')+' onchange="toggleExamReadiness('+x.id+',this.checked)"> '+escapeHTML(x.task)+'</label><button class="secondary" onclick="deleteExamReadinessTask('+x.id+')">Delete</button></div>').join("")+'</div>').join("")||'<p class="tool-muted">No exam tasks yet. Add your first task above.</p>';
+}
+function saveLectureLog(){
+ const date=document.getElementById("lectureDate").value||localDateKey(),subject=document.getElementById("lectureSubject").value.trim(),topic=document.getElementById("lectureTopic").value.trim(),learning=document.getElementById("lectureLearning").value.trim(),homework=document.getElementById("lectureHomework").value.trim();
+ if(!subject||!topic){alert("Enter subject and lecture topic.");return}
+ lectureLearningLogs.unshift({id:Date.now(),date,subject,topic,learning,homework});lectureLearningLogs=lectureLearningLogs.slice(0,300);
+ if(!saveJSON("ruchi_lecture_logs",lectureLearningLogs))return;
+ ["lectureSubject","lectureTopic","lectureLearning","lectureHomework"].forEach(id=>document.getElementById(id).value="");renderLectureLogs();
+}
+function renderLectureLogs(){
+ const el=document.getElementById("lectureLogList");if(!el)return;
+ el.innerHTML=lectureLearningLogs.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p>'+(x.learning?'<p>'+escapeHTML(x.learning)+'</p>':'')+(x.homework?'<p><b>Follow-up:</b> '+escapeHTML(x.homework)+'</p>':'')+'</div><button class="secondary" onclick="deleteLectureLog('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No class logs saved yet.</p>';
+}
+function deleteLectureLog(id){lectureLearningLogs=lectureLearningLogs.filter(x=>x.id!==id);saveJSON("ruchi_lecture_logs",lectureLearningLogs);renderLectureLogs()}
 
 </script>
 </body>
