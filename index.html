@@ -890,7 +890,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals"]);"ruchi_study_logs","ruchi_revision_queue"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -909,7 +909,7 @@ let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
 let focusSessions=loadJSON("ruchi_focus_sessions",[]);
-let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);revisionQueue=loadJSON("ruchi_revision_queue",[]);
+let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1478,8 +1478,8 @@ function renderWeeklyGoals(){const el=document.getElementById("weeklyGoalList");
 function changeGoalProgress(id,delta){const x=weeklyGoals.find(g=>g.id===id);if(!x)return;x.done=Math.max(0,Math.min(x.target,x.done+delta));saveJSON("ruchi_weekly_goals",weeklyGoals);renderWeeklyGoals()}
 function deleteWeeklyGoal(id){weeklyGoals=weeklyGoals.filter(x=>x.id!==id);saveJSON("ruchi_weekly_goals",weeklyGoals);renderWeeklyGoals()}
 
-function renderStudentToolkit(){function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();searchMedicalReference();renderRevisionQueue();searchMedicalReference();
+function renderStudentToolkit(){
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();searchMedicalReference();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
