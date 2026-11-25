@@ -1546,7 +1546,7 @@ function renderInfectionTopics(){const el=document.getElementById("infectionTopi
 function startQuickQuiz(){quickQuizIndex=(quickQuizIndex+1)%quickQuiz.length;document.getElementById("quickQuizQuestion").innerHTML='<b>Question '+(quickQuizIndex+1)+' of '+quickQuiz.length+'</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][0])+'</p>';const a=document.getElementById("quickQuizAnswer");a.style.display="none";a.textContent=""}
 function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if(quickQuizIndex<0){a.style.display="block";a.textContent="Tap Start to begin.";return}a.style.display="block";a.innerHTML='<b>Explanation</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][1])+'</p>'}
 
-function renderStudentToolkit(){function renderStudentToolkit(){
+function renderStudentToolkit(){
  renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderWeeklyGoals();searchMedicalReference();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
