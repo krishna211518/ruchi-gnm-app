@@ -484,7 +484,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
 <nav class="krx-mobile-nav" aria-label="Main navigation">
  <button type="button" data-page="home" class="active" onclick="show('home',this)"><span class="nav-icon">⌂</span><span>Home</span></button>
  <button type="button" data-page="library" onclick="show('library',this)"><span class="nav-icon">▤</span><span>Study</span></button>
- <button type="button" data-page="mcq" class="krx-center" onclick="show('mcq',this)"><span class="nav-icon">✦</span><span>Practice</span></button>
+ <button type="button" data-page="ai-hub" class="krx-center" onclick="show('ai-hub',this)" aria-label="Open RUCHI AI Study Hub"><span class="nav-icon">🤖</span><span>AI</span></button>
  <button type="button" data-page="notes" onclick="show('notes',this)"><span class="nav-icon">▧</span><span>Notes</span></button>
  <button type="button" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>More</span></button>
 </nav>
@@ -667,6 +667,50 @@ infection-control policies and supervisor's instructions during actual patient c
 <div id="studyPlanList"></div>
 </section>
 
+<section id="ai-hub" class="section">
+ <h2>🤖 RUCHI AI Study Hub</h2>
+ <p class="small">Your central place for AI-assisted study tools and learning support.</p>
+ <div class="tool-grid">
+ <div class="card" id="ruchiSmartAssistant">
+  <h3>🤖 RUCHI Smart Study Assistant</h3>
+  <p class="tool-muted">Apna nursing ya study topic poochho. Assistant app ki study library aur medical dictionary mein relevant content dhoondhega.</p>
+  <input id="ruchiAssistantQuestion" type="text" placeholder="Example: What is the function of the skeletal system?">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px">
+   <button onclick="askRuchiAssistant()">Ask RUCHI</button>
+   <button class="secondary" onclick="searchRuchiAssistantWeb()">Search on web</button>
+   <button class="secondary" onclick="clearRuchiAssistant()">Clear</button>
+  </div>
+  <div id="ruchiAssistantStatus" class="tool-muted" style="margin-top:10px" aria-live="polite">Ready — ask a question to search your saved study library.</div>
+  <div id="ruchiAssistantResults" class="tool-list" style="margin-top:10px"></div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
+   <button class="secondary" onclick="useRuchiPrompt('Explain the topic in simple words: ')">Simple explanation</button>
+   <button class="secondary" onclick="useRuchiPrompt('Give me revision points about: ')">Revision points</button>
+   <button class="secondary" onclick="useRuchiPrompt('Find study references for: ')">Find references</button>
+  </div>
+  <div class="card" style="margin-top:12px">
+   <h4>🗂️ RUCHI Study Tools</h4>
+   <label for="ruchiNotesInput">Notes summarizer (offline)</label>
+   <textarea id="ruchiNotesInput" rows="4" placeholder="Paste your own notes here to extract key sentences..."></textarea>
+   <button onclick="summarizeRuchiNotes()">Create short revision summary</button>
+   <div id="ruchiNotesSummary" class="tool-list" style="margin-top:8px"></div>
+   <label for="ruchiFlashcardTopic" style="display:block;margin-top:12px">Flashcard maker from app library</label>
+   <input id="ruchiFlashcardTopic" placeholder="Enter a topic, e.g. skeletal system">
+   <button onclick="makeRuchiFlashcards()">Make revision flashcards</button>
+   <div id="ruchiFlashcardResults" class="tool-list" style="margin-top:8px"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+   <h4>💬 Recent Study Chat</h4>
+   <p class="tool-muted">Recent questions and local study matches are saved only on this device.</p>
+   <button class="secondary" onclick="renderRuchiChatHistory()">Show chat history</button>
+   <button class="secondary" onclick="clearRuchiChatHistory()">Clear history</button>
+   <div id="ruchiChatHistory" class="tool-list" style="margin-top:8px"></div>
+  </div>
+  <p class="tool-muted" style="margin-top:10px"> Medical topics are for learning, not diagnosis or treatment. Verify important information with your textbook and teacher. Do not enter real patient details.</p>
+ </div>
+
+ </div>
+</section>
+
 <section id="tools" class="section">
 <h2>🧰 Student Toolkit</h2>
 <p class="small">College work, attendance, timetable and quick nursing reference. Your entries stay on this device.</p>
@@ -746,42 +790,6 @@ infection-control policies and supervisor's instructions during actual patient c
  <div class="card"><h3>🌍 Community Health Awareness Project Planner</h3><p class="tool-muted">Classroom awareness project ko plan aur organize karo.</p><input id="communityProjectTitle" placeholder="Project title / health topic"><input id="communityProjectAudience" placeholder="Intended audience"><textarea id="communityProjectMessage" rows="2" placeholder="Main awareness message"></textarea><textarea id="communityProjectActivities" rows="2" placeholder="Planned activities / materials"></textarea><textarea id="communityProjectSources" rows="2" placeholder="Verified source references"></textarea><button onclick="saveCommunityProject()">Save project plan</button><div id="communityProjectList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>🧩 Exam Error Analysis Journal</h3><p class="tool-muted">Galat ya chhoote hue question ka reason aur next practice step likho.</p><input id="errorSubject" placeholder="Subject"><input id="errorTopic" placeholder="Topic / question reference"><select id="errorReason"><option>Concept not clear</option><option>Forgot the fact</option><option>Misread the question</option><option>Calculation / spelling mistake</option><option>Time management</option><option>Other</option></select><textarea id="errorCorrection" rows="2" placeholder="Correct concept (textbook / teacher verified)"></textarea><textarea id="errorNextStep" rows="2" placeholder="How will I prepare differently next time?"></textarea><button onclick="saveExamError()">Save error analysis</button><div id="examErrorList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>💬 Nursing Communication Roleplay Log</h3><p class="tool-muted">Sirf fictional classroom roleplay. Real patient details enter mat karo.</p><input id="roleplayScenario" placeholder="Fictional scenario title"><input id="roleplayGoal" placeholder="Communication goal"><textarea id="roleplayOpening" rows="2" placeholder="How would you begin respectfully?"></textarea><textarea id="roleplayListening" rows="2" placeholder="What would you listen for / clarify?"></textarea><textarea id="roleplayReflection" rows="2" placeholder="What went well and what can improve?"></textarea><button onclick="saveCommunicationRoleplay()">Save roleplay</button><div id="communicationRoleplayList" class="tool-list" style="margin-top:10px"></div></div>
- <div class="card" id="ruchiSmartAssistant">
-  <h3>🤖 RUCHI Smart Study Assistant</h3>
-  <p class="tool-muted">Apna nursing ya study topic poochho. Assistant app ki study library aur medical dictionary mein relevant content dhoondhega.</p>
-  <input id="ruchiAssistantQuestion" type="text" placeholder="Example: What is the function of the skeletal system?">
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px">
-   <button onclick="askRuchiAssistant()">Ask RUCHI</button>
-   <button class="secondary" onclick="searchRuchiAssistantWeb()">Search on web</button>
-   <button class="secondary" onclick="clearRuchiAssistant()">Clear</button>
-  </div>
-  <div id="ruchiAssistantStatus" class="tool-muted" style="margin-top:10px" aria-live="polite">Ready — ask a question to search your saved study library.</div>
-  <div id="ruchiAssistantResults" class="tool-list" style="margin-top:10px"></div>
-  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
-   <button class="secondary" onclick="useRuchiPrompt('Explain the topic in simple words: ')">Simple explanation</button>
-   <button class="secondary" onclick="useRuchiPrompt('Give me revision points about: ')">Revision points</button>
-   <button class="secondary" onclick="useRuchiPrompt('Find study references for: ')">Find references</button>
-  </div>
-  <div class="card" style="margin-top:12px">
-   <h4>🗂️ RUCHI Study Tools</h4>
-   <label for="ruchiNotesInput">Notes summarizer (offline)</label>
-   <textarea id="ruchiNotesInput" rows="4" placeholder="Paste your own notes here to extract key sentences..."></textarea>
-   <button onclick="summarizeRuchiNotes()">Create short revision summary</button>
-   <div id="ruchiNotesSummary" class="tool-list" style="margin-top:8px"></div>
-   <label for="ruchiFlashcardTopic" style="display:block;margin-top:12px">Flashcard maker from app library</label>
-   <input id="ruchiFlashcardTopic" placeholder="Enter a topic, e.g. skeletal system">
-   <button onclick="makeRuchiFlashcards()">Make revision flashcards</button>
-   <div id="ruchiFlashcardResults" class="tool-list" style="margin-top:8px"></div>
-  </div>
-  <div class="card" style="margin-top:12px">
-   <h4>💬 Recent Study Chat</h4>
-   <p class="tool-muted">Recent questions and local study matches are saved only on this device.</p>
-   <button class="secondary" onclick="renderRuchiChatHistory()">Show chat history</button>
-   <button class="secondary" onclick="clearRuchiChatHistory()">Clear history</button>
-   <div id="ruchiChatHistory" class="tool-list" style="margin-top:8px"></div>
-  </div>
-  <p class="tool-muted" style="margin-top:10px"> Medical topics are for learning, not diagnosis or treatment. Verify important information with your textbook and teacher. Do not enter real patient details.</p>
- </div>
  <div class="card">
   <h3>🧑‍🏫 Teacher Feedback & Improvement Log</h3>
   <p class="tool-muted">Teacher se mile feedback ko action steps me badlo.</p>
@@ -1361,7 +1369,7 @@ function show(id,btn){
  document.querySelectorAll(".nav button,.krx-mobile-nav button").forEach(x=>{x.classList.remove("selected","active")});
  if(btn){btn.classList.add("selected","active");}
  const menu=document.getElementById("ruchiMoreMenu");if(menu)menu.classList.remove("open");
- const title=document.getElementById("pageTitle");if(title){const label=({home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",focus:"Focus Room",tools:"Student Toolkit",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
+ const title=document.getElementById("pageTitle");if(title){const label=({ "ai-hub":"RUCHI AI Study Hub",home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",focus:"Focus Room",tools:"Student Toolkit",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
  refreshStats();
  if(id==="library")renderLibrary();
  if(id==="notes")renderNotes();
