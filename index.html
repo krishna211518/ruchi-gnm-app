@@ -391,6 +391,49 @@ body:has(#welcome.active) .workspace>header,body:has(#welcome.active) .sidebar,b
 }
 @media(prefers-reduced-motion:reduce){.krx-mobile-nav button{transition:none!important}}
 
+
+/* RUCHI PERMANENT DARK MODE — refined contrast and readable glass surfaces */
+:root{
+ --bg:#071321;--white:#102238;--text:#edf6ff;--muted:#a8bdd2;
+ --line:rgba(153,190,226,.20);--light:#18334d;
+ --shadow:0 14px 38px rgba(0,0,0,.28);
+}
+html,body{min-height:100%;background:#071321;color:#edf6ff}
+body{background:radial-gradient(ellipse at 8% -5%,rgba(22,105,160,.28),transparent 38%),radial-gradient(ellipse at 95% 12%,rgba(76,67,160,.18),transparent 34%),linear-gradient(145deg,#071321,#0a192b 55%,#0a1424)!important;color:#edf6ff!important}
+header{background:linear-gradient(120deg,#0b2239 0%,#123c62 58%,#185b86 100%)!important;box-shadow:0 14px 38px rgba(0,0,0,.28)!important}
+.container{color:#edf6ff}
+.card,.stat,.item,.panel,.result,.recommended-book,.book-frame{
+ background:linear-gradient(145deg,rgba(20,47,73,.92),rgba(12,30,50,.96))!important;
+ border:1px solid rgba(157,199,235,.19)!important;
+ box-shadow:0 12px 30px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.035)!important;
+ color:#edf6ff!important;
+}
+h1,h2,h3,h4,strong,.card h3,.item h3{color:#edf6ff}
+p,small,.muted,.stat span,footer{color:#afc2d6}
+input,select,textarea,.field{
+ background:#091a2c!important;color:#edf6ff!important;
+ border:1px solid #34516e!important;
+}
+input::placeholder,textarea::placeholder{color:#8199b2!important}
+input:focus,select:focus,textarea:focus{
+ outline:none!important;border-color:#42c9ed!important;
+ box-shadow:0 0 0 3px rgba(46,190,225,.15)!important;
+}
+button.secondary,.option,.tabs button{
+ background:rgba(20,48,75,.88)!important;color:#e5f2ff!important;
+ border:1px solid rgba(153,190,226,.22)!important;
+}
+button.secondary:hover,.tabs button:hover{background:#1b4262!important}
+.tabs{background:rgba(8,24,41,.92)!important;border-color:rgba(153,190,226,.2)!important;backdrop-filter:blur(20px)}
+.tabs button.selected{background:linear-gradient(120deg,#12628a,#2458a5)!important;color:#fff!important}
+.progress{background:#1a344c!important}
+.progress div{background:linear-gradient(90deg,#20c997,#27b9e8,#4d83ff)!important}
+hr{border-color:rgba(153,190,226,.2)!important}
+#pullRefreshHint{background:rgba(12,44,70,.96)!important;color:#eaf8ff!important;border:1px solid rgba(140,215,255,.25)}
+.app-lock{background:rgba(2,9,18,.94)!important}
+.app-lock-panel{background:#10243a!important;border-color:#34516e!important;color:#edf6ff!important}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
@@ -426,7 +469,7 @@ body:has(#welcome.active) .workspace>header,body:has(#welcome.active) .sidebar,b
 <main class="workspace">
 <header class="topbar">
 <div><div class="eyebrow">RUCHI GNM • YOUR NURSING HUB</div><h1 id="pageTitle">Dashboard</h1><p>Learn • Practice • Revise • Succeed</p></div>
-<div class="top-actions"><span id="connectionStatus" role="status">Checking connection…</span><button class="btn small" id="themeToggle" type="button" onclick="toggleTheme()">☼ Theme</button><button class="btn small" id="installApp" type="button" style="display:none" onclick="installApp()">↓ Install App</button></div>
+<div class="top-actions"><span id="connectionStatus" role="status">Checking connection…</span><button class="btn small" id="installApp" type="button" style="display:none" onclick="installApp()">↓ Install App</button></div>
 </header>
 <div class="container">
 <section id="welcome" class="section">
@@ -711,7 +754,7 @@ function loadJSON(key,fallback){try{const raw=localStorage.getItem(key);return r
 function saveJSON(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true}catch(e){alert("Could not save data on this device. Export a backup or free storage.");return false}}
 let dailyGoal=Number(loadJSON("ruchi_daily_goal",3));
 let topicDays=loadJSON("ruchi_topic_days",{});
-function toggleTheme(){const dark=document.body.classList.toggle("dark");saveJSON("ruchi_theme",dark);document.getElementById("themeToggle").textContent=dark?"☀️ Light":"☼ Theme"}
+
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
@@ -1186,7 +1229,7 @@ function resetProgress(){
  ["ruchi_attempts","ruchi_wrong","ruchi_done","ruchi_topic_days"].forEach(key=>localStorage.removeItem(key));
  renderProgress();refreshStats();
 }
-if(loadJSON("ruchi_theme",false)){document.body.classList.add("dark");document.getElementById("themeToggle").textContent="☀️ Light"}
+document.body.classList.add("dark");
 if(loadJSON("ruchi_pin",null)){document.getElementById("appLock").style.display="grid"}
 if(loadJSON("ruchi_welcome_seen",false)){document.getElementById("welcome").classList.remove("active");document.getElementById("home").classList.add("active")}else{document.getElementById("home").classList.remove("active");document.getElementById("welcome").classList.add("active")}
 fillSubjects();
