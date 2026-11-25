@@ -733,6 +733,33 @@ infection-control policies and supervisor's instructions during actual patient c
   <div id="lectureLogList" class="tool-list" style="margin-top:12px"></div>
  </div>
  <div class="card">
+  <h3>📊 Subject-wise Revision Report</h3>
+  <p class="tool-muted">Aapke saved syllabus, weak topics, study logs aur exam scores se summary banti hai. Koi score ya progress guess nahi hota.</p>
+  <button type="button" onclick="renderSubjectRevisionReport()">↻ Refresh report</button>
+  <div id="subjectRevisionReport" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
+  <h3>❓ Classroom Question Bank</h3>
+  <p class="tool-muted">Teacher ke important questions save karo aur apne answers baad mein revise karo.</p>
+  <input id="classQuestionSubject" placeholder="Subject" style="width:100%">
+  <input id="classQuestionTopic" placeholder="Chapter / topic" style="width:100%">
+  <textarea id="classQuestionText" rows="3" placeholder="Question..." style="width:100%"></textarea>
+  <textarea id="classQuestionAnswer" rows="3" placeholder="Your answer / key points (optional)" style="width:100%"></textarea>
+  <button type="button" onclick="saveClassQuestion()">Save question</button>
+  <input id="classQuestionSearch" type="search" placeholder="Search saved questions..." oninput="renderClassQuestions()" style="width:100%;margin-top:10px">
+  <div id="classQuestionList" class="tool-list"></div>
+ </div>
+ <div class="card">
+  <h3>🖥️ Nursing Presentation Planner</h3>
+  <p class="tool-muted">Class presentation ke liye title, slide outline aur speaking notes organize karo.</p>
+  <input id="presentationTitle" placeholder="Presentation title" style="width:100%">
+  <input id="presentationSubject" placeholder="Subject" style="width:100%">
+  <textarea id="presentationSlides" rows="4" placeholder="Slide outline — one heading per line" style="width:100%"></textarea>
+  <textarea id="presentationNotes" rows="3" placeholder="Opening / speaking notes..." style="width:100%"></textarea>
+  <button type="button" onclick="saveNursingPresentation()">Save presentation plan</button>
+  <div id="nursingPresentationList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
   <h3>📖 My Nursing Glossary</h3>
   <p class="tool-muted">Apne course ke important terms aur unki easy definitions save karo.</p>
   <label for="glossaryTerm">Medical / Nursing term</label><input id="glossaryTerm" placeholder="e.g. Homeostasis" style="width:100%">
@@ -1068,7 +1095,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -1078,7 +1105,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -2078,7 +2105,7 @@ function nextStudyQuizQuestion(){
  renderStudyQuizQuestion();
 }
 function renderStudentToolkit(){
- renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
+ renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();renderSubjectRevisionReport();renderClassQuestions();renderNursingPresentations();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
@@ -2320,6 +2347,51 @@ function deleteLearningExitTicket(id){learningExitTickets=learningExitTickets.fi
 function renderLearningExitTickets(){
  const el=document.getElementById("learningExitTicketList");if(!el)return;
  el.innerHTML=learningExitTickets.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p><p><b>Learned:</b> '+escapeHTML(x.learned)+'</p>'+(x.doubt?'<p><b>Still unclear:</b> '+escapeHTML(x.doubt)+'</p>':'')+(x.next?'<p><b>Next step:</b> '+escapeHTML(x.next)+'</p>':'')+'</div><button class="secondary" onclick="deleteLearningExitTicket('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No reflections saved yet.</p>';
+}
+
+
+let classQuestionBank=loadJSON("ruchi_class_questions",[]);
+let nursingPresentationPlans=loadJSON("ruchi_presentation_plans",[]);
+function renderSubjectRevisionReport(){
+ const el=document.getElementById("subjectRevisionReport");if(!el)return;
+ const subjects=new Set();
+ syllabusTopics.forEach(x=>subjects.add(x.subject||"General"));weakTopics.forEach(x=>subjects.add(x.subject||"General"));studyLogs.forEach(x=>subjects.add(x.subject||"General"));examScores.forEach(x=>subjects.add(x.subject||"General"));
+ const names=[...subjects].sort((a,b)=>a.localeCompare(b));
+ const totals=examScores.reduce((a,x)=>({got:a.got+(Number(x.obtained)||0),max:a.max+(Number(x.total)||0)}),{got:0,max:0});
+ let html='<div class="dictionary-result"><b>Overall snapshot</b><p>Syllabus topics: '+syllabusTopics.length+' · Weak topics: '+weakTopics.length+' · Study entries: '+studyLogs.length+' · Recorded tests: '+examScores.length+'</p><p>Recorded marks: '+(totals.max>0?(totals.got/totals.max*100).toFixed(1)+'%':'No marks recorded yet')+'</p></div>';
+ if(!names.length)html+='<p class="tool-muted">Abhi report ke liye data nahi hai. Syllabus tracker, weak topic tracker ya study log mein entries add karo.</p>';
+ html+=names.map(name=>{
+  const st=syllabusTopics.filter(x=>(x.subject||"General")===name),wk=weakTopics.filter(x=>(x.subject||"General")===name),logs=studyLogs.filter(x=>(x.subject||"General")===name),scores=examScores.filter(x=>(x.subject||"General")===name);
+  const studied=st.filter(x=>/studied|revised|complete/i.test(x.status||"")).length,mastered=wk.filter(x=>x.level==="Mastered").length,minutes=logs.reduce((a,x)=>a+(Number(x.minutes)||0),0),got=scores.reduce((a,x)=>a+(Number(x.obtained)||0),0),max=scores.reduce((a,x)=>a+(Number(x.total)||0),0);
+  return '<div class="dictionary-result"><b>'+escapeHTML(name)+'</b><p>Syllabus: '+studied+'/'+st.length+' marked studied/revised · Weak topics: '+wk.length+' ('+mastered+' mastered) · Study time logged: '+minutes+' min · Tests: '+scores.length+(max>0?' · Marks: '+(got/max*100).toFixed(1)+'%':'')+'</p></div>';
+ }).join("");
+ el.innerHTML=html;
+}
+function saveClassQuestion(){
+ const subject=document.getElementById("classQuestionSubject").value.trim(),topic=document.getElementById("classQuestionTopic").value.trim(),question=document.getElementById("classQuestionText").value.trim(),answer=document.getElementById("classQuestionAnswer").value.trim();
+ if(!subject||!question){alert("Enter subject and question.");return}
+ classQuestionBank.unshift({id:Date.now(),subject,topic,question,answer,date:localDateKey(),revealed:false});classQuestionBank=classQuestionBank.slice(0,500);
+ if(!saveJSON("ruchi_class_questions",classQuestionBank))return;
+ ["classQuestionSubject","classQuestionTopic","classQuestionText","classQuestionAnswer"].forEach(id=>document.getElementById(id).value="");renderClassQuestions();
+}
+function toggleClassAnswer(id){const x=classQuestionBank.find(v=>v.id===id);if(!x)return;x.revealed=!x.revealed;renderClassQuestions()}
+function deleteClassQuestion(id){classQuestionBank=classQuestionBank.filter(x=>x.id!==id);saveJSON("ruchi_class_questions",classQuestionBank);renderClassQuestions()}
+function renderClassQuestions(){
+ const el=document.getElementById("classQuestionList");if(!el)return;const q=(document.getElementById("classQuestionSearch")?.value||"").toLowerCase().trim();
+ const rows=classQuestionBank.filter(x=>[x.subject,x.topic,x.question,x.answer].join(" ").toLowerCase().includes(q));
+ el.innerHTML=rows.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.question)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.topic||"General")+' · '+escapeHTML(x.date)+'</p>'+(x.answer&&x.revealed?'<p><b>Answer:</b> '+escapeHTML(x.answer)+'</p>':'')+(x.answer?'<button class="secondary" onclick="toggleClassAnswer('+x.id+')">'+(x.revealed?'Hide answer':'Reveal answer')+'</button>':'<p class="tool-muted">No answer saved.</p>')+' <button class="secondary" onclick="deleteClassQuestion('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No saved questions match your search.</p>';
+}
+function saveNursingPresentation(){
+ const title=document.getElementById("presentationTitle").value.trim(),subject=document.getElementById("presentationSubject").value.trim(),slides=document.getElementById("presentationSlides").value.split("\\n").map(x=>x.trim()).filter(Boolean),notes=document.getElementById("presentationNotes").value.trim();
+ if(!title||!slides.length){alert("Enter a title and at least one slide heading.");return}
+ nursingPresentationPlans.unshift({id:Date.now(),title,subject,slides,notes,date:localDateKey()});nursingPresentationPlans=nursingPresentationPlans.slice(0,200);
+ if(!saveJSON("ruchi_presentation_plans",nursingPresentationPlans))return;
+ ["presentationTitle","presentationSubject","presentationSlides","presentationNotes"].forEach(id=>document.getElementById(id).value="");renderNursingPresentations();
+}
+function deleteNursingPresentation(id){nursingPresentationPlans=nursingPresentationPlans.filter(x=>x.id!==id);saveJSON("ruchi_presentation_plans",nursingPresentationPlans);renderNursingPresentations()}
+function renderNursingPresentations(){
+ const el=document.getElementById("nursingPresentationList");if(!el)return;
+ el.innerHTML=nursingPresentationPlans.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+'</p><ol>'+x.slides.map(v=>'<li>'+escapeHTML(v)+'</li>').join("")+'</ol>'+(x.notes?'<p><b>Speaking notes:</b> '+escapeHTML(x.notes)+'</p>':'')+'<button class="secondary" onclick="deleteNursingPresentation('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No presentation plans saved yet.</p>';
 }
 
 </script>
