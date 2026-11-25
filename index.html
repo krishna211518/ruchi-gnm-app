@@ -722,6 +722,24 @@ infection-control policies and supervisor's instructions during actual patient c
   <div id="medicalResults" style="margin-top:10px"></div>
   <p class="tool-muted">For learning only. Verify clinical meanings and local approved abbreviations before use.</p>
  </div>
+
+ <div class="card">
+  <h3>🗂️ Personal Notes Organizer</h3>
+  <p class="tool-muted">Save short study notes with subject and tags. Search them anytime on this device.</p>
+  <div class="tool-form"><input id="vaultTitle" placeholder="Note title"><input id="vaultSubject" placeholder="Subject"><input id="vaultTags" placeholder="Tags (comma separated)"><textarea id="vaultBody" class="full" rows="3" placeholder="Write your study note..."></textarea><button class="full" type="button" onclick="saveVaultNote()">＋ Save note</button></div>
+  <input id="vaultSearch" type="search" placeholder="Search title, subject, tags or note..." oninput="renderVaultNotes()" style="width:100%;margin-top:10px"><div id="vaultNoteList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
+  <h3>🎯 Weak Topic Tracker</h3>
+  <p class="tool-muted">Track topics that need another revision. Mark a topic improving or mastered as your confidence grows.</p>
+  <div class="tool-form"><input id="weakSubject" placeholder="Subject"><input id="weakTopic" placeholder="Topic to practise"><button class="full" type="button" onclick="addWeakTopic()">＋ Add weak topic</button></div>
+  <div id="weakTopicSummary" class="tool-muted" style="margin-top:8px"></div><div id="weakTopicList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
+  <h3>🔥 Study Streak & Consistency</h3>
+  <p class="tool-muted">Calculated only from the study sessions you record in Daily Study Log. No sessions are invented.</p>
+  <div id="studyStreakSummary" class="tool-list"></div>
+ </div>
 </div>
 </section>
 
@@ -885,7 +903,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -895,7 +913,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -914,7 +932,7 @@ let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
 let focusSessions=loadJSON("ruchi_focus_sessions",[]);
-let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);
+let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);\nlet vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1546,7 +1564,43 @@ function renderInfectionTopics(){const el=document.getElementById("infectionTopi
 function startQuickQuiz(){quickQuizIndex=(quickQuizIndex+1)%quickQuiz.length;document.getElementById("quickQuizQuestion").innerHTML='<b>Question '+(quickQuizIndex+1)+' of '+quickQuiz.length+'</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][0])+'</p>';const a=document.getElementById("quickQuizAnswer");a.style.display="none";a.textContent=""}
 function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if(quickQuizIndex<0){a.style.display="block";a.textContent="Tap Start to begin.";return}a.style.display="block";a.innerHTML='<b>Explanation</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][1])+'</p>'}
 
-function renderStudentToolkit(){
+
+function saveVaultNote(){
+ const title=document.getElementById("vaultTitle").value.trim(),subject=document.getElementById("vaultSubject").value.trim(),tags=document.getElementById("vaultTags").value.split(",").map(x=>x.trim()).filter(Boolean),body=document.getElementById("vaultBody").value.trim();
+ if(!title||!body){alert("Enter a note title and note content.");return}
+ vaultNotes.unshift({id:Date.now(),title,subject,tags,body,date:localDateKey()});vaultNotes=vaultNotes.slice(0,300);saveJSON("ruchi_vault_notes",vaultNotes);
+ ["vaultTitle","vaultSubject","vaultTags","vaultBody"].forEach(id=>document.getElementById(id).value="");renderVaultNotes();
+}
+function renderVaultNotes(){
+ const el=document.getElementById("vaultNoteList");if(!el)return;const q=(document.getElementById("vaultSearch")?.value||"").trim().toLowerCase();
+ const rows=vaultNotes.filter(x=>[x.title,x.subject,x.body,(x.tags||[]).join(" ")].join(" ").toLowerCase().includes(q));
+ el.innerHTML=rows.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+' · '+escapeHTML((x.tags||[]).join(", "))+'</p><p>'+escapeHTML(x.body)+'</p></div><button class="secondary" onclick="deleteVaultNote('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No matching notes. Save a note to build your study library.</p>';
+}
+function deleteVaultNote(id){vaultNotes=vaultNotes.filter(x=>x.id!==id);saveJSON("ruchi_vault_notes",vaultNotes);renderVaultNotes()}
+function addWeakTopic(){
+ const subject=document.getElementById("weakSubject").value.trim(),topic=document.getElementById("weakTopic").value.trim();
+ if(!subject||!topic){alert("Enter both subject and topic.");return}
+ weakTopics.unshift({id:Date.now(),subject,topic,level:"Needs practice",added:localDateKey()});weakTopics=weakTopics.slice(0,200);saveJSON("ruchi_weak_topics",weakTopics);
+ document.getElementById("weakSubject").value="";document.getElementById("weakTopic").value="";renderWeakTopics();
+}
+function cycleWeakTopic(id){const x=weakTopics.find(t=>t.id===id);if(!x)return;const states=["Needs practice","Improving","Mastered"];x.level=states[(states.indexOf(x.level)+1)%states.length];saveJSON("ruchi_weak_topics",weakTopics);renderWeakTopics()}
+function deleteWeakTopic(id){weakTopics=weakTopics.filter(x=>x.id!==id);saveJSON("ruchi_weak_topics",weakTopics);renderWeakTopics()}
+function renderWeakTopics(){
+ const el=document.getElementById("weakTopicList"),sum=document.getElementById("weakTopicSummary");if(!el||!sum)return;
+ const mastered=weakTopics.filter(x=>x.level==="Mastered").length,active=weakTopics.length-mastered;sum.textContent=weakTopics.length+" tracked · "+active+" to revisit · "+mastered+" mastered";
+ el.innerHTML=weakTopics.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.level)+'</p></div><div><button class="secondary" onclick="cycleWeakTopic('+x.id+')">Next status</button> <button class="secondary" onclick="deleteWeakTopic('+x.id+')">Remove</button></div></div>').join("")||'<p class="tool-muted">Add a topic you want to strengthen.</p>';
+}
+function renderStudyStreak(){
+ const el=document.getElementById("studyStreakSummary");if(!el)return;
+ const dates=[...new Set(studyLogs.map(x=>x.date).filter(Boolean))].sort(),set=new Set(dates);
+ const dayKey=d=>{const x=new Date(d+"T12:00:00");return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
+ const shift=(d,n)=>{const x=new Date(d+"T12:00:00");x.setDate(x.getDate()+n);return dayKey(x)};
+ let current=0,start=localDateKey();if(!set.has(start))start=shift(start,-1);while(set.has(start)){current++;start=shift(start,-1)}
+ let best=0,run=0,prev="";dates.forEach(d=>{run=prev&&shift(prev,1)===d?run+1:1;best=Math.max(best,run);prev=d});
+ const today=studyLogs.filter(x=>x.date===localDateKey()).reduce((a,x)=>a+(Number(x.minutes)||0),0);
+ el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
+}
+\nfunction renderStudentToolkit(){
  renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderWeeklyGoals();searchMedicalReference();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
