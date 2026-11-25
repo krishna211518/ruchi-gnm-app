@@ -525,6 +525,19 @@ hr{border-color:rgba(153,190,226,.2)!important}
   <button type="button" onclick="go('flashcards')"><span class="ref-quick-icon">🃏</span><span><strong>Flashcard Revision</strong><small>Revise key questions and answers</small></span><b>›</b></button>
   <button type="button" onclick="go('clinical')"><span class="ref-quick-icon">🩺</span><span><strong>Clinical Learning</strong><small>Skills, safety and care plans</small></span><b>›</b></button>
  </div>
+ <div class="card" id="personalStudyDashboard">
+  <div class="ref-quick-head"><h3>📈 My Study Snapshot</h3><button type="button" onclick="go('tools')">Open Toolkit →</button></div>
+  <p class="tool-muted">Your real saved study records at a glance. Nothing is estimated or pre-filled.</p>
+  <div class="tool-grid">
+   <div class="dictionary-result"><strong id="dashTodayMinutes">0 min</strong><p class="tool-muted">Study time today</p></div>
+   <div class="dictionary-result"><strong id="dashWeekMinutes">0 min</strong><p class="tool-muted">Study time this week</p></div>
+   <div class="dictionary-result"><strong id="dashPendingTasks">0</strong><p class="tool-muted">Pending assignments</p></div>
+   <div class="dictionary-result"><strong id="dashWeakTopics">0</strong><p class="tool-muted">Topics to practise</p></div>
+   <div class="dictionary-result"><strong id="dashNotesCount">0</strong><p class="tool-muted">Saved personal notes</p></div>
+   <div class="dictionary-result"><strong id="dashNextExam">No exam saved</strong><p class="tool-muted" id="dashNextExamDate">Upcoming exam</p></div>
+  </div>
+  <p id="dashStudyNudge" class="tool-muted" aria-live="polite">Log a study session to start building your snapshot.</p>
+ </div>
  <div class="ref-stats">
   <div><strong id="totalQ">0</strong><small>Questions attempted</small></div><div><strong id="accuracy">0%</strong><small>Accuracy</small></div><div><strong id="completed">0</strong><small>Topics completed</small></div>
  </div>
@@ -1038,7 +1051,32 @@ function searchHomeModules(query){
  const q=String(query||"").trim().toLowerCase();
  document.querySelectorAll(".home-module-card").forEach(card=>{card.style.display=!q||card.textContent.toLowerCase().includes(q)?"":"none"});
 }
+
+function renderPersonalStudyDashboard(){
+ const el=id=>document.getElementById(id);if(!el("dashTodayMinutes"))return;
+ const today=localDateKey(),now=new Date(),weekStart=new Date(now);weekStart.setHours(0,0,0,0);weekStart.setDate(weekStart.getDate()-((weekStart.getDay()+6)%7));
+ const weekKey=weekStart.getFullYear()+"-"+String(weekStart.getMonth()+1).padStart(2,"0")+"-"+String(weekStart.getDate()).padStart(2,"0");
+ const todayMins=studyLogs.filter(x=>x.date===today).reduce((n,x)=>n+(Number(x.minutes)||0),0);
+ const weekMins=studyLogs.filter(x=>x.date&&x.date>=weekKey&&x.date<=today).reduce((n,x)=>n+(Number(x.minutes)||0),0);
+ const pending=studentTasks.filter(x=>!x.done).length;
+ const weak=weakTopics.filter(x=>x.level!=="Mastered").length;
+ el("dashTodayMinutes").textContent=todayMins+" min";
+ el("dashWeekMinutes").textContent=weekMins+" min";
+ el("dashPendingTasks").textContent=String(pending);
+ el("dashWeakTopics").textContent=String(weak);
+ el("dashNotesCount").textContent=String(vaultNotes.length);
+ const upcoming=examDates.filter(x=>x.date>=today).sort((a,b)=>a.date.localeCompare(b.date))[0];
+ if(upcoming){
+  const days=Math.round((new Date(upcoming.date+"T00:00:00")-new Date(today+"T00:00:00"))/86400000);
+  el("dashNextExam").textContent=upcoming.name;
+  el("dashNextExamDate").textContent=days===0?"Today":days+" days left · "+upcoming.date;
+ }else{el("dashNextExam").textContent="No exam saved";el("dashNextExamDate").textContent="Add one in Student Toolkit";}
+ const nudge=todayMins===0?"Add your first study session in Daily Study Log.":pending>0?pending+" assignment(s) still pending — check your task list.":weak>0?weak+" topic(s) are waiting for revision.": "Nice progress — keep your study record updated.";
+ el("dashStudyNudge").textContent=nudge;
+}
+
 function refreshStats(){
+ renderPersonalStudyDashboard();
  document.getElementById("totalQ").textContent=attempts.length;
  const right=attempts.filter(a=>a.ok).length;
  document.getElementById("accuracy").textContent=attempts.length?Math.round(right/attempts.length*100)+"%":"0%";
@@ -1379,6 +1417,7 @@ function addPlanTask(){
 function togglePlanTask(i,done){if(!studyPlan[i])return;studyPlan[i].done=done;saveJSON("ruchi_study_plan",studyPlan);renderPlanner()}
 function deletePlanTask(i){studyPlan.splice(i,1);saveJSON("ruchi_study_plan",studyPlan);renderPlanner()}
 function renderWeakTopics(){
+ renderPersonalStudyDashboard();
  const subjectByQuestion=new Map(allQuestions().map(q=>[q[2],q[0]])),counts={};
  wrong.forEach(item=>{const subject=subjectByQuestion.get(item.q)||"Other";counts[subject]=(counts[subject]||0)+1});
  const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
@@ -1590,14 +1629,14 @@ function renderSyllabusTracker(){const list=document.getElementById("syllabusLis
 function setSyllabusStatus(id,status){const x=syllabusTopics.find(t=>t.id===id);if(!x)return;x.status=status;saveJSON("ruchi_syllabus_topics",syllabusTopics);renderSyllabusTracker()}
 function deleteSyllabusTopic(id){syllabusTopics=syllabusTopics.filter(x=>x.id!==id);saveJSON("ruchi_syllabus_topics",syllabusTopics);renderSyllabusTracker()}
 function saveExamDate(){const name=document.getElementById("examName").value.trim(),date=document.getElementById("examDate").value;if(!name||!date){alert("Enter exam name and date.");return}examDates.push({id:Date.now(),name,date});saveJSON("ruchi_exam_dates",examDates);document.getElementById("examName").value="";document.getElementById("examDate").value="";renderExamCountdown()}
-function renderExamCountdown(){const el=document.getElementById("examCountdownList");if(!el)return;const today=new Date();today.setHours(0,0,0,0);el.innerHTML=examDates.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>{const d=new Date(x.date+"T00:00:00"),days=Math.ceil((d-today)/86400000);return '<div class="tool-row"><div><b>'+escapeHTML(x.name)+'</b><p>'+escapeHTML(x.date)+' · '+(days<0?"Date passed":days===0?"Today":days+" days left")+'</p></div><button class="secondary" onclick="deleteExamDate('+x.id+')">Remove</button></div>'}).join("")||'<p class="tool-muted">No exam dates saved yet.</p>'}
+function renderExamCountdown(){renderPersonalStudyDashboard();const el=document.getElementById("examCountdownList");if(!el)return;const today=new Date();today.setHours(0,0,0,0);el.innerHTML=examDates.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>{const d=new Date(x.date+"T00:00:00"),days=Math.ceil((d-today)/86400000);return '<div class="tool-row"><div><b>'+escapeHTML(x.name)+'</b><p>'+escapeHTML(x.date)+' · '+(days<0?"Date passed":days===0?"Today":days+" days left")+'</p></div><button class="secondary" onclick="deleteExamDate('+x.id+')">Remove</button></div>'}).join("")||'<p class="tool-muted">No exam dates saved yet.</p>'}
 function deleteExamDate(id){examDates=examDates.filter(x=>x.id!==id);saveJSON("ruchi_exam_dates",examDates);renderExamCountdown()}
 function calculateMarks(){const got=Number(document.getElementById("marksObtained").value),total=Number(document.getElementById("marksTotal").value),out=document.getElementById("marksResult");if(!Number.isFinite(got)||!Number.isFinite(total)||total<=0||got<0||got>total){out.textContent="Enter valid marks (obtained must be between zero and total).";return}out.innerHTML='<strong>'+((got/total)*100).toFixed(2)+'%</strong><div>'+got+' out of '+total+' marks</div>'}
 function saveAnswerDraft(){const subject=document.getElementById("answerSubject").value.trim(),question=document.getElementById("answerQuestion").value.trim(),answer=document.getElementById("answerDraft").value.trim();if(!question||!answer){alert("Enter the question and your answer.");return}answerDrafts.unshift({id:Date.now(),subject,question,answer,date:localDateKey()});answerDrafts=answerDrafts.slice(0,100);saveJSON("ruchi_answer_drafts",answerDrafts);document.getElementById("answerQuestion").value="";document.getElementById("answerDraft").value="";renderAnswerDrafts()}
 function renderAnswerDrafts(){const el=document.getElementById("answerDraftList");if(!el)return;el.innerHTML=answerDrafts.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.question)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+'</p><p>'+escapeHTML(x.answer)+'</p></div><button class="secondary" onclick="deleteAnswerDraft('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">Your saved answer drafts will appear here.</p>'}
 function deleteAnswerDraft(id){answerDrafts=answerDrafts.filter(x=>x.id!==id);saveJSON("ruchi_answer_drafts",answerDrafts);renderAnswerDrafts()}
 function addStudyLog(){const subject=document.getElementById("studyLogSubject").value.trim(),minutes=Number(document.getElementById("studyLogMinutes").value);if(!subject||!Number.isInteger(minutes)||minutes<1||minutes>1440){alert("Enter a subject and valid study minutes (1–1440).");return}studyLogs.unshift({id:Date.now(),subject,minutes,date:localDateKey()});studyLogs=studyLogs.slice(0,500);saveJSON("ruchi_study_logs",studyLogs);document.getElementById("studyLogSubject").value="";document.getElementById("studyLogMinutes").value="";renderStudyLog()}
-function renderStudyLog(){const sum=document.getElementById("studyLogSummary"),list=document.getElementById("studyLogList");if(!sum||!list)return;const today=localDateKey(),mins=studyLogs.filter(x=>x.date===today).reduce((a,x)=>a+x.minutes,0),total=studyLogs.reduce((a,x)=>a+x.minutes,0);sum.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+mins+' min</span><p>Today · '+Math.floor(mins/60)+'h '+mins%60+'m</p></div><div><span class="tool-stat">'+total+' min</span><p>Total recorded</p></div></div>';list.innerHTML=studyLogs.slice(0,8).map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.subject)+'</b><p>'+escapeHTML(x.date)+' · '+x.minutes+' min</p></div><button class="secondary" onclick="deleteStudyLog('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No study sessions logged yet.</p>'}
+function renderStudyLog(){renderPersonalStudyDashboard();const sum=document.getElementById("studyLogSummary"),list=document.getElementById("studyLogList");if(!sum||!list)return;const today=localDateKey(),mins=studyLogs.filter(x=>x.date===today).reduce((a,x)=>a+x.minutes,0),total=studyLogs.reduce((a,x)=>a+x.minutes,0);sum.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+mins+' min</span><p>Today · '+Math.floor(mins/60)+'h '+mins%60+'m</p></div><div><span class="tool-stat">'+total+' min</span><p>Total recorded</p></div></div>';list.innerHTML=studyLogs.slice(0,8).map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.subject)+'</b><p>'+escapeHTML(x.date)+' · '+x.minutes+' min</p></div><button class="secondary" onclick="deleteStudyLog('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No study sessions logged yet.</p>'}
 function deleteStudyLog(id){studyLogs=studyLogs.filter(x=>x.id!==id);saveJSON("ruchi_study_logs",studyLogs);renderStudyLog()}
 function addRevisionTopic(){const topic=document.getElementById("revisionTopic").value.trim();if(!topic){alert("Enter a topic to revise.");return}revisionQueue.push({id:Date.now(),topic,done:false});saveJSON("ruchi_revision_queue",revisionQueue);document.getElementById("revisionTopic").value="";renderRevisionQueue()}
 function renderRevisionQueue(){const el=document.getElementById("revisionQueueList");if(!el)return;el.innerHTML=revisionQueue.map(x=>'<div class="tool-row"><div><b>'+(x.done?"✓ ":"")+escapeHTML(x.topic)+'</b><p>'+(x.done?"Revised":"Needs revision")+'</p></div><div><button class="secondary" onclick="toggleRevisionTopic('+x.id+')">'+(x.done?"Undo":"Revised")+'</button> <button class="secondary" onclick="deleteRevisionTopic('+x.id+')">Remove</button></div></div>').join("")||'<p class="tool-muted">Your revision queue is empty.</p>'}
@@ -1796,6 +1835,7 @@ function saveVaultNote(){
  ["vaultTitle","vaultSubject","vaultTags","vaultBody"].forEach(id=>document.getElementById(id).value="");renderVaultNotes();
 }
 function renderVaultNotes(){
+ renderPersonalStudyDashboard();
  const el=document.getElementById("vaultNoteList");if(!el)return;const q=(document.getElementById("vaultSearch")?.value||"").trim().toLowerCase();
  const rows=vaultNotes.filter(x=>[x.title,x.subject,x.body,(x.tags||[]).join(" ")].join(" ").toLowerCase().includes(q));
  el.innerHTML=rows.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+' · '+escapeHTML((x.tags||[]).join(", "))+'</p><p>'+escapeHTML(x.body)+'</p></div><button class="secondary" onclick="deleteVaultNote('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No matching notes. Save a note to build your study library.</p>';
@@ -1865,7 +1905,7 @@ function renderQuickReferences(){
 }
 
 function renderStudentToolkit(){
- renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
+ renderPersonalStudyDashboard();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
@@ -1877,6 +1917,7 @@ function addStudentTask(){
  ["taskTitle","taskSubject","taskDue"].forEach(id=>document.getElementById(id).value="");renderStudentTasks();
 }
 function renderStudentTasks(){
+ renderPersonalStudyDashboard();
  const el=document.getElementById("studentTaskList");if(!el)return;
  el.innerHTML=studentTasks.slice().sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")).map(x=>'<div class="tool-row"><div><b>'+(x.done?'✓ ':'')+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.due||"No due date")+'</p></div><div><button class="secondary" onclick="toggleStudentTask('+x.id+')">'+(x.done?"Reopen":"Done")+'</button> <button class="secondary" onclick="deleteStudentTask('+x.id+')">Delete</button></div></div>').join("")||'<p class="tool-muted">No assignments yet. Add your first task above.</p>';
 }
