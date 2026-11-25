@@ -658,6 +658,11 @@ infection-control policies and supervisor's instructions during actual patient c
 <h2>🧰 Student Toolkit</h2>
 <p class="small">College work, attendance, timetable and quick nursing reference. Your entries stay on this device.</p>
 <div class="tool-grid">
+ <div class="card"><h3>🫀 Anatomy & Body Systems Explorer</h3><p class="tool-muted">Select a body system for a short study overview. Educational reference only.</p><select id="bodySystemSelect" onchange="showBodySystem()" style="width:100%"><option value="">Choose a body system</option></select><div id="bodySystemDetail" class="dictionary-result" style="margin-top:10px">Choose a system to explore its main organs and functions.</div></div>
+ <div class="card"><h3>🩺 Nursing Instruments Library</h3><input id="instrumentSearch" type="search" placeholder="Search instruments..." oninput="renderInstrumentLibrary()" style="width:100%"><div id="instrumentResults" style="margin-top:10px"></div><p class="tool-muted">Identification and study notes only. Actual use requires instructor training and local protocols.</p></div>
+ <div class="card"><h3>🌡️ Vital Signs Learning Centre</h3><input id="vitalSearch" type="search" placeholder="Search vital sign..." oninput="renderVitalLearning()" style="width:100%"><div id="vitalResults" style="margin-top:10px"></div><p class="tool-muted">Interpretation depends on age, condition and context. Follow college teaching and facility policy; this is not a diagnostic tool.</p></div>
+ <div class="card"><h3>🧼 Infection Prevention Learning</h3><div id="infectionTopics" class="tool-list"></div><p class="tool-muted">Concept summaries only. Follow current institutional infection-control policies and supervised training.</p></div>
+ <div class="card"><h3>🧠 Quick Nursing Knowledge Check</h3><p class="tool-muted">Short concept questions for revision. These are not clinical competency tests.</p><div id="quickQuizQuestion" class="dictionary-result">Tap Start to begin a quick question.</div><div id="quickQuizAnswer" class="dictionary-result" style="margin-top:8px;display:none"></div><div class="tool-form" style="margin-top:8px"><button type="button" onclick="startQuickQuiz()">Start / Next question</button><button type="button" class="secondary" onclick="revealQuickQuiz()">Show explanation</button></div></div>
  <div class="card"><h3>📘 Syllabus & Topic Tracker</h3><p class="tool-muted">Add topics from your college syllabus and mark them as studied or revised.</p><div class="tool-form"><input id="syllabusSubject" placeholder="Subject name"><input id="syllabusTopic" placeholder="Chapter / topic"><button class="full" type="button" onclick="addSyllabusTopic()">＋ Add topic</button></div><div id="syllabusSummary" style="margin-top:10px"></div><div id="syllabusList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>⏳ Exam Countdown</h3><div class="tool-form"><input id="examName" placeholder="Exam name"><input id="examDate" type="date"><button class="full" type="button" onclick="saveExamDate()">Save exam date</button></div><div id="examCountdownList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>🧮 Marks & Percentage Calculator</h3><div class="tool-form"><input id="marksObtained" type="number" min="0" step="any" placeholder="Marks obtained"><input id="marksTotal" type="number" min="0.01" step="any" placeholder="Total marks"><button class="full" type="button" onclick="calculateMarks()">Calculate percentage</button></div><div id="marksResult" class="dictionary-result" aria-live="polite">Enter marks to calculate.</div></div>
@@ -1478,8 +1483,71 @@ function renderWeeklyGoals(){const el=document.getElementById("weeklyGoalList");
 function changeGoalProgress(id,delta){const x=weeklyGoals.find(g=>g.id===id);if(!x)return;x.done=Math.max(0,Math.min(x.target,x.done+delta));saveJSON("ruchi_weekly_goals",weeklyGoals);renderWeeklyGoals()}
 function deleteWeeklyGoal(id){weeklyGoals=weeklyGoals.filter(x=>x.id!==id);saveJSON("ruchi_weekly_goals",weeklyGoals);renderWeeklyGoals()}
 
-function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();searchMedicalReference();
+
+const bodySystems=[
+["Cardiovascular","Heart, blood and blood vessels","Moves blood around the body, delivering oxygen and nutrients and carrying away waste products."],
+["Respiratory","Nose, pharynx, larynx, trachea, bronchi and lungs","Supports gas exchange: oxygen enters the blood and carbon dioxide is removed."],
+["Nervous","Brain, spinal cord and peripheral nerves","Receives information, processes signals and coordinates body responses."],
+["Digestive","Mouth, oesophagus, stomach, intestines, liver, pancreas and gallbladder","Breaks down food, absorbs nutrients and eliminates solid waste."],
+["Urinary","Kidneys, ureters, bladder and urethra","Filters blood, forms urine and helps regulate fluid and electrolyte balance."],
+["Skeletal","Bones, joints, cartilage and ligaments","Supports and protects the body and works with muscles for movement."],
+["Muscular","Skeletal, smooth and cardiac muscle tissue","Enables movement, posture and movement of substances through organs."],
+["Endocrine","Pituitary, thyroid, parathyroids, adrenals, pancreas and gonads","Uses hormones to regulate growth, metabolism, reproduction and other functions."],
+["Integumentary","Skin, hair, nails and associated glands","Forms a protective barrier and contributes to temperature regulation and sensation."],
+["Lymphatic & immune","Lymph vessels, lymph nodes, spleen, thymus and immune cells","Returns tissue fluid to circulation and supports immune defence."],
+["Reproductive","Female and male reproductive organs","Supports reproduction and production of reproductive hormones."]
+];
+const instrumentLibrary=[
+["Stethoscope","Auscultation instrument used to listen to internal body sounds; learn parts and cleaning requirements."],
+["Sphygmomanometer","Instrument used with an appropriate cuff to measure blood pressure."],
+["Thermometer","Device used to measure body temperature; device type and site affect interpretation."],
+["Pulse oximeter","Non-invasive device that estimates peripheral oxygen saturation and pulse rate."],
+["Clinical weighing scale","Measures body mass; record units and use a calibrated device."],
+["Measuring tape","Used for selected body measurements according to the assessment being taught."],
+["Penlight","Small light used during selected observational assessments under supervision."],
+["Kidney dish","Curved receptacle used to collect or hold small items during care activities."],
+["Dressing trolley","A trolley used to organise supplies for a dressing procedure under local protocol."],
+["Bedpan","Assistive receptacle used to support toileting for a person unable to use a toilet."],
+["Wheelchair","Mobility aid; safe transfer and use require training and assessment."],
+["Walking frame","Mobility aid that provides support during walking when appropriately fitted."]
+];
+const vitalLearning=[
+["Temperature","Reflects the body's thermal state. Measurement route, device, age and environment can affect the reading."],
+["Pulse","A palpable arterial pressure wave related to cardiac activity. Students learn to describe rate, rhythm and volume under supervision."],
+["Respiratory rate","The number of breaths in a set period. Observe pattern and effort as well as the count."],
+["Blood pressure","Pressure of circulating blood against artery walls. Cuff size, positioning, device and technique affect measurement."],
+["Oxygen saturation (SpO₂)","A pulse oximeter estimate of haemoglobin oxygen saturation. Movement, circulation, nail products and other factors can affect accuracy."],
+["Pain assessment","A person's reported pain experience assessed using an age- and communication-appropriate validated scale."]
+];
+const infectionTopics=[
+["Hand hygiene","A core infection-prevention measure. Learn the moments, methods and local hand-hygiene policy taught by your institution."],
+["Personal protective equipment","PPE is selected according to anticipated exposure and local risk assessment. Learn correct selection, fit, removal and disposal with an instructor."],
+["Standard precautions","Basic precautions used for all patient care, based on risk and the possibility of exposure to infectious material."],
+["Transmission-based precautions","Additional precautions may be used for contact, droplet or airborne transmission, based on clinical guidance and facility policy."],
+["Environmental cleaning","Cleaning and disinfection reduce contamination. Product choice, contact time and process must follow approved instructions."],
+["Sharps safety","Use approved sharps containers and follow facility policy and supervised training. Never recap or handle sharps casually."],
+["Waste segregation","Segregate healthcare waste according to current local rules, colour coding and institutional policy."],
+["Aseptic principles","Practices intended to prevent contamination of key parts and sites during relevant procedures."]
+];
+const quickQuiz=[
+["Which body system is primarily responsible for gas exchange?","The respiratory system. The lungs are the main site where oxygen and carbon dioxide are exchanged."],
+["What does a pulse oximeter estimate?","Peripheral oxygen saturation (SpO₂) and usually pulse rate. It does not replace a full clinical assessment."],
+["Which organ filters blood and forms urine?","The kidneys, which also help regulate fluid and electrolyte balance."],
+["What is the main purpose of standard precautions?","To reduce infection transmission risk during care for every person, regardless of known infection status."],
+["Which instrument is commonly used to listen to heart and lung sounds?","A stethoscope. It should be cleaned according to local policy."],
+["What does the abbreviation RR commonly mean in vital-sign notes?","Respiratory rate. Always confirm abbreviations against the approved local list."]
+];
+let quickQuizIndex=-1;
+function initBodySystemExplorer(){const el=document.getElementById("bodySystemSelect");if(!el)return;el.innerHTML='<option value="">Choose a body system</option>'+bodySystems.map((x,i)=>'<option value="'+i+'">'+escapeHTML(x[0])+'</option>').join("");}
+function showBodySystem(){const i=Number(document.getElementById("bodySystemSelect").value),el=document.getElementById("bodySystemDetail");if(!el)return;if(document.getElementById("bodySystemSelect").value===""){el.textContent="Choose a system to explore its main organs and functions.";return}const x=bodySystems[i];if(!x)return;el.innerHTML='<b>'+escapeHTML(x[0])+'</b><p><b>Main structures:</b> '+escapeHTML(x[1])+'</p><p><b>Main function:</b> '+escapeHTML(x[2])+'</p>'}
+function renderInstrumentLibrary(){const q=(document.getElementById("instrumentSearch")?.value||"").trim().toLowerCase(),el=document.getElementById("instrumentResults");if(!el)return;const rows=instrumentLibrary.filter(x=>x.join(" ").toLowerCase().includes(q));el.innerHTML=rows.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x[0])+'</b><p>'+escapeHTML(x[1])+'</p></div>').join("")||'<p class="tool-muted">No instrument found.</p>'}
+function renderVitalLearning(){const q=(document.getElementById("vitalSearch")?.value||"").trim().toLowerCase(),el=document.getElementById("vitalResults");if(!el)return;const rows=vitalLearning.filter(x=>x.join(" ").toLowerCase().includes(q));el.innerHTML=rows.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x[0])+'</b><p>'+escapeHTML(x[1])+'</p></div>').join("")||'<p class="tool-muted">No matching topic found.</p>'}
+function renderInfectionTopics(){const el=document.getElementById("infectionTopics");if(!el)return;el.innerHTML=infectionTopics.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x[0])+'</b><p>'+escapeHTML(x[1])+'</p></div>').join("")}
+function startQuickQuiz(){quickQuizIndex=(quickQuizIndex+1)%quickQuiz.length;document.getElementById("quickQuizQuestion").innerHTML='<b>Question '+(quickQuizIndex+1)+' of '+quickQuiz.length+'</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][0])+'</p>';const a=document.getElementById("quickQuizAnswer");a.style.display="none";a.textContent=""}
+function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if(quickQuizIndex<0){a.style.display="block";a.textContent="Tap Start to begin.";return}a.style.display="block";a.innerHTML='<b>Explanation</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][1])+'</p>'}
+
+function renderStudentToolkit(){function renderStudentToolkit(){
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderWeeklyGoals();searchMedicalReference();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
