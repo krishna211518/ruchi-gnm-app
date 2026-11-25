@@ -2902,7 +2902,7 @@ function renderCommunicationRoleplays(){const el=document.getElementById("commun
 // Optional secure backend. Leave blank until a trusted server endpoint is deployed.
 // The server should call the AI model and, when needed, search the web automatically.
 // Never place private API keys in this public GitHub Pages file.
-const RUCHI_AI_API_URL = "";
+const RUCHI_AI_API_URL = "https://ruchi-ai-backend.krishna21151811.workers.dev/chat";
 let ruchiChatMessages = [];
 function loadRuchiChatMessages(){
  try{const saved=JSON.parse(localStorage.getItem("ruchi_ai_chat_history")||"[]");ruchiChatMessages=Array.isArray(saved)?saved.filter(x=>x&&x.role&&x.content).slice(0,80):[]}catch(e){ruchiChatMessages=[]}
@@ -2933,10 +2933,10 @@ async function askRuchiAssistant(){
  input.value="";addRuchiChatMessage("user",question);status.textContent="RUCHI is thinking…";if(send)send.disabled=true;
  try{
   if(RUCHI_AI_API_URL){
-   const response=await fetch(RUCHI_AI_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:question,history:ruchiChatMessages.slice(-12).map(x=>({role:x.role,content:x.content}))})});
+   const response=await fetch(RUCHI_AI_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:question,history:ruchiChatMessages.slice(-13,-1).map(x=>({role:x.role,content:x.content}))})});
    if(!response.ok)throw new Error("AI service unavailable");
    const data=await response.json();if(!data||typeof data.reply!=="string"||!data.reply.trim())throw new Error("No answer received");
-   addRuchiChatMessage("assistant",data.reply.trim());status.textContent=data.sources&&data.sources.length?"Answered with checked online references.":"Answered by RUCHI AI.";
+   addRuchiChatMessage("assistant",data.reply.trim());status.textContent=data.sources&&data.sources.length?"Answered with references.":"Answered by RUCHI AI. Web research is not enabled yet.";
   }else{
    const matches=getRuchiLocalAnswer(question);
    if(matches.length){
