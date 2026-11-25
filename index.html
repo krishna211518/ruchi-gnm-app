@@ -690,6 +690,19 @@ infection-control policies and supervisor's instructions during actual patient c
   <button onclick="saveNursingAnswerPlan()">Save answer outline</button>
   <div id="nursingAnswerPlanList" class="tool-list" style="margin-top:12px"></div>
  </div>
+ <div class="card">
+  <h3>📑 Assignment Reference Builder</h3>
+  <p class="tool-muted">Books aur websites ke sources ko ek jagah organize karke simple reference entry banao. College ke required citation format ko final submit karne se pehle check karna.</p>
+  <label for="refSourceType">Source type</label><select id="refSourceType" style="width:100%"><option value="Book">Book</option><option value="Website">Website</option><option value="Article">Article / Journal</option></select>
+  <label for="refAuthor">Author / Organisation</label><input id="refAuthor" placeholder="e.g. Author name or WHO" style="width:100%">
+  <label for="refYear">Year</label><input id="refYear" inputmode="numeric" placeholder="e.g. 2024" style="width:100%">
+  <label for="refTitle">Title</label><input id="refTitle" placeholder="Book, article or webpage title" style="width:100%">
+  <label for="refPublisher">Publisher / Website / Journal</label><input id="refPublisher" placeholder="e.g. Publisher or website name" style="width:100%">
+  <label for="refUrl">URL (optional)</label><input id="refUrl" type="url" placeholder="https://..." style="width:100%">
+  <button onclick="saveAssignmentReference()">Create & save reference</button>
+  <div id="assignmentReferencePreview" class="dictionary-result" aria-live="polite" style="margin-top:10px">Your formatted reference will appear here.</div>
+  <div id="assignmentReferenceList" class="tool-list" style="margin-top:12px"></div>
+ </div>
  <div class="card"><h3>🫀 Anatomy & Body Systems Explorer</h3><p class="tool-muted">Select a body system for a short study overview. Educational reference only.</p><select id="bodySystemSelect" onchange="showBodySystem()" style="width:100%"><option value="">Choose a body system</option></select><div id="bodySystemDetail" class="dictionary-result" style="margin-top:10px">Choose a system to explore its main organs and functions.</div></div>
  <div class="card"><h3>🩺 Nursing Instruments Library</h3><input id="instrumentSearch" type="search" placeholder="Search instruments..." oninput="renderInstrumentLibrary()" style="width:100%"><div id="instrumentResults" style="margin-top:10px"></div><p class="tool-muted">Identification and study notes only. Actual use requires instructor training and local protocols.</p></div>
  <div class="card"><h3>🌡️ Vital Signs Learning Centre</h3><input id="vitalSearch" type="search" placeholder="Search vital sign..." oninput="renderVitalLearning()" style="width:100%"><div id="vitalResults" style="margin-top:10px"></div><p class="tool-muted">Interpretation depends on age, condition and context. Follow college teaching and facility policy; this is not a diagnostic tool.</p></div>
@@ -996,7 +1009,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -1006,7 +1019,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -2134,6 +2147,33 @@ function renderNursingAnswerPlans(){
  el.innerHTML=nursingAnswerPlans.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.question)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+'</p>'+(x.intro?'<p>'+escapeHTML(x.intro)+'</p>':'')+(x.points?.length?'<ol>'+x.points.map(p=>'<li>'+escapeHTML(p)+'</li>').join("")+'</ol>':'')+(x.conclusion?'<p><b>Conclusion:</b> '+escapeHTML(x.conclusion)+'</p>':'')+'</div><button class="secondary" onclick="deleteNursingAnswerPlan('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No saved outlines yet.</p>';
 }
 function deleteNursingAnswerPlan(id){nursingAnswerPlans=nursingAnswerPlans.filter(x=>x.id!==id);saveJSON("ruchi_answer_plans",nursingAnswerPlans);renderNursingAnswerPlans()}
+
+
+let assignmentReferences=loadJSON("ruchi_assignment_references",[]);
+function buildAssignmentReference(x){
+ const author=x.author||"Author not provided",year=x.year||"n.d.",title=x.title||"Untitled";
+ if(x.type==="Book")return author+" ("+year+"). "+title+". "+(x.publisher||"Publisher not provided")+".";
+ if(x.type==="Article")return author+" ("+year+"). "+title+". "+(x.publisher||"Journal details not provided")+(x.url?" "+x.url:"")+".";
+ return author+" ("+year+"). "+title+". "+(x.publisher||"Website name not provided")+". "+(x.url||"URL not provided")+".";
+}
+function saveAssignmentReference(){
+ const type=document.getElementById("refSourceType").value,author=document.getElementById("refAuthor").value.trim(),year=document.getElementById("refYear").value.trim(),title=document.getElementById("refTitle").value.trim(),publisher=document.getElementById("refPublisher").value.trim(),url=document.getElementById("refUrl").value.trim();
+ if(!title){alert("Enter the source title first.");return}
+ if(year&&!/^\\d{4}$/.test(year)){alert("Enter a four-digit year, or leave it blank.");return}
+ if(url){try{const parsed=new URL(url);if(!["http:","https:"].includes(parsed.protocol))throw new Error("protocol")}catch(e){alert("Enter a valid http or https URL.");return}}
+ const item={id:Date.now(),type,author,year,title,publisher,url,date:localDateKey()};
+ item.formatted=buildAssignmentReference(item);
+ assignmentReferences.unshift(item);assignmentReferences=assignmentReferences.slice(0,200);
+ if(!saveJSON("ruchi_assignment_references",assignmentReferences))return;
+ document.getElementById("assignmentReferencePreview").textContent=item.formatted;
+ ["refAuthor","refYear","refTitle","refPublisher","refUrl"].forEach(id=>document.getElementById(id).value="");
+ renderAssignmentReferences();
+}
+function renderAssignmentReferences(){
+ const el=document.getElementById("assignmentReferenceList");if(!el)return;
+ el.innerHTML=assignmentReferences.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.type)+' · '+escapeHTML(x.date)+'</p><p>'+escapeHTML(x.formatted||buildAssignmentReference(x))+'</p>'+(x.url?'<p><a href="'+escapeHTML(x.url)+'" target="_blank" rel="noopener noreferrer">Open source ↗</a></p>':'')+'</div><button class="secondary" onclick="deleteAssignmentReference('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No references saved yet.</p>';
+}
+function deleteAssignmentReference(id){assignmentReferences=assignmentReferences.filter(x=>x.id!==id);saveJSON("ruchi_assignment_references",assignmentReferences);renderAssignmentReferences()}
 
 </script>
 </body>
