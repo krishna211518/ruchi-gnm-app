@@ -684,6 +684,7 @@ infection-control policies and supervisor's instructions during actual patient c
  <div class="card"><h3>🌡️ Vital Signs Learning Centre</h3><input id="vitalSearch" type="search" placeholder="Search vital sign..." oninput="renderVitalLearning()" style="width:100%"><div id="vitalResults" style="margin-top:10px"></div><p class="tool-muted">Interpretation depends on age, condition and context. Follow college teaching and facility policy; this is not a diagnostic tool.</p></div>
  <div class="card"><h3>🧼 Infection Prevention Learning</h3><div id="infectionTopics" class="tool-list"></div><p class="tool-muted">Concept summaries only. Follow current institutional infection-control policies and supervised training.</p></div>
  <div class="card"><h3>🧠 Quick Nursing Knowledge Check</h3><p class="tool-muted">Short concept questions for revision. These are not clinical competency tests.</p><div id="quickQuizQuestion" class="dictionary-result">Tap Start to begin a quick question.</div><div id="quickQuizAnswer" class="dictionary-result" style="margin-top:8px;display:none"></div><div class="tool-form" style="margin-top:8px"><button type="button" onclick="startQuickQuiz()">Start / Next question</button><button type="button" class="secondary" onclick="revealQuickQuiz()">Show explanation</button></div></div>
+ <div class="card"><h3>📝 Subject-wise Practice Quiz</h3><p class="tool-muted">Practice MCQs from basic GNM study concepts. Choose a subject and start a 10-question round. Explanations appear after each answer.</p><select id="studyQuizSubject" style="width:100%"><option value="All">All subjects</option><option value="Anatomy & Physiology">Anatomy & Physiology</option><option value="Nursing Foundations">Nursing Foundations</option><option value="Microbiology">Microbiology</option><option value="Nutrition">Nutrition</option><option value="Psychology">Psychology</option><option value="Community Health Nursing">Community Health Nursing</option></select><div id="studyQuizProgress" class="tool-muted" style="margin-top:10px" aria-live="polite">Ready when you are.</div><div id="studyQuizQuestion" class="dictionary-result" style="margin-top:8px">Select a subject and tap Start Quiz.</div><div id="studyQuizOptions" class="tool-list" style="margin-top:8px"></div><div id="studyQuizFeedback" class="dictionary-result" style="display:none;margin-top:8px" aria-live="polite"></div><div class="tool-form" style="margin-top:8px"><button type="button" onclick="startStudyQuiz()">Start / Restart Quiz</button><button type="button" class="secondary" id="studyQuizNext" onclick="nextStudyQuizQuestion()" disabled>Next Question</button></div><div id="studyQuizScore" class="tool-muted" style="margin-top:8px"></div></div>
  <div class="card"><h3>📘 Syllabus & Topic Tracker</h3><p class="tool-muted">Add topics from your college syllabus and mark them as studied or revised.</p><div class="tool-form"><input id="syllabusSubject" placeholder="Subject name"><input id="syllabusTopic" placeholder="Chapter / topic"><button class="full" type="button" onclick="addSyllabusTopic()">＋ Add topic</button></div><div id="syllabusSummary" style="margin-top:10px"></div><div id="syllabusList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>⏳ Exam Countdown</h3><div class="tool-form"><input id="examName" placeholder="Exam name"><input id="examDate" type="date"><button class="full" type="button" onclick="saveExamDate()">Save exam date</button></div><div id="examCountdownList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>🧮 Marks & Percentage Calculator</h3><div class="tool-form"><input id="marksObtained" type="number" min="0" step="any" placeholder="Marks obtained"><input id="marksTotal" type="number" min="0.01" step="any" placeholder="Total marks"><button class="full" type="button" onclick="calculateMarks()">Calculate percentage</button></div><div id="marksResult" class="dictionary-result" aria-live="polite">Enter marks to calculate.</div></div>
@@ -1934,6 +1935,64 @@ function convertAcademicUnit(){
  }
  const pretty=Number(answer.toPrecision(8));
  out.textContent=value+" "+from+" = "+pretty+" "+to;
+}
+const studyQuizBank=[
+{subject:"Anatomy & Physiology",q:"Which organ pumps blood through the body?",o:["Lungs","Heart","Kidneys","Stomach"],a:1,e:"The heart acts as a muscular pump that circulates blood."},
+{subject:"Anatomy & Physiology",q:"Which body system includes the brain and spinal cord?",o:["Digestive system","Nervous system","Urinary system","Skeletal system"],a:1,e:"The central nervous system consists of the brain and spinal cord."},
+{subject:"Nursing Foundations",q:"What is the main purpose of hand hygiene in healthcare?",o:["Improve handwriting","Reduce spread of microorganisms","Replace all PPE","Save time"],a:1,e:"Hand hygiene is a key measure for reducing transmission of microorganisms."},
+{subject:"Nursing Foundations",q:"Which quality is important when communicating with a patient?",o:["Use confusing jargon","Listen respectfully","Interrupt frequently","Ignore questions"],a:1,e:"Respectful listening supports clear, person-centred communication."},
+{subject:"Microbiology",q:"Microbiology is the study of what?",o:["Weather","Microorganisms","Planets","Rocks"],a:1,e:"Microbiology studies organisms and agents too small to be seen clearly without magnification."},
+{subject:"Microbiology",q:"Which of these is a type of microorganism?",o:["Bacterium","Mountain","Mineral","Cloud"],a:0,e:"Bacteria are single-celled microorganisms; many are harmless while some can cause disease."},
+{subject:"Nutrition",q:"Which nutrient is a major source of energy for the body?",o:["Carbohydrates","Water","Minerals","Vitamins"],a:0,e:"Carbohydrates are an important energy source in the diet."},
+{subject:"Nutrition",q:"Which nutrient is especially important for growth and tissue repair?",o:["Protein","Water only","Salt","Fibre only"],a:0,e:"Proteins provide amino acids used for growth and tissue maintenance and repair."},
+{subject:"Psychology",q:"Which sequence describes basic memory processes?",o:["Absorption, digestion, excretion","Encoding, storage, retrieval","Inhalation, circulation, movement","Reading, writing, speaking"],a:1,e:"Memory is commonly described through encoding, storage and retrieval."},
+{subject:"Psychology",q:"Motivation mainly helps to:",o:["Direct goal-oriented behaviour","Stop all learning","Replace memory","Prevent communication"],a:0,e:"Motivation influences the direction, effort and persistence of goal-oriented behaviour."},
+{subject:"Community Health Nursing",q:"Primary prevention mainly aims to:",o:["Prevent disease before it occurs","Treat complications only","Provide rehabilitation only","Record old cases"],a:0,e:"Primary prevention aims to reduce the chance of disease or injury occurring."},
+{subject:"Community Health Nursing",q:"Which is an example of a community sanitation measure?",o:["Safe waste disposal","Skipping handwashing","Storing drinking water uncovered","Littering public spaces"],a:0,e:"Safe waste disposal helps maintain a cleaner environment and reduce health risks."}
+];
+let studyQuizRound=[],studyQuizIndex=0,studyQuizScore=0,studyQuizAnswered=false;
+function startStudyQuiz(){
+ const chosen=document.getElementById("studyQuizSubject")?.value||"All";
+ let pool=studyQuizBank.filter(x=>chosen==="All"||x.subject===chosen);
+ for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+ studyQuizRound=pool.slice(0,Math.min(10,pool.length));studyQuizIndex=0;studyQuizScore=0;studyQuizAnswered=false;
+ const score=document.getElementById("studyQuizScore");if(score)score.textContent="";
+ renderStudyQuizQuestion();
+}
+function renderStudyQuizQuestion(){
+ const q=studyQuizRound[studyQuizIndex],question=document.getElementById("studyQuizQuestion"),opts=document.getElementById("studyQuizOptions"),feedback=document.getElementById("studyQuizFeedback"),progress=document.getElementById("studyQuizProgress"),next=document.getElementById("studyQuizNext"),score=document.getElementById("studyQuizScore");
+ if(!question||!opts)return;
+ if(!q){question.textContent="Quiz complete!";opts.innerHTML="";return}
+ question.innerHTML='<b>'+escapeHTML(q.subject)+'</b><p>'+escapeHTML((studyQuizIndex+1)+". "+q.q)+'</p>';
+ opts.innerHTML=q.o.map((v,i)=>'<button type="button" class="secondary" style="text-align:left;width:100%" '+(studyQuizAnswered?'disabled':'')+' onclick="answerStudyQuiz('+i+')">'+String.fromCharCode(65+i)+'. '+escapeHTML(v)+'</button>').join("");
+ if(feedback){feedback.style.display="none";feedback.textContent=""}
+ if(progress)progress.textContent="Question "+(studyQuizIndex+1)+" of "+studyQuizRound.length;
+ if(next)next.disabled=true;
+ if(score)score.textContent="Score: "+studyQuizScore+" / "+studyQuizRound.length;
+ studyQuizAnswered=false;
+}
+function answerStudyQuiz(choice){
+ const q=studyQuizRound[studyQuizIndex];if(!q||studyQuizAnswered)return;studyQuizAnswered=true;
+ const correct=choice===q.a;if(correct)studyQuizScore++;
+ const opts=document.getElementById("studyQuizOptions"),feedback=document.getElementById("studyQuizFeedback"),next=document.getElementById("studyQuizNext"),score=document.getElementById("studyQuizScore");
+ if(opts){opts.querySelectorAll("button").forEach((b,i)=>{b.disabled=true;if(i===q.a)b.textContent="✓ "+b.textContent;if(i===choice&&!correct)b.textContent="✕ "+b.textContent})}
+ if(feedback){feedback.style.display="block";feedback.innerHTML='<b>'+(correct?"Correct!":"Not quite.")+'</b><p>'+escapeHTML(q.e)+'</p>'}
+ if(next)next.disabled=false;if(score)score.textContent="Score: "+studyQuizScore+" / "+studyQuizRound.length;
+}
+function nextStudyQuizQuestion(){
+ if(!studyQuizRound.length||!studyQuizAnswered)return;
+ studyQuizIndex++;
+ if(studyQuizIndex>=studyQuizRound.length){
+  const question=document.getElementById("studyQuizQuestion"),opts=document.getElementById("studyQuizOptions"),feedback=document.getElementById("studyQuizFeedback"),progress=document.getElementById("studyQuizProgress"),next=document.getElementById("studyQuizNext"),score=document.getElementById("studyQuizScore");
+  if(question)question.textContent="Round completed!";
+  if(opts)opts.innerHTML="";
+  if(feedback){feedback.style.display="block";feedback.textContent="Your final score: "+studyQuizScore+" out of "+studyQuizRound.length+"."}
+  if(progress)progress.textContent="Quiz finished";
+  if(next)next.disabled=true;
+  if(score)score.textContent=studyQuizScore===studyQuizRound.length?"Excellent — full marks!":studyQuizScore>=Math.ceil(studyQuizRound.length*.7)?"Good effort. Revise any missed concepts.":"Keep practising — review the explanations and try again.";
+  studyQuizRound=[];return;
+ }
+ renderStudyQuizQuestion();
 }
 function renderStudentToolkit(){
  renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
