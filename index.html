@@ -733,6 +733,35 @@ infection-control policies and supervisor's instructions during actual patient c
   <div id="lectureLogList" class="tool-list" style="margin-top:12px"></div>
  </div>
  <div class="card">
+  <h3>🧠 Nursing Mnemonics Notebook</h3>
+  <p class="tool-muted">Apne banaye hue memory tricks aur short forms save karo. Mnemonics ko textbook se cross-check karna yaad rakho.</p>
+  <input id="mnemonicTitle" placeholder="Topic / mnemonic title" style="width:100%">
+  <input id="mnemonicSubject" placeholder="Subject" style="width:100%">
+  <textarea id="mnemonicText" rows="3" placeholder="Mnemonic / memory trick..." style="width:100%"></textarea>
+  <textarea id="mnemonicMeaning" rows="3" placeholder="What each part means..." style="width:100%"></textarea>
+  <button type="button" onclick="saveNursingMnemonic()">Save mnemonic</button>
+  <input id="mnemonicSearch" type="search" placeholder="Search mnemonics..." oninput="renderNursingMnemonics()" style="width:100%;margin-top:10px">
+  <div id="nursingMnemonicList" class="tool-list"></div>
+ </div>
+ <div class="card">
+  <h3>🎒 Exam Hall Checklist</h3>
+  <p class="tool-muted">Exam se pehle apni preparation checklist banao. School/college ke official instructions ko priority do.</p>
+  <input id="examChecklistName" placeholder="Exam / checklist name" style="width:100%">
+  <input id="examChecklistItem" placeholder="Add an item (e.g. Check exam timetable)" style="width:100%">
+  <button type="button" onclick="addExamChecklistItem()">＋ Add checklist item</button>
+  <div id="examChecklistList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
+  <h3>📚 Reading Progress Tracker</h3>
+  <p class="tool-muted">Textbook chapters, articles aur class handouts ki reading progress track karo.</p>
+  <input id="readingTitle" placeholder="Book / chapter / resource title" style="width:100%">
+  <input id="readingSubject" placeholder="Subject" style="width:100%">
+  <input id="readingPages" placeholder="Page range (optional)" style="width:100%">
+  <select id="readingStatus" style="width:100%"><option value="To read">To read</option><option value="Reading">Reading</option><option value="Finished">Finished</option></select>
+  <button type="button" onclick="saveReadingProgress()">Save reading item</button>
+  <div id="readingProgressList" class="tool-list" style="margin-top:10px"></div>
+ </div>
+ <div class="card">
   <h3>📊 Subject-wise Revision Report</h3>
   <p class="tool-muted">Aapke saved syllabus, weak topics, study logs aur exam scores se summary banti hai. Koi score ya progress guess nahi hota.</p>
   <button type="button" onclick="renderSubjectRevisionReport()">↻ Refresh report</button>
@@ -1095,7 +1124,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans","ruchi_nursing_mnemonics","ruchi_exam_checklist","ruchi_reading_progress"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -1105,7 +1134,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets","ruchi_class_questions","ruchi_presentation_plans","ruchi_nursing_mnemonics","ruchi_exam_checklist","ruchi_reading_progress"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -2105,7 +2134,7 @@ function nextStudyQuizQuestion(){
  renderStudyQuizQuestion();
 }
 function renderStudentToolkit(){
- renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();renderSubjectRevisionReport();renderClassQuestions();renderNursingPresentations();
+ renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();renderSubjectRevisionReport();renderClassQuestions();renderNursingPresentations();renderNursingMnemonics();renderExamChecklist();renderReadingProgress();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
@@ -2392,6 +2421,51 @@ function deleteNursingPresentation(id){nursingPresentationPlans=nursingPresentat
 function renderNursingPresentations(){
  const el=document.getElementById("nursingPresentationList");if(!el)return;
  el.innerHTML=nursingPresentationPlans.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.date)+'</p><ol>'+x.slides.map(v=>'<li>'+escapeHTML(v)+'</li>').join("")+'</ol>'+(x.notes?'<p><b>Speaking notes:</b> '+escapeHTML(x.notes)+'</p>':'')+'<button class="secondary" onclick="deleteNursingPresentation('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No presentation plans saved yet.</p>';
+}
+
+
+let nursingMnemonics=loadJSON("ruchi_nursing_mnemonics",[]);
+let examChecklistItems=loadJSON("ruchi_exam_checklist",[]);
+let readingProgressItems=loadJSON("ruchi_reading_progress",[]);
+function saveNursingMnemonic(){
+ const title=document.getElementById("mnemonicTitle").value.trim(),subject=document.getElementById("mnemonicSubject").value.trim(),mnemonic=document.getElementById("mnemonicText").value.trim(),meaning=document.getElementById("mnemonicMeaning").value.trim();
+ if(!title||!mnemonic){alert("Enter a title and mnemonic.");return}
+ nursingMnemonics.unshift({id:Date.now(),title,subject,mnemonic,meaning,date:localDateKey()});nursingMnemonics=nursingMnemonics.slice(0,400);
+ if(!saveJSON("ruchi_nursing_mnemonics",nursingMnemonics))return;
+ ["mnemonicTitle","mnemonicSubject","mnemonicText","mnemonicMeaning"].forEach(id=>document.getElementById(id).value="");renderNursingMnemonics();
+}
+function deleteNursingMnemonic(id){nursingMnemonics=nursingMnemonics.filter(x=>x.id!==id);saveJSON("ruchi_nursing_mnemonics",nursingMnemonics);renderNursingMnemonics()}
+function renderNursingMnemonics(){
+ const el=document.getElementById("nursingMnemonicList");if(!el)return;const q=(document.getElementById("mnemonicSearch")?.value||"").toLowerCase().trim();
+ const rows=nursingMnemonics.filter(x=>[x.title,x.subject,x.mnemonic,x.meaning].join(" ").toLowerCase().includes(q));
+ el.innerHTML=rows.map(x=>'<details class="dictionary-result"><summary><b>'+escapeHTML(x.title)+'</b> · '+escapeHTML(x.subject||"General")+'</summary><p><b>Mnemonic:</b> '+escapeHTML(x.mnemonic)+'</p>'+(x.meaning?'<p><b>Meaning:</b> '+escapeHTML(x.meaning)+'</p>':'')+'<p class="tool-muted">'+escapeHTML(x.date||"")+'</p><button class="secondary" onclick="deleteNursingMnemonic('+x.id+')">Delete</button></details>').join("")||'<p class="tool-muted">No mnemonics saved yet.</p>';
+}
+function addExamChecklistItem(){
+ const name=document.getElementById("examChecklistName").value.trim(),item=document.getElementById("examChecklistItem").value.trim();
+ if(!name||!item){alert("Enter a checklist name and item.");return}
+ examChecklistItems.unshift({id:Date.now(),name,item,done:false});examChecklistItems=examChecklistItems.slice(0,300);
+ if(!saveJSON("ruchi_exam_checklist",examChecklistItems))return;
+ document.getElementById("examChecklistItem").value="";renderExamChecklist();
+}
+function toggleExamChecklistItem(id,checked){const x=examChecklistItems.find(v=>v.id===id);if(!x)return;x.done=checked;saveJSON("ruchi_exam_checklist",examChecklistItems);renderExamChecklist()}
+function deleteExamChecklistItem(id){examChecklistItems=examChecklistItems.filter(x=>x.id!==id);saveJSON("ruchi_exam_checklist",examChecklistItems);renderExamChecklist()}
+function renderExamChecklist(){
+ const el=document.getElementById("examChecklistList");if(!el)return;
+ const groups=[...new Set(examChecklistItems.map(x=>x.name))];
+ el.innerHTML=groups.map(name=>{const rows=examChecklistItems.filter(x=>x.name===name),done=rows.filter(x=>x.done).length;return '<div class="dictionary-result"><b>'+escapeHTML(name)+'</b><p class="tool-muted">'+done+'/'+rows.length+' completed</p>'+rows.map(x=>'<label style="display:block;margin:6px 0"><input type="checkbox" '+(x.done?'checked':'')+' onchange="toggleExamChecklistItem('+x.id+',this.checked)"> '+escapeHTML(x.item)+'</label><button class="secondary" onclick="deleteExamChecklistItem('+x.id+')">Remove</button>').join("")+'</div>'}).join("")||'<p class="tool-muted">Create your first exam checklist above.</p>';
+}
+function saveReadingProgress(){
+ const title=document.getElementById("readingTitle").value.trim(),subject=document.getElementById("readingSubject").value.trim(),pages=document.getElementById("readingPages").value.trim(),status=document.getElementById("readingStatus").value;
+ if(!title||!subject){alert("Enter a title and subject.");return}
+ readingProgressItems.unshift({id:Date.now(),title,subject,pages,status,date:localDateKey()});readingProgressItems=readingProgressItems.slice(0,400);
+ if(!saveJSON("ruchi_reading_progress",readingProgressItems))return;
+ ["readingTitle","readingSubject","readingPages"].forEach(id=>document.getElementById(id).value="");renderReadingProgress();
+}
+function updateReadingProgress(id,status){const x=readingProgressItems.find(v=>v.id===id);if(!x)return;x.status=status;saveJSON("ruchi_reading_progress",readingProgressItems);renderReadingProgress()}
+function deleteReadingProgress(id){readingProgressItems=readingProgressItems.filter(x=>x.id!==id);saveJSON("ruchi_reading_progress",readingProgressItems);renderReadingProgress()}
+function renderReadingProgress(){
+ const el=document.getElementById("readingProgressList");if(!el)return;
+ el.innerHTML=readingProgressItems.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.pages||"Pages not specified")+' · '+escapeHTML(x.date)+'</p><select onchange="updateReadingProgress('+x.id+',this.value)"><option '+(x.status==="To read"?'selected':'')+'>To read</option><option '+(x.status==="Reading"?'selected':'')+'>Reading</option><option '+(x.status==="Finished"?'selected':'')+'>Finished</option></select></div><button class="secondary" onclick="deleteReadingProgress('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No reading items saved yet.</p>';
 }
 
 </script>
