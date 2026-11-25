@@ -947,7 +947,9 @@ let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
 let focusSessions=loadJSON("ruchi_focus_sessions",[]);
-let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);\nlet vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);\nlet studyResources=loadJSON("ruchi_study_resources",[]);
+let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);
+let vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);
+let studyResources=loadJSON("ruchi_study_resources",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
