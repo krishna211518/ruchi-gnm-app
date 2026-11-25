@@ -454,6 +454,9 @@ hr{border-color:rgba(153,190,226,.2)!important}
 .focus-history-row:last-child{border-bottom:0}
 @media(max-width:650px){.focus-layout{grid-template-columns:1fr}.focus-clock{letter-spacing:-2px}.focus-history-head{align-items:flex-start}}
 
+
+/* Student Toolkit */
+.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.tool-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tool-form .full{grid-column:1/-1}.tool-list{display:grid;gap:8px}.tool-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel, var(--white))}.tool-row p{margin:4px 0 0;color:var(--muted);font-size:12px}.tool-row button{flex:none}.tool-muted{color:var(--muted);font-size:12px}.tool-stat{font-size:24px;font-weight:800;color:var(--blue)}.tool-table{width:100%;border-collapse:collapse;font-size:13px}.tool-table th,.tool-table td{padding:9px;border-bottom:1px solid var(--line);text-align:left}.tool-table th{color:var(--muted)}.tool-table select{min-width:95px}.dictionary-result{padding:12px;border:1px solid var(--line);border-radius:12px;margin-top:8px}.dictionary-result strong{color:var(--blue)}@media(max-width:650px){.tool-grid,.tool-form{grid-template-columns:1fr}.tool-form .full{grid-column:auto}.tool-row{flex-direction:column}.tool-row button{align-self:flex-start}}
 </style>
 </head>
 <body>
@@ -472,6 +475,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
  <button onclick="show('progress',this)"><span class="ico" aria-hidden="true">▥</span><span>Progress</span></button>
  <button onclick="show('planner',this)"><span class="ico" aria-hidden="true">▦</span><span>Study Plan</span></button>
  <button onclick="show('focus',this)"><span class="ico" aria-hidden="true">◷</span><span>Focus Room</span></button>
+ <button onclick="show('tools',this)"><span class="ico" aria-hidden="true">▦</span><span>Student Toolkit</span></button>
  <button onclick="show('add',this)"><span class="ico" aria-hidden="true">＋</span><span>Add</span></button>
  <button onclick="show('security',this)"><span class="ico" aria-hidden="true">♙</span><span>🔐 Security</span></button>
 </nav></div>
@@ -485,7 +489,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
  <button type="button" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>More</span></button>
 </nav>
 <div class="ruchi-more-menu" id="ruchiMoreMenu" aria-label="More nursing sections">
- <button type="button" onclick="go('reader')">📖 Chapters</button><button type="button" onclick="go('books')">📚 Books</button><button type="button" onclick="go('flashcards')">🃏 Flashcards</button><button type="button" onclick="go('exam')">📝 Mock Test</button><button type="button" onclick="go('clinical')">🩺 Clinical</button><button type="button" onclick="go('viva')">🎤 Viva</button><button type="button" onclick="go('progress')">📊 Progress</button><button type="button" onclick="go('planner')">🗓️ Planner</button><button type="button" onclick="go('focus')">⏱️ Focus Room</button><button type="button" onclick="go('add')">＋ Add MCQ</button><button type="button" onclick="go('security')">🔐 Security</button>
+ <button type="button" onclick="go('reader')">📖 Chapters</button><button type="button" onclick="go('books')">📚 Books</button><button type="button" onclick="go('flashcards')">🃏 Flashcards</button><button type="button" onclick="go('exam')">📝 Mock Test</button><button type="button" onclick="go('clinical')">🩺 Clinical</button><button type="button" onclick="go('viva')">🎤 Viva</button><button type="button" onclick="go('progress')">📊 Progress</button><button type="button" onclick="go('planner')">🗓️ Planner</button><button type="button" onclick="go('focus')">⏱️ Focus Room</button><button type="button" onclick="go('tools')">🧰 Student Toolkit</button><button type="button" onclick="go('add')">＋ Add MCQ</button><button type="button" onclick="go('security')">🔐 Security</button>
 </div>
 <main class="workspace">
 <header class="topbar">
@@ -513,6 +517,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
   <button type="button" onclick="go('mcq')"><span>🧠</span>MCQ Practice</button>
   <button type="button" onclick="go('exam')"><span>📝</span>Mock Test</button>
   <button type="button" onclick="go('viva')"><span>🎤</span>Viva</button>
+  <button type="button" onclick="go('tools')"><span>🧰</span>Student Toolkit</button>
  </div>
  <div class="ref-quick-head"><h3>Quick Access</h3><button type="button" onclick="go('planner')">Study Plan →</button></div>
  <div class="ref-quick-list">
@@ -647,6 +652,51 @@ infection-control policies and supervisor's instructions during actual patient c
 <p class="small">Date, subject aur topic add karo. Plan isi device par save rahega.</p>
 <div class="card"><label for="planDate">Study date</label><input id="planDate" type="date"><label for="planSubject">Subject</label><input id="planSubject" placeholder="e.g. Nursing Foundations"><label for="planTopic">Topic</label><input id="planTopic" placeholder="e.g. Hand hygiene"><button onclick="addPlanTask()">Add to plan</button></div>
 <div id="studyPlanList"></div>
+</section>
+
+<section id="tools" class="section">
+<h2>🧰 Student Toolkit</h2>
+<p class="small">College work, attendance, timetable and quick nursing reference. Your entries stay on this device.</p>
+<div class="tool-grid">
+ <div class="card">
+  <h3>📌 Assignment Manager</h3>
+  <div class="tool-form">
+   <input id="taskTitle" class="full" placeholder="Assignment / practical file name">
+   <input id="taskSubject" placeholder="Subject">
+   <input id="taskDue" type="date" aria-label="Due date">
+   <button type="button" class="full" onclick="addStudentTask()">＋ Add task</button>
+  </div>
+  <div id="studentTaskList" class="tool-list" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
+  <h3>📅 Class Timetable</h3>
+  <div class="tool-form">
+   <select id="ttDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+   <input id="ttTime" placeholder="Time (e.g. 9:00–10:00)">
+   <input id="ttSubject" placeholder="Subject / class">
+   <input id="ttRoom" placeholder="Room / teacher (optional)">
+   <button type="button" class="full" onclick="addTimetableEntry()">＋ Add class</button>
+  </div>
+  <div id="timetableList" class="tool-list" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
+  <h3>📊 Attendance Tracker</h3>
+  <div class="tool-form">
+   <input id="attSubject" class="full" placeholder="Subject / clinical posting">
+   <select id="attStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="leave">Leave</option></select>
+   <input id="attDate" type="date" aria-label="Attendance date">
+   <button type="button" class="full" onclick="recordAttendance()">Save attendance</button>
+  </div>
+  <div id="attendanceSummary" style="margin-top:12px"></div>
+  <div id="attendanceList" class="tool-list" style="margin-top:8px"></div>
+ </div>
+ <div class="card">
+  <h3>🔎 Medical Dictionary & Abbreviations</h3>
+  <input id="medicalSearch" type="search" placeholder="Search term or abbreviation..." oninput="searchMedicalReference()" style="width:100%">
+  <div id="medicalResults" style="margin-top:10px"></div>
+  <p class="tool-muted">For learning only. Verify clinical meanings and local approved abbreviations before use.</p>
+ </div>
+</div>
 </section>
 
 <section id="focus" class="section">
@@ -819,7 +869,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -838,6 +888,7 @@ let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
 let focusSessions=loadJSON("ruchi_focus_sessions",[]);
+let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -847,7 +898,7 @@ function show(id,btn){
  document.querySelectorAll(".nav button,.krx-mobile-nav button").forEach(x=>{x.classList.remove("selected","active")});
  if(btn){btn.classList.add("selected","active");}
  const menu=document.getElementById("ruchiMoreMenu");if(menu)menu.classList.remove("open");
- const title=document.getElementById("pageTitle");if(title){const label=({home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",focus:"Focus Room",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
+ const title=document.getElementById("pageTitle");if(title){const label=({home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",focus:"Focus Room",tools:"Student Toolkit",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
  refreshStats();
  if(id==="library")renderLibrary();
  if(id==="notes")renderNotes();
@@ -858,6 +909,7 @@ function show(id,btn){
  if(id==="progress")renderProgress();
  if(id==="planner")renderPlanner();
  if(id==="focus")renderFocusRoom();
+ if(id==="tools")renderStudentToolkit();
  if(id==="security")renderSecurity();
  if(id==="mcq")startPractice();
 }
@@ -1324,6 +1376,76 @@ document.addEventListener("touchcancel",clearPullRefresh,{passive:true});
 
 // Show a short branded opening animation, then reveal the app.
 (()=>{const splash=document.getElementById("launchScreen");if(!splash)return;const hide=()=>{splash.classList.add("is-hidden");setTimeout(()=>splash.remove(),500)};splash.addEventListener("click",hide,{once:true});window.setTimeout(hide,1500)})();
+
+
+const medicalReference=[
+ ["BP","Blood pressure","Pressure exerted by circulating blood on vessel walls."],
+ ["BMI","Body mass index","A screening measure calculated from weight and height; not a diagnosis."],
+ ["CNS","Central nervous system","Brain and spinal cord."],
+ ["CPR","Cardiopulmonary resuscitation","Emergency response performed by trained people according to current guidance."],
+ ["ECG","Electrocardiogram","Recording of the heart's electrical activity."],
+ ["GIT","Gastrointestinal tract","Digestive tract from mouth to anus."],
+ ["HR","Heart rate","Number of heart beats per minute."],
+ ["IV","Intravenous","Within or into a vein."],
+ ["NPO","Nil per os","Nothing by mouth; use only when specifically prescribed."],
+ ["RR","Respiratory rate","Number of breaths per minute."],
+ ["SpO2","Peripheral oxygen saturation","Estimate of oxygen saturation measured by a pulse oximeter."],
+ ["UTI","Urinary tract infection","Infection involving any part of the urinary tract."],
+ ["Asepsis","Asepsis","Practices intended to prevent contamination by disease-causing microorganisms."],
+ ["Edema","Oedema / Edema","Swelling caused by excess fluid in body tissues."],
+ ["Dyspnea","Dyspnoea / Dyspnea","The sensation of difficult or uncomfortable breathing."],
+ ["Tachycardia","Tachycardia","A faster-than-expected heart rate; interpretation depends on age and context."],
+ ["Bradycardia","Bradycardia","A slower-than-expected heart rate; interpretation depends on age and context."],
+ ["Anemia","Anaemia / Anemia","A condition involving reduced haemoglobin or healthy red blood cells."]
+];
+function renderStudentToolkit(){
+ renderStudentTasks();renderTimetable();renderAttendance();searchMedicalReference();
+ const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
+}
+function addStudentTask(){
+ const title=document.getElementById("taskTitle").value.trim(),subject=document.getElementById("taskSubject").value.trim(),due=document.getElementById("taskDue").value;
+ if(!title){alert("Please enter an assignment or task name.");return}
+ studentTasks.push({id:Date.now(),title,subject,due,done:false});
+ saveJSON("ruchi_student_tasks",studentTasks);
+ ["taskTitle","taskSubject","taskDue"].forEach(id=>document.getElementById(id).value="");renderStudentTasks();
+}
+function renderStudentTasks(){
+ const el=document.getElementById("studentTaskList");if(!el)return;
+ el.innerHTML=studentTasks.slice().sort((a,b)=>(a.due||"9999").localeCompare(b.due||"9999")).map(x=>'<div class="tool-row"><div><b>'+(x.done?'✓ ':'')+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.due||"No due date")+'</p></div><div><button class="secondary" onclick="toggleStudentTask('+x.id+')">'+(x.done?"Reopen":"Done")+'</button> <button class="secondary" onclick="deleteStudentTask('+x.id+')">Delete</button></div></div>').join("")||'<p class="tool-muted">No assignments yet. Add your first task above.</p>';
+}
+function toggleStudentTask(id){const x=studentTasks.find(t=>t.id===id);if(!x)return;x.done=!x.done;saveJSON("ruchi_student_tasks",studentTasks);renderStudentTasks()}
+function deleteStudentTask(id){studentTasks=studentTasks.filter(t=>t.id!==id);saveJSON("ruchi_student_tasks",studentTasks);renderStudentTasks()}
+function addTimetableEntry(){
+ const day=document.getElementById("ttDay").value,time=document.getElementById("ttTime").value.trim(),subject=document.getElementById("ttSubject").value.trim(),room=document.getElementById("ttRoom").value.trim();
+ if(!time||!subject){alert("Please enter class time and subject.");return}
+ timetableEntries.push({id:Date.now(),day,time,subject,room});saveJSON("ruchi_timetable",timetableEntries);
+ ["ttTime","ttSubject","ttRoom"].forEach(id=>document.getElementById(id).value="");renderTimetable();
+}
+function renderTimetable(){
+ const el=document.getElementById("timetableList");if(!el)return;
+ const days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+ el.innerHTML=days.map(day=>{const rows=timetableEntries.filter(x=>x.day===day);return rows.length?'<div><b>'+day+'</b>'+rows.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.time)+' · '+escapeHTML(x.subject)+'</b><p>'+escapeHTML(x.room||"")+'</p></div><button class="secondary" onclick="deleteTimetableEntry('+x.id+')">Remove</button></div>').join("")+'</div>':""}).join("")||'<p class="tool-muted">Your weekly timetable will appear here.</p>';
+}
+function deleteTimetableEntry(id){timetableEntries=timetableEntries.filter(x=>x.id!==id);saveJSON("ruchi_timetable",timetableEntries);renderTimetable()}
+function recordAttendance(){
+ const subject=document.getElementById("attSubject").value.trim(),status=document.getElementById("attStatus").value,date=document.getElementById("attDate").value||localDateKey();
+ if(!subject){alert("Please enter a subject or posting name.");return}
+ if(attendanceEntries.some(x=>x.subject.toLowerCase()===subject.toLowerCase()&&x.date===date)){alert("Attendance for this subject and date is already recorded.");return}
+ attendanceEntries.push({id:Date.now(),subject,status,date});saveJSON("ruchi_attendance",attendanceEntries);
+ document.getElementById("attSubject").value="";renderAttendance();
+}
+function renderAttendance(){
+ const summary=document.getElementById("attendanceSummary"),list=document.getElementById("attendanceList");if(!summary||!list)return;
+ const present=attendanceEntries.filter(x=>x.status==="present").length,absent=attendanceEntries.filter(x=>x.status==="absent").length,leave=attendanceEntries.filter(x=>x.status==="leave").length,total=present+absent;
+ summary.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+(total?Math.round(present/total*100):0)+'%</span><p>Recorded attendance (leave excluded)</p></div><div class="tool-muted">Present: '+present+'<br>Absent: '+absent+'<br>Leave: '+leave+'</div></div>';
+ list.innerHTML=attendanceEntries.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12).map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.subject)+'</b><p>'+escapeHTML(x.date)+' · '+escapeHTML(x.status.toUpperCase())+'</p></div><button class="secondary" onclick="deleteAttendance('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No attendance records yet.</p>';
+}
+function deleteAttendance(id){attendanceEntries=attendanceEntries.filter(x=>x.id!==id);saveJSON("ruchi_attendance",attendanceEntries);renderAttendance()}
+function searchMedicalReference(){
+ const input=document.getElementById("medicalSearch"),out=document.getElementById("medicalResults");if(!input||!out)return;
+ const q=input.value.trim().toLowerCase(),matches=medicalReference.filter(x=>!q||x.join(" ").toLowerCase().includes(q));
+ out.innerHTML=matches.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x[0])+' · '+escapeHTML(x[1])+'</strong><div>'+escapeHTML(x[2])+'</div></div>').join("")||'<p class="tool-muted">No matching term. Check the spelling or try another word.</p>';
+}
 
 function setFocusPreset(minutes,button){
  if(focusRunning)return;
