@@ -770,6 +770,9 @@ infection-control policies and supervisor's instructions during actual patient c
   <div class="tool-form"><input id="spacedSubject" placeholder="Subject"><input id="spacedTopic" placeholder="Topic to revise"><button class="full" type="button" onclick="addSpacedRevision()">＋ Schedule topic</button></div>
   <div id="spacedRevisionSummary" class="tool-muted" style="margin:8px 0"></div><div id="spacedRevisionList" class="tool-list"></div>
  </div>
+<div class="card"><h3>📂 Practical File Manager</h3><p class="tool-muted">Organise practical records and progress.</p><button class="full" onclick="show('practicalFiles')">Open Practical Files</button></div>
+<div class="card"><h3>📑 Practice Paper Organizer</h3><p class="tool-muted">Keep papers and preparation status together.</p><button class="full" onclick="show('papers')">Open Paper Organizer</button></div>
+<div class="card"><h3>🏅 Exam Score Tracker</h3><p class="tool-muted">Record test marks and track progress.</p><button class="full" onclick="show('scores')">Open Score Tracker</button></div>
 </div>
 </section>
 
@@ -789,6 +792,13 @@ infection-control policies and supervisor's instructions during actual patient c
   <div class="tool-form"><label for="paperTitle">Paper title</label><input id="paperTitle" placeholder="e.g. Anatomy unit test"><label for="paperSubject">Subject</label><input id="paperSubject" placeholder="Subject name"><label for="paperYear">Year / session</label><input id="paperYear" placeholder="e.g. 2025 or 2025-26"><label for="paperLink">Paper link (optional)</label><input id="paperLink" type="url" placeholder="https://..."><label for="paperStatus">Preparation status</label><select id="paperStatus"><option>Not attempted</option><option>Attempted</option><option>Reviewed</option></select><button class="full" type="button" onclick="addPracticePaper()">＋ Save paper</button></div>
  </div>
  <div class="card"><h3>Saved papers</h3><div id="practicePaperList" class="tool-list"></div></div>
+</section>
+
+<section id="scores" class="section">
+ <h2>🏅 Exam Score Tracker</h2>
+ <p class="small">Record marks from your own tests. Percentages are calculated from your entries; this is not an official grade report.</p>
+ <div class="card"><div class="tool-form"><label for="scoreTestName">Test / exam name</label><input id="scoreTestName" placeholder="e.g. Anatomy chapter test"><label for="scoreSubject">Subject</label><input id="scoreSubject" placeholder="Subject"><label for="scoreObtained">Marks obtained</label><input id="scoreObtained" type="number" min="0" step="0.5" placeholder="e.g. 36"><label for="scoreMaximum">Maximum marks</label><input id="scoreMaximum" type="number" min="0.5" step="0.5" placeholder="e.g. 50"><label for="scoreDate">Test date</label><input id="scoreDate" type="date"><button class="full" onclick="addExamScore()">＋ Save score</button></div></div>
+ <div class="card"><h3>My score summary</h3><div id="examScoreSummary" class="tool-row"></div><div id="examScoreList" class="tool-list"></div></div>
 </section>
 <section id="focus" class="section">
 <h2>⏱️ Focus Room</h2>
@@ -950,7 +960,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -960,7 +970,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -984,6 +994,7 @@ let vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_
 let studyResources=loadJSON("ruchi_study_resources",[]);
 let spacedRevisions=loadJSON("ruchi_spaced_revisions",[]);
 let practicalFiles=loadJSON("ruchi_practical_files",[]),practicePapers=loadJSON("ruchi_practice_papers",[]);
+let examScores=loadJSON("ruchi_exam_scores",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1619,6 +1630,21 @@ function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if
 
 
 
+
+function addExamScore(){
+ const name=document.getElementById("scoreTestName").value.trim(),subject=document.getElementById("scoreSubject").value.trim(),obtained=Number(document.getElementById("scoreObtained").value),maximum=Number(document.getElementById("scoreMaximum").value),date=document.getElementById("scoreDate").value||localDateKey();
+ if(!name||!subject||document.getElementById("scoreObtained").value===""||document.getElementById("scoreMaximum").value===""||!Number.isFinite(obtained)||!Number.isFinite(maximum)||maximum<=0||obtained<0||obtained>maximum){alert("Enter test name, subject and valid marks (obtained cannot exceed maximum).");return}
+ examScores.unshift({id:Date.now(),name,subject,obtained,maximum,date});examScores=examScores.slice(0,500);saveJSON("ruchi_exam_scores",examScores);
+ ["scoreTestName","scoreSubject","scoreObtained","scoreMaximum","scoreDate"].forEach(id=>document.getElementById(id).value="");renderExamScores();
+}
+function removeExamScore(id){examScores=examScores.filter(x=>x.id!==id);saveJSON("ruchi_exam_scores",examScores);renderExamScores()}
+function renderExamScores(){
+ const summary=document.getElementById("examScoreSummary"),list=document.getElementById("examScoreList");if(!summary||!list)return;
+ const obtained=examScores.reduce((a,x)=>a+Number(x.obtained||0),0),maximum=examScores.reduce((a,x)=>a+Number(x.maximum||0),0),pct=maximum?Math.round(obtained/maximum*1000)/10:0;
+ summary.innerHTML='<div><span class="tool-stat">'+examScores.length+'</span><p>Tests recorded</p></div><div><span class="tool-stat">'+(maximum?pct+"%":"—")+'</span><p>Combined percentage</p></div><div><span class="tool-stat">'+obtained+'/'+maximum+'</span><p>Total marks</p></div>';
+ list.innerHTML=examScores.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.name)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p><p>'+x.obtained+'/'+x.maximum+' · '+Math.round(x.obtained/x.maximum*1000)/10+'%</p></div><button class="danger" onclick="removeExamScore('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No test scores saved yet.</p>';
+}
+
 function addPracticalFile(){
  const title=document.getElementById("pfTitle").value.trim(),subject=document.getElementById("pfSubject").value.trim(),date=document.getElementById("pfDate").value||localDateKey(),status=document.getElementById("pfStatus").value,notes=document.getElementById("pfNotes").value.trim();
  if(!title||!subject){alert("Enter a practical title and subject.");return}
@@ -1742,7 +1768,7 @@ function renderStudyStreak(){
  el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
 }
 function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
