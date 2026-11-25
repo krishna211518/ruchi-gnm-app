@@ -434,6 +434,26 @@ hr{border-color:rgba(153,190,226,.2)!important}
 .app-lock-panel{background:#10243a!important;border-color:#34516e!important;color:#edf6ff!important}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important}}
 
+
+/* FOCUS ROOM — timer, session history and responsive layout */
+.focus-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr);gap:14px}
+.focus-main{text-align:center;padding:clamp(20px,4vw,38px);background:linear-gradient(145deg,#142d49,#183f67);color:#f2f8ff;border:1px solid #3a6289}
+.focus-kicker{font-size:11px;font-weight:800;letter-spacing:2px;color:#9bcfff}
+.focus-clock{font-size:clamp(54px,12vw,88px);font-weight:850;letter-spacing:-4px;line-height:1.25;font-variant-numeric:tabular-nums;margin:14px 0}
+.focus-main .small{color:#c0d6ed}
+.focus-presets,.focus-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:18px}
+.focus-preset.selected{background:#d7efff;color:#12365b;border-color:#fff}
+.focus-main button{min-width:94px}
+.focus-summary h3{margin-bottom:18px}
+.focus-stat{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+.focus-stat strong{font-size:23px;color:#50a9ff}.focus-stat span{font-size:12px;color:var(--muted)}
+.focus-summary .progress{margin-top:18px}
+.focus-history-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.focus-history-head h3{margin:0}
+.focus-history-row{display:flex;justify-content:space-between;gap:10px;padding:11px 2px;border-bottom:1px solid var(--line);font-size:13px}
+.focus-history-row:last-child{border-bottom:0}
+@media(max-width:650px){.focus-layout{grid-template-columns:1fr}.focus-clock{letter-spacing:-2px}.focus-history-head{align-items:flex-start}}
+
 </style>
 </head>
 <body>
@@ -451,6 +471,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
  <button onclick="show('viva',this)"><span class="ico" aria-hidden="true">◉</span><span>Viva</span></button>
  <button onclick="show('progress',this)"><span class="ico" aria-hidden="true">▥</span><span>Progress</span></button>
  <button onclick="show('planner',this)"><span class="ico" aria-hidden="true">▦</span><span>Study Plan</span></button>
+ <button onclick="show('focus',this)"><span class="ico" aria-hidden="true">◷</span><span>Focus Room</span></button>
  <button onclick="show('add',this)"><span class="ico" aria-hidden="true">＋</span><span>Add</span></button>
  <button onclick="show('security',this)"><span class="ico" aria-hidden="true">♙</span><span>🔐 Security</span></button>
 </nav></div>
@@ -464,7 +485,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
  <button type="button" onclick="toggleMoreMenu()"><span class="nav-icon">•••</span><span>More</span></button>
 </nav>
 <div class="ruchi-more-menu" id="ruchiMoreMenu" aria-label="More nursing sections">
- <button type="button" onclick="go('reader')">📖 Chapters</button><button type="button" onclick="go('books')">📚 Books</button><button type="button" onclick="go('flashcards')">🃏 Flashcards</button><button type="button" onclick="go('exam')">📝 Mock Test</button><button type="button" onclick="go('clinical')">🩺 Clinical</button><button type="button" onclick="go('viva')">🎤 Viva</button><button type="button" onclick="go('progress')">📊 Progress</button><button type="button" onclick="go('planner')">🗓️ Planner</button><button type="button" onclick="go('add')">＋ Add MCQ</button><button type="button" onclick="go('security')">🔐 Security</button>
+ <button type="button" onclick="go('reader')">📖 Chapters</button><button type="button" onclick="go('books')">📚 Books</button><button type="button" onclick="go('flashcards')">🃏 Flashcards</button><button type="button" onclick="go('exam')">📝 Mock Test</button><button type="button" onclick="go('clinical')">🩺 Clinical</button><button type="button" onclick="go('viva')">🎤 Viva</button><button type="button" onclick="go('progress')">📊 Progress</button><button type="button" onclick="go('planner')">🗓️ Planner</button><button type="button" onclick="go('focus')">⏱️ Focus Room</button><button type="button" onclick="go('add')">＋ Add MCQ</button><button type="button" onclick="go('security')">🔐 Security</button>
 </div>
 <main class="workspace">
 <header class="topbar">
@@ -511,6 +532,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
   <div class="card home-module-card"><div class="emoji">🎤</div><h3>Viva Practice</h3><p>Important oral questions.</p><button onclick="go('viva')">Start Viva</button></div>
   <div class="card home-module-card"><div class="emoji">📊</div><h3>My Progress</h3><p>Track your learning.</p><button onclick="go('progress')">View Progress</button></div>
   <div class="card home-module-card"><div class="emoji">🗓️</div><h3>Weekly Study Plan</h3><p>Plan topics by date and mark them done.</p><button onclick="go('planner')">Open Plan</button></div>
+  <div class="card home-module-card"><div class="emoji">⏱️</div><h3>Focus Room</h3><p>Pomodoro timer and saved study sessions.</p><button onclick="go('focus')">Start Focus</button></div>
  </div>
  <div class="home-progress-grid">
   <div class="card"><label for="dailyGoal">Topics to complete today</label><input id="dailyGoal" type="number" min="1" max="20" value="3" onchange="setDailyGoal(this.value)"><div class="progress"><div id="dailyProgress"></div></div><p class="small" id="dailyProgressText">Mark a topic complete to track today’s goal.</p></div>
@@ -625,6 +647,35 @@ infection-control policies and supervisor's instructions during actual patient c
 <p class="small">Date, subject aur topic add karo. Plan isi device par save rahega.</p>
 <div class="card"><label for="planDate">Study date</label><input id="planDate" type="date"><label for="planSubject">Subject</label><input id="planSubject" placeholder="e.g. Nursing Foundations"><label for="planTopic">Topic</label><input id="planTopic" placeholder="e.g. Hand hygiene"><button onclick="addPlanTask()">Add to plan</button></div>
 <div id="studyPlanList"></div>
+</section>
+
+<section id="focus" class="section">
+<h2>⏱️ Focus Room</h2>
+<p class="small">Distraction-free study timer. Completed focus sessions are saved only on this device.</p>
+<div class="focus-layout">
+ <div class="card focus-main">
+  <div class="focus-kicker">YOUR STUDY SPRINT</div>
+  <div id="focusTimer" class="focus-clock" role="timer" aria-live="off">25:00</div>
+  <p id="focusStatus" class="small" aria-live="polite">Ready when you are. Choose a session and press Start.</p>
+  <div class="focus-presets" role="group" aria-label="Focus duration">
+   <button type="button" class="secondary focus-preset selected" onclick="setFocusPreset(25,this)">25 min</button>
+   <button type="button" class="secondary focus-preset" onclick="setFocusPreset(15,this)">15 min</button>
+   <button type="button" class="secondary focus-preset" onclick="setFocusPreset(5,this)">5 min</button>
+  </div>
+  <div class="focus-actions">
+   <button type="button" id="focusStartButton" onclick="toggleFocusTimer()">Start Focus</button>
+   <button type="button" class="secondary" onclick="resetFocusTimer()">Reset</button>
+  </div>
+ </div>
+ <div class="card focus-summary">
+  <h3>My Focus Stats</h3>
+  <div class="focus-stat"><strong id="focusSessionsCount">0</strong><span>Sessions completed</span></div>
+  <div class="focus-stat"><strong id="focusMinutesTotal">0 min</strong><span>Total focused time</span></div>
+  <div class="progress"><div id="focusProgressBar"></div></div>
+  <p class="small" id="focusProgressText">Complete your first session to build your study record.</p>
+ </div>
+</div>
+<div class="card"><div class="focus-history-head"><h3>Recent Sessions</h3><button type="button" class="secondary" onclick="clearFocusHistory()">Clear history</button></div><div id="focusHistory" class="focus-history"></div></div>
 </section>
 
 <section id="security" class="section">
@@ -785,6 +836,8 @@ let flashcardPool=[],flashcardIndex=0,flashcardFlipped=false,flashcardKnown=load
 let studyPlan=loadJSON("ruchi_study_plan",[]);
 let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
+let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
+let focusSessions=loadJSON("ruchi_focus_sessions",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -794,7 +847,7 @@ function show(id,btn){
  document.querySelectorAll(".nav button,.krx-mobile-nav button").forEach(x=>{x.classList.remove("selected","active")});
  if(btn){btn.classList.add("selected","active");}
  const menu=document.getElementById("ruchiMoreMenu");if(menu)menu.classList.remove("open");
- const title=document.getElementById("pageTitle");if(title){const label=({home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
+ const title=document.getElementById("pageTitle");if(title){const label=({home:"Dashboard",library:"Study Library",reader:"Chapter Reader",books:"Bookshelf",mcq:"MCQ Practice",flashcards:"Flashcards",exam:"Mock Test",notes:"My Notes",clinical:"Clinical Learning",viva:"Viva Practice",progress:"Progress",planner:"Study Plan",add:"Add Study Content",focus:"Focus Room",security:"Privacy & Security"})[id]||"RUCHI GNM";title.textContent=label;}
  refreshStats();
  if(id==="library")renderLibrary();
  if(id==="notes")renderNotes();
@@ -804,6 +857,7 @@ function show(id,btn){
  if(id==="viva")renderViva();
  if(id==="progress")renderProgress();
  if(id==="planner")renderPlanner();
+ if(id==="focus")renderFocusRoom();
  if(id==="security")renderSecurity();
  if(id==="mcq")startPractice();
 }
@@ -1270,6 +1324,63 @@ document.addEventListener("touchcancel",clearPullRefresh,{passive:true});
 
 // Show a short branded opening animation, then reveal the app.
 (()=>{const splash=document.getElementById("launchScreen");if(!splash)return;const hide=()=>{splash.classList.add("is-hidden");setTimeout(()=>splash.remove(),500)};splash.addEventListener("click",hide,{once:true});window.setTimeout(hide,1500)})();
+
+function setFocusPreset(minutes,button){
+ if(focusRunning)return;
+ focusDuration=minutes*60;focusSecondsLeft=focusDuration;
+ document.querySelectorAll(".focus-preset").forEach(x=>x.classList.remove("selected"));
+ if(button)button.classList.add("selected");
+ renderFocusClock();document.getElementById("focusStatus").textContent=minutes+" minute session selected.";
+}
+function renderFocusClock(){
+ const el=document.getElementById("focusTimer");if(!el)return;
+ const m=Math.floor(focusSecondsLeft/60),sec=focusSecondsLeft%60;
+ el.textContent=String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+ const bar=document.getElementById("focusProgressBar");
+ if(bar)bar.style.width=Math.round((1-focusSecondsLeft/Math.max(1,focusDuration))*100)+"%";
+ const btn=document.getElementById("focusStartButton");if(btn)btn.textContent=focusRunning?"Pause":"Start Focus";
+}
+function renderFocusRoom(){
+ renderFocusClock();
+ const count=document.getElementById("focusSessionsCount"),total=document.getElementById("focusMinutesTotal");
+ if(count)count.textContent=focusSessions.length;
+ const minutes=focusSessions.reduce((sum,x)=>sum+(Number(x.minutes)||0),0);
+ if(total)total.textContent=minutes+" min";
+ const p=document.getElementById("focusProgressText");
+ if(p)p.textContent=focusSessions.length?("You've completed "+focusSessions.length+" focused session"+(focusSessions.length===1?"":"s")+". Keep it steady!"):"Complete your first session to build your study record.";
+ const history=document.getElementById("focusHistory");
+ if(history)history.innerHTML=focusSessions.slice(-8).reverse().map(x=>'<div class="focus-history-row"><span>✓ '+escapeHTML(x.date||"Study session")+'</span><b>'+Number(x.minutes||0)+' min</b></div>').join("")||'<p class="small">No completed sessions yet.</p>';
+}
+function toggleFocusTimer(){
+ if(focusRunning){clearInterval(focusTimer);focusTimer=null;focusRunning=false;document.getElementById("focusStatus").textContent="Paused. Resume whenever you're ready.";renderFocusClock();return}
+ if(focusSecondsLeft<=0)resetFocusTimer();
+ focusRunning=true;document.getElementById("focusStatus").textContent="Focus mode is running. One task at a time!";
+ renderFocusClock();
+ focusTimer=setInterval(()=>{
+  if(!focusRunning)return;
+  focusSecondsLeft=Math.max(0,focusSecondsLeft-1);renderFocusClock();
+  if(focusSecondsLeft===0){
+   clearInterval(focusTimer);focusTimer=null;focusRunning=false;
+   const minutes=Math.round(focusDuration/60),date=new Date().toLocaleString();
+   focusSessions.push({minutes,date,at:Date.now()});
+   focusSessions=focusSessions.slice(-100);saveJSON("ruchi_focus_sessions",focusSessions);
+   document.getElementById("focusStatus").textContent="Session complete! Great work. Take a short break.";
+   renderFocusRoom();
+  }
+ },1000);
+}
+function resetFocusTimer(){
+ if(focusTimer)clearInterval(focusTimer);
+ focusTimer=null;focusRunning=false;focusSecondsLeft=focusDuration;
+ const status=document.getElementById("focusStatus");if(status)status.textContent="Timer reset. Ready for another sprint.";
+ renderFocusClock();
+}
+function clearFocusHistory(){
+ if(!focusSessions.length)return;
+ if(!confirm("Clear all saved focus session history on this device?"))return;
+ focusSessions=[];saveJSON("ruchi_focus_sessions",focusSessions);renderFocusRoom();
+}
+
 </script>
 </body>
 </html>
