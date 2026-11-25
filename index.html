@@ -2357,12 +2357,12 @@ function renderSubjectRevisionReport(){
  const subjects=new Set();
  syllabusTopics.forEach(x=>subjects.add(x.subject||"General"));weakTopics.forEach(x=>subjects.add(x.subject||"General"));studyLogs.forEach(x=>subjects.add(x.subject||"General"));examScores.forEach(x=>subjects.add(x.subject||"General"));
  const names=[...subjects].sort((a,b)=>a.localeCompare(b));
- const totals=examScores.reduce((a,x)=>({got:a.got+(Number(x.obtained)||0),max:a.max+(Number(x.total)||0)}),{got:0,max:0});
+ const totals=examScores.reduce((a,x)=>({got:a.got+(Number(x.obtained)||0),max:a.max+(Number(x.maximum)||0)}),{got:0,max:0});
  let html='<div class="dictionary-result"><b>Overall snapshot</b><p>Syllabus topics: '+syllabusTopics.length+' · Weak topics: '+weakTopics.length+' · Study entries: '+studyLogs.length+' · Recorded tests: '+examScores.length+'</p><p>Recorded marks: '+(totals.max>0?(totals.got/totals.max*100).toFixed(1)+'%':'No marks recorded yet')+'</p></div>';
  if(!names.length)html+='<p class="tool-muted">Abhi report ke liye data nahi hai. Syllabus tracker, weak topic tracker ya study log mein entries add karo.</p>';
  html+=names.map(name=>{
   const st=syllabusTopics.filter(x=>(x.subject||"General")===name),wk=weakTopics.filter(x=>(x.subject||"General")===name),logs=studyLogs.filter(x=>(x.subject||"General")===name),scores=examScores.filter(x=>(x.subject||"General")===name);
-  const studied=st.filter(x=>/studied|revised|complete/i.test(x.status||"")).length,mastered=wk.filter(x=>x.level==="Mastered").length,minutes=logs.reduce((a,x)=>a+(Number(x.minutes)||0),0),got=scores.reduce((a,x)=>a+(Number(x.obtained)||0),0),max=scores.reduce((a,x)=>a+(Number(x.total)||0),0);
+  const studied=st.filter(x=>/studied|revised|complete/i.test(x.status||"")).length,mastered=wk.filter(x=>x.level==="Mastered").length,minutes=logs.reduce((a,x)=>a+(Number(x.minutes)||0),0),got=scores.reduce((a,x)=>a+(Number(x.obtained)||0),0),max=scores.reduce((a,x)=>a+(Number(x.maximum)||0),0);
   return '<div class="dictionary-result"><b>'+escapeHTML(name)+'</b><p>Syllabus: '+studied+'/'+st.length+' marked studied/revised · Weak topics: '+wk.length+' ('+mastered+' mastered) · Study time logged: '+minutes+' min · Tests: '+scores.length+(max>0?' · Marks: '+(got/max*100).toFixed(1)+'%':'')+'</p></div>';
  }).join("");
  el.innerHTML=html;
