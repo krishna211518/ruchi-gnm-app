@@ -773,6 +773,23 @@ infection-control policies and supervisor's instructions during actual patient c
 </div>
 </section>
 
+
+<section id="practicalFiles" class="section">
+ <h2>📂 Practical File Manager</h2>
+ <p class="small">Organise your own practical records and checklist notes. Do not enter patient names, contact details, photos, IDs or other identifying information.</p>
+ <div class="card">
+  <div class="tool-form"><label for="pfTitle">Practical title</label><input id="pfTitle" placeholder="e.g. Handwashing assignment"><label for="pfSubject">Subject</label><input id="pfSubject" placeholder="e.g. Fundamentals of Nursing"><label for="pfDate">Date</label><input id="pfDate" type="date"><label for="pfStatus">Status</label><select id="pfStatus"><option value="Not started">Not started</option><option value="In progress">In progress</option><option value="Completed">Completed</option></select><label for="pfNotes">Short note / checklist</label><textarea id="pfNotes" rows="3" placeholder="What needs to be included?"></textarea><button class="full" type="button" onclick="addPracticalFile()">＋ Save practical</button></div>
+ </div>
+ <div class="card"><h3>My practical files</h3><div id="practicalFileList" class="tool-list"></div></div>
+</section>
+<section id="papers" class="section">
+ <h2>📑 Practice Paper Organizer</h2>
+ <p class="small">Save details and links to papers you already have. This organiser does not provide or verify papers automatically.</p>
+ <div class="card">
+  <div class="tool-form"><label for="paperTitle">Paper title</label><input id="paperTitle" placeholder="e.g. Anatomy unit test"><label for="paperSubject">Subject</label><input id="paperSubject" placeholder="Subject name"><label for="paperYear">Year / session</label><input id="paperYear" placeholder="e.g. 2025 or 2025-26"><label for="paperLink">Paper link (optional)</label><input id="paperLink" type="url" placeholder="https://..."><label for="paperStatus">Preparation status</label><select id="paperStatus"><option>Not attempted</option><option>Attempted</option><option>Reviewed</option></select><button class="full" type="button" onclick="addPracticePaper()">＋ Save paper</button></div>
+ </div>
+ <div class="card"><h3>Saved papers</h3><div id="practicePaperList" class="tool-list"></div></div>
+</section>
 <section id="focus" class="section">
 <h2>⏱️ Focus Room</h2>
 <p class="small">Distraction-free study timer. Completed focus sessions are saved only on this device.</p>
@@ -933,7 +950,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -943,7 +960,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -966,6 +983,7 @@ let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("r
 let vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);
 let studyResources=loadJSON("ruchi_study_resources",[]);
 let spacedRevisions=loadJSON("ruchi_spaced_revisions",[]);
+let practicalFiles=loadJSON("ruchi_practical_files",[]),practicePapers=loadJSON("ruchi_practice_papers",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1600,6 +1618,33 @@ function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if
 
 
 
+
+function addPracticalFile(){
+ const title=document.getElementById("pfTitle").value.trim(),subject=document.getElementById("pfSubject").value.trim(),date=document.getElementById("pfDate").value||localDateKey(),status=document.getElementById("pfStatus").value,notes=document.getElementById("pfNotes").value.trim();
+ if(!title||!subject){alert("Enter a practical title and subject.");return}
+ practicalFiles.unshift({id:Date.now(),title,subject,date,status,notes});practicalFiles=practicalFiles.slice(0,300);saveJSON("ruchi_practical_files",practicalFiles);
+ ["pfTitle","pfSubject","pfDate","pfNotes"].forEach(id=>document.getElementById(id).value="");document.getElementById("pfStatus").value="Not started";renderPracticalFiles();
+}
+function updatePracticalStatus(id,value){const x=practicalFiles.find(v=>v.id===id);if(!x)return;x.status=value;saveJSON("ruchi_practical_files",practicalFiles);renderPracticalFiles()}
+function removePracticalFile(id){if(!confirm("Remove this practical record?"))return;practicalFiles=practicalFiles.filter(x=>x.id!==id);saveJSON("ruchi_practical_files",practicalFiles);renderPracticalFiles()}
+function renderPracticalFiles(){
+ const el=document.getElementById("practicalFileList");if(!el)return;
+ el.innerHTML=practicalFiles.map(x=>'<div class="item"><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p>'+(x.notes?'<p>'+escapeHTML(x.notes)+'</p>':'')+'<label>Status</label><select onchange="updatePracticalStatus('+x.id+',this.value)"><option '+(x.status==="Not started"?"selected":"")+' value="Not started">Not started</option><option '+(x.status==="In progress"?"selected":"")+' value="In progress">In progress</option><option '+(x.status==="Completed"?"selected":"")+' value="Completed">Completed</option></select> <button class="danger" onclick="removePracticalFile('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No practical records saved yet.</p>';
+}
+function addPracticePaper(){
+ const title=document.getElementById("paperTitle").value.trim(),subject=document.getElementById("paperSubject").value.trim(),year=document.getElementById("paperYear").value.trim(),raw=document.getElementById("paperLink").value.trim(),status=document.getElementById("paperStatus").value;
+ if(!title||!subject){alert("Enter a paper title and subject.");return}
+ let link="";if(raw){try{const u=new URL(raw);if(!["http:","https:"].includes(u.protocol))throw new Error();link=u.href}catch(e){alert("Enter a valid http or https link.");return}}
+ practicePapers.unshift({id:Date.now(),title,subject,year,link,status});practicePapers=practicePapers.slice(0,300);saveJSON("ruchi_practice_papers",practicePapers);
+ ["paperTitle","paperSubject","paperYear","paperLink"].forEach(id=>document.getElementById(id).value="");document.getElementById("paperStatus").value="Not attempted";renderPracticePapers();
+}
+function updatePaperStatus(id,value){const x=practicePapers.find(v=>v.id===id);if(!x)return;x.status=value;saveJSON("ruchi_practice_papers",practicePapers);renderPracticePapers()}
+function removePracticePaper(id){practicePapers=practicePapers.filter(x=>x.id!==id);saveJSON("ruchi_practice_papers",practicePapers);renderPracticePapers()}
+function renderPracticePapers(){
+ const el=document.getElementById("practicePaperList");if(!el)return;
+ el.innerHTML=practicePapers.map(x=>'<div class="item"><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.year||"Year not set")+'</p>'+(x.link?'<p><a href="'+escapeHTML(x.link)+'" target="_blank" rel="noopener noreferrer">Open saved paper ↗</a></p>':'')+'<label>Status</label><select onchange="updatePaperStatus('+x.id+',this.value)"><option '+(x.status==="Not attempted"?"selected":"")+'>Not attempted</option><option '+(x.status==="Attempted"?"selected":"")+'>Attempted</option><option '+(x.status==="Reviewed"?"selected":"")+'>Reviewed</option></select> <button class="danger" onclick="removePracticePaper('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No papers saved yet.</p>';
+}
+
 function startReadAloud(){
  const text=document.getElementById("readAloudText")?.value.trim(),status=document.getElementById("readAloudStatus");
  if(!text){if(status)status.textContent="Paste some study text first.";return}
@@ -1697,7 +1742,7 @@ function renderStudyStreak(){
  el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
 }
 function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
