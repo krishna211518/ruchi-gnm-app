@@ -740,6 +740,21 @@ infection-control policies and supervisor's instructions during actual patient c
   <p class="tool-muted">Calculated only from the study sessions you record in Daily Study Log. No sessions are invented.</p>
   <div id="studyStreakSummary" class="tool-list"></div>
  </div>
+
+ <div class="card">
+  <h3>📝 Wrong Answer Notebook</h3>
+  <p class="tool-muted">MCQ mein galat hue questions yahan revise karo. Questions ko review list se hata sakte ho; original question bank safe rahega.</p>
+  <input id="wrongNotebookSearch" type="search" placeholder="Search wrong questions..." oninput="renderWrongNotebook()" style="width:100%">
+  <div id="wrongNotebookSummary" class="tool-muted" style="margin:8px 0"></div>
+  <div id="wrongNotebookList" class="tool-list"></div>
+ </div>
+ <div class="card">
+  <h3>🔖 Study Resource Bookmarks</h3>
+  <p class="tool-muted">Apne trusted class notes, college resources aur study websites ke links save karo. Sirf http/https links accept honge.</p>
+  <div class="tool-form"><input id="resourceTitle" placeholder="Resource title"><input id="resourceSubject" placeholder="Subject"><input id="resourceUrl" class="full" type="url" placeholder="https://example.com"><button class="full" type="button" onclick="addStudyResource()">＋ Save resource</button></div>
+  <input id="resourceSearch" type="search" placeholder="Search saved resources..." oninput="renderStudyResources()" style="width:100%;margin-top:10px">
+  <div id="studyResourceList" class="tool-list" style="margin-top:10px"></div>
+ </div>
 </div>
 </section>
 
@@ -903,7 +918,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -913,7 +928,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -932,7 +947,7 @@ let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
 let focusSessions=loadJSON("ruchi_focus_sessions",[]);
-let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);\nlet vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);
+let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]),syllabusTopics=loadJSON("ruchi_syllabus_topics",[]),examDates=loadJSON("ruchi_exam_dates",[]),answerDrafts=loadJSON("ruchi_answer_drafts",[]),studyLogs=loadJSON("ruchi_study_logs",[]),revisionQueue=loadJSON("ruchi_revision_queue",[]),projects=loadJSON("ruchi_projects",[]),postingLogs=loadJSON("ruchi_posting_logs",[]),caseStudies=loadJSON("ruchi_case_studies",[]),weeklyGoals=loadJSON("ruchi_weekly_goals",[]);\nlet vaultNotes=loadJSON("ruchi_vault_notes",[]),weakTopics=loadJSON("ruchi_weak_topics",[]);\nlet studyResources=loadJSON("ruchi_study_resources",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1565,7 +1580,30 @@ function startQuickQuiz(){quickQuizIndex=(quickQuizIndex+1)%quickQuiz.length;doc
 function revealQuickQuiz(){const a=document.getElementById("quickQuizAnswer");if(quickQuizIndex<0){a.style.display="block";a.textContent="Tap Start to begin.";return}a.style.display="block";a.innerHTML='<b>Explanation</b><p>'+escapeHTML(quickQuiz[quickQuizIndex][1])+'</p>'}
 
 
-function saveVaultNote(){
+
+function renderWrongNotebook(){
+ const el=document.getElementById("wrongNotebookList"),sum=document.getElementById("wrongNotebookSummary");if(!el||!sum)return;
+ const q=(document.getElementById("wrongNotebookSearch")?.value||"").trim().toLowerCase();
+ const rows=wrong.filter(x=>String(x.q||"").toLowerCase().includes(q));
+ sum.textContent=wrong.length+" question(s) saved for revision";
+ el.innerHTML=rows.map((x,i)=>'<div class="tool-row"><div><b>'+escapeHTML(x.q||"Question")+'</b><p><strong>Correct answer:</strong> '+escapeHTML(x.correct||"Not available")+'</p><p>'+escapeHTML(x.explain||"Review this concept in your study material.")+'</p></div><button class="secondary" onclick="removeWrongNotebookItem('+wrong.indexOf(x)+')">Remove</button></div>').join("")||'<p class="tool-muted">No matching wrong answers yet. Try MCQ practice to build this notebook.</p>';
+}
+function removeWrongNotebookItem(index){if(index<0||index>=wrong.length)return;wrong.splice(index,1);saveJSON("ruchi_wrong",wrong);renderWrongNotebook()}
+function addStudyResource(){
+ const title=document.getElementById("resourceTitle").value.trim(),subject=document.getElementById("resourceSubject").value.trim(),raw=document.getElementById("resourceUrl").value.trim();
+ if(!title||!raw){alert("Enter a resource title and website link.");return}
+ let url;try{url=new URL(raw)}catch(e){alert("Enter a valid full website link beginning with https:// or http://");return}
+ if(!["https:","http:"].includes(url.protocol)){alert("Only http and https website links are allowed.");return}
+ studyResources.unshift({id:Date.now(),title,subject,url:url.href,added:localDateKey()});studyResources=studyResources.slice(0,300);saveJSON("ruchi_study_resources",studyResources);
+ ["resourceTitle","resourceSubject","resourceUrl"].forEach(id=>document.getElementById(id).value="");renderStudyResources();
+}
+function renderStudyResources(){
+ const el=document.getElementById("studyResourceList");if(!el)return;const q=(document.getElementById("resourceSearch")?.value||"").trim().toLowerCase();
+ const rows=studyResources.filter(x=>[x.title,x.subject,x.url].join(" ").toLowerCase().includes(q));
+ el.innerHTML=rows.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.added)+'</p><p><a href="'+escapeHTML(x.url)+'" target="_blank" rel="noopener noreferrer">Open saved resource ↗</a></p></div><button class="secondary" onclick="deleteStudyResource('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No saved resources yet.</p>';
+}
+function deleteStudyResource(id){studyResources=studyResources.filter(x=>x.id!==id);saveJSON("ruchi_study_resources",studyResources);renderStudyResources()}
+\nfunction saveVaultNote(){
  const title=document.getElementById("vaultTitle").value.trim(),subject=document.getElementById("vaultSubject").value.trim(),tags=document.getElementById("vaultTags").value.split(",").map(x=>x.trim()).filter(Boolean),body=document.getElementById("vaultBody").value.trim();
  if(!title||!body){alert("Enter a note title and note content.");return}
  vaultNotes.unshift({id:Date.now(),title,subject,tags,body,date:localDateKey()});vaultNotes=vaultNotes.slice(0,300);saveJSON("ruchi_vault_notes",vaultNotes);
@@ -1601,7 +1639,7 @@ function renderStudyStreak(){
  el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
 }
 \nfunction renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
