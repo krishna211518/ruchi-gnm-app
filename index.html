@@ -691,6 +691,16 @@ infection-control policies and supervisor's instructions during actual patient c
   <div id="attendanceList" class="tool-list" style="margin-top:8px"></div>
  </div>
  <div class="card">
+  <h3>🩺 Practical Skills Checklist</h3>
+  <p class="tool-muted">Learning checklist only. Perform clinical skills only with instructor approval and supervision.</p>
+  <div id="practicalChecklist" class="tool-list"></div>
+ </div>
+ <div class="card">
+  <h3>📔 Clinical Learning Diary</h3>
+  <div class="tool-form"><input id="diaryDate" type="date" aria-label="Learning date"><input id="diaryTopic" placeholder="Skill / topic learned"><textarea id="diaryReflection" class="full" rows="3" placeholder="What did you learn? Do not include patient-identifying details."></textarea><button class="full" type="button" onclick="saveClinicalDiary()">Save learning note</button></div>
+  <div id="clinicalDiaryList" class="tool-list" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
   <h3>🔎 Medical Dictionary & Abbreviations</h3>
   <input id="medicalSearch" type="search" placeholder="Search term or abbreviation..." oninput="searchMedicalReference()" style="width:100%">
   <div id="medicalResults" style="margin-top:10px"></div>
@@ -869,7 +879,7 @@ async function restoreBackup(file){
  if(!file)return;
  try{const backup=JSON.parse(await file.text());if(backup.format!=="ruchi-gnm-backup-v1"||!backup.data)throw new Error("Invalid file");
   if(!confirm("Restore this backup? Matching study data on this device will be replaced."))return;
-  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance"]);
+  const allowed=new Set(["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done"]);
   Object.entries(backup.data).forEach(([key,value])=>{if(allowed.has(key))saveJSON(key,value)});location.reload();
  }catch(e){alert("That backup file could not be read.")}
 }
@@ -888,7 +898,7 @@ let bookmarkedChapters=loadJSON("ruchi_bookmarks",[]);
 let examTimer=null,secondsLeft=0;
 let focusTimer=null,focusDuration=25*60,focusSecondsLeft=25*60,focusRunning=false;
 let focusSessions=loadJSON("ruchi_focus_sessions",[]);
-let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]);
+let studentTasks=loadJSON("ruchi_student_tasks",[]),timetableEntries=loadJSON("ruchi_timetable",[]),attendanceEntries=loadJSON("ruchi_attendance",[]),clinicalDiary=loadJSON("ruchi_clinical_diary",[]),practicalDone=loadJSON("ruchi_practical_done",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
@@ -1398,8 +1408,32 @@ const medicalReference=[
  ["Bradycardia","Bradycardia","A slower-than-expected heart rate; interpretation depends on age and context."],
  ["Anemia","Anaemia / Anemia","A condition involving reduced haemoglobin or healthy red blood cells."]
 ];
+
+const practicalSkills=["Hand hygiene principles","Personal protective equipment (PPE) awareness","Medical hand washing steps (college checklist)","Bed making principles","Patient identification and privacy principles","Vital signs equipment identification","Temperature measurement learning","Pulse and respiratory rate assessment learning","Blood pressure equipment and supervised practice","Safe patient communication","Biomedical waste segregation awareness","Basic nursing documentation principles"];
+function renderPracticalChecklist(){
+ const el=document.getElementById("practicalChecklist");if(!el)return;
+ el.innerHTML=practicalSkills.map((x,i)=>'<label class="tool-row" style="align-items:center"><span><input type="checkbox" '+(practicalDone.includes(i)?"checked":"")+' onchange="togglePracticalSkill('+i+',this.checked)"> '+escapeHTML(x)+'</span></label>').join("")+'<p class="tool-muted">'+practicalDone.length+' of '+practicalSkills.length+' learning items reviewed</p>';
+}
+function togglePracticalSkill(i,checked){
+ practicalDone=checked?[...new Set(practicalDone.concat(i))]:practicalDone.filter(x=>x!==i);
+ saveJSON("ruchi_practical_done",practicalDone);renderPracticalChecklist();
+}
+function saveClinicalDiary(){
+ const date=document.getElementById("diaryDate").value||localDateKey(),topic=document.getElementById("diaryTopic").value.trim(),reflection=document.getElementById("diaryReflection").value.trim();
+ if(!topic||!reflection){alert("Please add the topic and your learning reflection.");return}
+ if(/patient name|phone number|address|hospital number|mrn/i.test(reflection)){alert("Please remove patient-identifying details before saving.");return}
+ clinicalDiary.unshift({id:Date.now(),date,topic,reflection});clinicalDiary=clinicalDiary.slice(0,100);
+ saveJSON("ruchi_clinical_diary",clinicalDiary);document.getElementById("diaryTopic").value="";document.getElementById("diaryReflection").value="";renderClinicalDiary();
+}
+function renderClinicalDiary(){
+ const el=document.getElementById("clinicalDiaryList");if(!el)return;
+ el.innerHTML=clinicalDiary.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.date)+'</p><p>'+escapeHTML(x.reflection)+'</p></div><button class="secondary" onclick="deleteClinicalDiary('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No learning reflections saved yet.</p>';
+}
+function deleteClinicalDiary(id){clinicalDiary=clinicalDiary.filter(x=>x.id!==id);saveJSON("ruchi_clinical_diary",clinicalDiary);renderClinicalDiary()}
+
 function renderStudentToolkit(){
- renderStudentTasks();renderTimetable();renderAttendance();searchMedicalReference();
+ renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();searchMedicalReference();
+ const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
 function addStudentTask(){
