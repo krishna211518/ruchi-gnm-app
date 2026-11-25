@@ -472,7 +472,7 @@ hr{border-color:rgba(153,190,226,.2)!important}
 .ruchi-chat-composer{display:flex;align-items:flex-end;gap:9px;padding:13px 15px;border-top:1px solid var(--line);background:var(--white)}.ruchi-chat-composer textarea{flex:1;min-height:45px;max-height:130px;resize:vertical;margin:0;border-radius:16px;padding:12px 14px}.ruchi-chat-composer button{width:47px;height:45px;padding:0;border-radius:15px;font-size:20px;flex:0 0 47px}.ruchi-ai-footnote{text-align:center;color:var(--muted);font-size:10px;padding:0 16px 13px;margin:0}.ruchi-extra-tools{max-width:900px;margin:14px auto}.ruchi-extra-tools summary{cursor:pointer;font-weight:750;color:var(--navy)}
 .dark .ruchi-ai-shell,.dark .ruchi-extra-tools{background:var(--white);border-color:var(--line)}.dark .ruchi-chat-bubble{background:#20354b;color:var(--text)}.dark .ruchi-welcome-icon,.dark .ruchi-chat-avatar{background:#20354b}.dark .ruchi-welcome h3,.dark .ruchi-extra-tools summary{color:#d7eaff}
 @media(max-width:600px){.ruchi-ai-shell{min-height:70vh;border-radius:17px;margin:0 -2px}.ruchi-ai-top{padding:14px 12px;gap:9px}.ruchi-ai-avatar{width:40px;height:40px;flex-basis:40px}.ruchi-ai-top h2{font-size:18px}.ruchi-ai-top p{font-size:10px}.ruchi-new-chat{font-size:11px;padding:9px 10px}.ruchi-chat-messages{padding:14px 11px;min-height:360px;max-height:57vh}.ruchi-chat-bubble{max-width:88%;font-size:13px}.ruchi-chat-composer{padding:10px}.ruchi-chat-composer textarea{font-size:14px}.ruchi-suggestions button{font-size:11px;padding:9px}}
-</style>
+\n.ruchi-source-list{margin:8px 0 4px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--light);font-size:12px;display:grid;gap:6px}.ruchi-source-list a{color:var(--blue);overflow-wrap:anywhere;text-decoration:underline}.dark .ruchi-source-list{background:#20364f;border-color:#3a4e67}.dark .ruchi-source-list a{color:#a9d1ff}\n</style>
 </head>
 <body>
 <div class="app">
@@ -2908,14 +2908,18 @@ function loadRuchiChatMessages(){
  try{const saved=JSON.parse(localStorage.getItem("ruchi_ai_chat_history")||"[]");ruchiChatMessages=Array.isArray(saved)?saved.filter(x=>x&&x.role&&x.content).slice(0,80):[]}catch(e){ruchiChatMessages=[]}
 }
 function persistRuchiChatMessages(){try{localStorage.setItem("ruchi_ai_chat_history",JSON.stringify(ruchiChatMessages.slice(-80)))}catch(e){}}
-function addRuchiChatMessage(role,content){
- ruchiChatMessages.push({role,content:String(content||"").slice(0,8000),time:new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})});
- ruchiChatMessages=ruchiChatMessages.slice(-80);persistRuchiChatMessages();renderRuchiChatMessages();
+function addRuchiChatMessage(role,content,meta={}){
+ const entry={role,content:String(content||"").slice(0,8000),time:new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})};
+ if(role==="assistant"&&Array.isArray(meta.sources))entry.sources=meta.sources.filter(x=>x&&typeof x.title==="string"&&typeof x.url==="string"&&/^https:\/\//i.test(x.url)).slice(0,5);
+ ruchiChatMessages.push(entry);ruchiChatMessages=ruchiChatMessages.slice(-80);persistRuchiChatMessages();renderRuchiChatMessages();
 }
 function renderRuchiChatMessages(){
  const out=document.getElementById("ruchiAssistantResults");if(!out)return;
  if(!ruchiChatMessages.length){out.innerHTML='<div class="ruchi-welcome"><div class="ruchi-welcome-icon">✦</div><h3>Hi! I’m RUCHI AI</h3><p>Ask a question, get a simple explanation, or revise a topic step by step.</p><div class="ruchi-suggestions"><button class="secondary" onclick="useRuchiPrompt(\'Explain the human heart in simple words\')">❤️ Explain the human heart</button><button class="secondary" onclick="useRuchiPrompt(\'Give me 5 revision points on hand hygiene\')">📘 Revision points</button></div></div>';return}
- out.innerHTML=ruchiChatMessages.map(m=>'<div class="ruchi-chat-row '+(m.role==="user"?"user":"assistant")+'">'+(m.role==="assistant"?'<div class="ruchi-chat-avatar">🤖</div>':'')+'<div><div class="ruchi-chat-bubble">'+escapeHTML(m.content)+'</div><div class="ruchi-chat-meta">'+(m.role==="user"?"You":"RUCHI AI")+' · '+escapeHTML(m.time||"")+'</div></div></div>').join("");
+ out.innerHTML=ruchiChatMessages.map(m=>{
+  const sources=Array.isArray(m.sources)&&m.sources.length?'<div class="ruchi-source-list"><strong>📚 Sources</strong>'+m.sources.map(x=>'<a href="'+escapeHTML(x.url)+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(x.title)+'</a>').join("")+'</div>':'';
+  return '<div class="ruchi-chat-row '+(m.role==="user"?"user":"assistant")+'">'+(m.role==="assistant"?'<div class="ruchi-chat-avatar">🤖</div>':'')+'<div><div class="ruchi-chat-bubble">'+escapeHTML(m.content).replace(/\n/g,"<br>")+'</div>'+sources+'<div class="ruchi-chat-meta">'+(m.role==="user"?"You":"RUCHI AI")+' · '+escapeHTML(m.time||"")+'</div></div></div>';
+ }).join("");
  out.scrollTop=out.scrollHeight;
 }
 function handleRuchiChatKey(event){if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();askRuchiAssistant()}}
@@ -2933,10 +2937,12 @@ async function askRuchiAssistant(){
  input.value="";addRuchiChatMessage("user",question);status.textContent="RUCHI is thinking…";if(send)send.disabled=true;
  try{
   if(RUCHI_AI_API_URL){
-   const response=await fetch(RUCHI_AI_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:question,history:ruchiChatMessages.slice(-13,-1).map(x=>({role:x.role,content:x.content}))})});
+   const studyMatches=getRuchiLocalAnswer(question).slice(0,5);
+   const studyContext=studyMatches.map(x=>({title:x.title,subject:x.group,detail:String(x.detail||"").slice(0,900)}));
+   const response=await fetch(RUCHI_AI_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:question,history:ruchiChatMessages.slice(-13,-1).map(x=>({role:x.role,content:x.content})),studyContext})});
    if(!response.ok)throw new Error("AI service unavailable");
    const data=await response.json();if(!data||typeof data.reply!=="string"||!data.reply.trim())throw new Error("No answer received");
-   addRuchiChatMessage("assistant",data.reply.trim());status.textContent=data.sources&&data.sources.length?"Answered with references.":"Answered by RUCHI AI. Web research is not enabled yet.";
+   addRuchiChatMessage("assistant",data.reply.trim(),{sources:data.sources||[]});status.textContent=data.webResearch?"Answered with PubMed research references.":"Answered by RUCHI AI. No research sources were needed or retrieved.";
   }else{
    const matches=getRuchiLocalAnswer(question);
    if(matches.length){
