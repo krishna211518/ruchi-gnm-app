@@ -687,6 +687,7 @@ infection-control policies and supervisor's instructions during actual patient c
  <div class="card"><h3>📘 Syllabus & Topic Tracker</h3><p class="tool-muted">Add topics from your college syllabus and mark them as studied or revised.</p><div class="tool-form"><input id="syllabusSubject" placeholder="Subject name"><input id="syllabusTopic" placeholder="Chapter / topic"><button class="full" type="button" onclick="addSyllabusTopic()">＋ Add topic</button></div><div id="syllabusSummary" style="margin-top:10px"></div><div id="syllabusList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>⏳ Exam Countdown</h3><div class="tool-form"><input id="examName" placeholder="Exam name"><input id="examDate" type="date"><button class="full" type="button" onclick="saveExamDate()">Save exam date</button></div><div id="examCountdownList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>🧮 Marks & Percentage Calculator</h3><div class="tool-form"><input id="marksObtained" type="number" min="0" step="any" placeholder="Marks obtained"><input id="marksTotal" type="number" min="0.01" step="any" placeholder="Total marks"><button class="full" type="button" onclick="calculateMarks()">Calculate percentage</button></div><div id="marksResult" class="dictionary-result" aria-live="polite">Enter marks to calculate.</div></div>
+ <div class="card"><h3>📐 Academic Unit Converter & Formula Desk</h3><p class="tool-muted">Common school-level conversions and science formulas. Results are for study practice, not clinical calculations.</p><div class="tool-form"><select id="academicUnitType" onchange="updateAcademicUnits()"><option value="length">Length</option><option value="mass">Mass</option><option value="volume">Volume</option><option value="time">Time</option><option value="temperature">Temperature</option><option value="data">Digital storage</option></select><input id="academicUnitValue" type="number" step="any" placeholder="Enter value"><select id="academicUnitFrom"></select><select id="academicUnitTo"></select><button class="full" type="button" onclick="convertAcademicUnit()">Convert</button></div><div id="academicUnitResult" class="dictionary-result" aria-live="polite">Choose units and enter a value.</div><details style="margin-top:12px"><summary><b>Useful science formulas</b></summary><div class="dictionary-result"><b>Speed</b> = Distance ÷ Time<br><b>Density</b> = Mass ÷ Volume<br><b>Force</b> = Mass × Acceleration<br><b>Work</b> = Force × Distance<br><b>Power</b> = Work ÷ Time<br><b>Area of rectangle</b> = Length × Breadth<br><b>Area of triangle</b> = ½ × Base × Height</div></details></div>
  <div class="card"><h3>📖 Answer Writing Practice</h3><div class="tool-form"><input id="answerSubject" placeholder="Subject"><input id="answerQuestion" placeholder="Question / topic"><textarea id="answerDraft" class="full" rows="4" placeholder="Write your answer here..."></textarea><button class="full" type="button" onclick="saveAnswerDraft()">Save answer draft</button></div><div id="answerDraftList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>⏱️ Daily Study Log</h3><div class="tool-form"><input id="studyLogSubject" placeholder="Subject / topic"><input id="studyLogMinutes" type="number" min="1" max="1440" placeholder="Minutes studied"><button class="full" type="button" onclick="addStudyLog()">＋ Log study time</button></div><div id="studyLogSummary" style="margin-top:10px"></div><div id="studyLogList" class="tool-list" style="margin-top:10px"></div></div>
  <div class="card"><h3>🔁 Personal Revision Queue</h3><p class="tool-muted">Save topics you want to revisit. Mark them revised when done.</p><div class="tool-form"><input id="revisionTopic" class="full" placeholder="Topic to revise"><button class="full" type="button" onclick="addRevisionTopic()">＋ Add to revision</button></div><div id="revisionQueueList" class="tool-list" style="margin-top:10px"></div></div>
@@ -1904,8 +1905,38 @@ function renderQuickReferences(){
  out.innerHTML=rows.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x.topic)+'</strong><p class="tool-muted">'+escapeHTML(x.subject)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join("")||'<p class="tool-muted">No matching study card. Try another keyword or subject.</p>';
 }
 
+const academicUnits={
+ length:[["mm","Millimetre",0.001],["cm","Centimetre",0.01],["m","Metre",1],["km","Kilometre",1000]],
+ mass:[["mg","Milligram",0.001],["g","Gram",1],["kg","Kilogram",1000]],
+ volume:[["mL","Millilitre",1],["L","Litre",1000]],
+ time:[["sec","Second",1],["min","Minute",60],["hr","Hour",3600],["day","Day",86400]],
+ data:[["B","Byte",1],["KB","Kilobyte",1024],["MB","Megabyte",1048576],["GB","Gigabyte",1073741824]],
+ temperature:[["C","Celsius"],["F","Fahrenheit"],["K","Kelvin"]]
+};
+function updateAcademicUnits(){
+ const type=document.getElementById("academicUnitType")?.value||"length",from=document.getElementById("academicUnitFrom"),to=document.getElementById("academicUnitTo");if(!from||!to)return;
+ const units=academicUnits[type]||academicUnits.length;
+ const options=units.map(x=>'<option value="'+x[0]+'">'+x[1]+' ('+x[0]+')</option>').join("");
+ from.innerHTML=options;to.innerHTML=options;
+ if(type==="length")to.value="cm";else if(type==="mass")to.value="g";else if(type==="volume")to.value="L";else if(type==="time")to.value="min";else if(type==="data")to.value="MB";else to.value="F";
+ const result=document.getElementById("academicUnitResult");if(result)result.textContent="Enter a value and tap Convert.";
+}
+function convertAcademicUnit(){
+ const type=document.getElementById("academicUnitType")?.value||"length",raw=document.getElementById("academicUnitValue")?.value,from=document.getElementById("academicUnitFrom")?.value,to=document.getElementById("academicUnitTo")?.value,out=document.getElementById("academicUnitResult");
+ if(!out)return;const value=Number(raw);if(raw===""||!Number.isFinite(value)){out.textContent="Please enter a valid number.";return}
+ let answer;
+ if(type==="temperature"){
+  let c=from==="C"?value:from==="F"?(value-32)*5/9:value-273.15;
+  answer=to==="C"?c:to==="F"?c*9/5+32:c+273.15;
+ }else{
+  const units=academicUnits[type],a=units.find(x=>x[0]===from),b=units.find(x=>x[0]===to);
+  if(!a||!b)return;answer=value*a[2]/b[2];
+ }
+ const pretty=Number(answer.toPrecision(8));
+ out.textContent=value+" "+from+" = "+pretty+" "+to;
+}
 function renderStudentToolkit(){
- renderPersonalStudyDashboard();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
+ renderPersonalStudyDashboard();updateAcademicUnits();renderQuickReferences();renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();renderSpacedRevisions();renderPracticalFiles();renderPracticePapers();renderExamScores();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
 }
