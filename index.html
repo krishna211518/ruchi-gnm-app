@@ -732,6 +732,36 @@ infection-control policies and supervisor's instructions during actual patient c
   <button onclick="saveLectureLog()">Save class log</button>
   <div id="lectureLogList" class="tool-list" style="margin-top:12px"></div>
  </div>
+ <div class="card">
+  <h3>📖 My Nursing Glossary</h3>
+  <p class="tool-muted">Apne course ke important terms aur unki easy definitions save karo.</p>
+  <label for="glossaryTerm">Medical / Nursing term</label><input id="glossaryTerm" placeholder="e.g. Homeostasis" style="width:100%">
+  <label for="glossarySubject">Subject</label><input id="glossarySubject" placeholder="e.g. Anatomy & Physiology" style="width:100%">
+  <label for="glossaryMeaning">Meaning in your own words</label><textarea id="glossaryMeaning" rows="3" placeholder="Simple explanation..." style="width:100%"></textarea>
+  <button onclick="savePersonalGlossary()">Save term</button>
+  <input id="glossarySearch" type="search" placeholder="Search your glossary..." oninput="renderPersonalGlossary()" style="width:100%;margin-top:12px">
+  <div id="personalGlossaryList" class="tool-list"></div>
+ </div>
+ <div class="card">
+  <h3>🧩 Diagram Label Practice</h3>
+  <p class="tool-muted">Anatomy diagrams ke labels ko pehle khud yaad karo, phir answers reveal karke check karo. Diagram image yahan upload nahi hoti; yeh label-revision list hai.</p>
+  <label for="diagramPracticeName">Diagram / Topic</label><input id="diagramPracticeName" placeholder="e.g. Human heart" style="width:100%">
+  <label for="diagramPracticeSubject">Subject</label><input id="diagramPracticeSubject" placeholder="e.g. Anatomy & Physiology" style="width:100%">
+  <label for="diagramPracticeLabels">Important labels (one per line)</label><textarea id="diagramPracticeLabels" rows="5" placeholder="Right atrium&#10;Left atrium&#10;Right ventricle&#10;Left ventricle" style="width:100%"></textarea>
+  <button onclick="saveDiagramPractice()">Save label set</button>
+  <div id="diagramPracticeList" class="tool-list" style="margin-top:12px"></div>
+ </div>
+ <div class="card">
+  <h3>🎯 Daily Learning Exit Ticket</h3>
+  <p class="tool-muted">Study session ke end mein 1-minute reflection: aaj kya samjha, kya unclear hai aur next step kya hoga.</p>
+  <label for="exitTicketSubject">Subject</label><input id="exitTicketSubject" placeholder="e.g. Microbiology" style="width:100%">
+  <label for="exitTicketTopic">Topic studied</label><input id="exitTicketTopic" placeholder="e.g. Bacteria" style="width:100%">
+  <label for="exitTicketLearned">One thing I learned</label><textarea id="exitTicketLearned" rows="2" placeholder="Aaj maine kya seekha..." style="width:100%"></textarea>
+  <label for="exitTicketDoubt">One doubt / unclear point</label><textarea id="exitTicketDoubt" rows="2" placeholder="Kya abhi clear nahi hai?" style="width:100%"></textarea>
+  <label for="exitTicketNext">My next study step</label><input id="exitTicketNext" placeholder="e.g. Revise the diagram" style="width:100%">
+  <button onclick="saveLearningExitTicket()">Save reflection</button>
+  <div id="learningExitTicketList" class="tool-list" style="margin-top:12px"></div>
+ </div>
  <div class="card"><h3>🫀 Anatomy & Body Systems Explorer</h3><p class="tool-muted">Select a body system for a short study overview. Educational reference only.</p><select id="bodySystemSelect" onchange="showBodySystem()" style="width:100%"><option value="">Choose a body system</option></select><div id="bodySystemDetail" class="dictionary-result" style="margin-top:10px">Choose a system to explore its main organs and functions.</div></div>
  <div class="card"><h3>🩺 Nursing Instruments Library</h3><input id="instrumentSearch" type="search" placeholder="Search instruments..." oninput="renderInstrumentLibrary()" style="width:100%"><div id="instrumentResults" style="margin-top:10px"></div><p class="tool-muted">Identification and study notes only. Actual use requires instructor training and local protocols.</p></div>
  <div class="card"><h3>🌡️ Vital Signs Learning Centre</h3><input id="vitalSearch" type="search" placeholder="Search vital sign..." oninput="renderVitalLearning()" style="width:100%"><div id="vitalResults" style="margin-top:10px"></div><p class="tool-muted">Interpretation depends on age, condition and context. Follow college teaching and facility policy; this is not a diagnostic tool.</p></div>
@@ -1038,7 +1068,7 @@ let topicDays=loadJSON("ruchi_topic_days",{});
 function localDateKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function setDailyGoal(value){dailyGoal=Math.max(1,Math.min(20,Math.round(Number(value)||3)));saveJSON("ruchi_daily_goal",dailyGoal);const label=document.getElementById("dailyProgressText");if(label)label.textContent="Daily target set to "+dailyGoal+" topics."}
 function downloadBackup(){
- const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs"];
+ const keys=["ruchi_extra_q","ruchi_custom_topics","ruchi_done","ruchi_notes","ruchi_attempts","ruchi_wrong","ruchi_books","ruchi_daily_goal","ruchi_theme","ruchi_last_lesson","ruchi_topic_days","ruchi_flashcard_known","ruchi_study_plan","ruchi_bookmarks","ruchi_student_tasks","ruchi_timetable","ruchi_attendance","ruchi_clinical_diary","ruchi_practical_done","ruchi_syllabus_topics","ruchi_exam_dates","ruchi_answer_drafts","ruchi_study_logs","ruchi_revision_queue","ruchi_projects","ruchi_posting_logs","ruchi_case_studies","ruchi_weekly_goals","ruchi_vault_notes","ruchi_weak_topics","ruchi_study_resources","ruchi_spaced_revisions","ruchi_practical_files","ruchi_practice_papers","ruchi_exam_scores","ruchi_answer_plans","ruchi_assignment_references","ruchi_concept_maps","ruchi_exam_readiness","ruchi_lecture_logs","ruchi_personal_glossary","ruchi_diagram_practice","ruchi_exit_tickets"];
  const data={format:"ruchi-gnm-backup-v1",createdAt:new Date().toISOString(),data:{}};
  keys.forEach(key=>{const value=loadJSON(key,null);if(value!==null)data.data[key]=value});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),link=document.createElement("a");
@@ -2247,6 +2277,50 @@ function renderLectureLogs(){
  el.innerHTML=lectureLearningLogs.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p>'+(x.learning?'<p>'+escapeHTML(x.learning)+'</p>':'')+(x.homework?'<p><b>Follow-up:</b> '+escapeHTML(x.homework)+'</p>':'')+'</div><button class="secondary" onclick="deleteLectureLog('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No class logs saved yet.</p>';
 }
 function deleteLectureLog(id){lectureLearningLogs=lectureLearningLogs.filter(x=>x.id!==id);saveJSON("ruchi_lecture_logs",lectureLearningLogs);renderLectureLogs()}
+
+
+let personalGlossary=loadJSON("ruchi_personal_glossary",[]);
+let diagramPracticeSets=loadJSON("ruchi_diagram_practice",[]);
+let learningExitTickets=loadJSON("ruchi_exit_tickets",[]);
+function savePersonalGlossary(){
+ const term=document.getElementById("glossaryTerm").value.trim(),subject=document.getElementById("glossarySubject").value.trim(),meaning=document.getElementById("glossaryMeaning").value.trim();
+ if(!term||!meaning){alert("Enter a term and its meaning.");return}
+ personalGlossary.unshift({id:Date.now(),term,subject,meaning,date:localDateKey()});personalGlossary=personalGlossary.slice(0,500);
+ if(!saveJSON("ruchi_personal_glossary",personalGlossary))return;
+ ["glossaryTerm","glossarySubject","glossaryMeaning"].forEach(id=>document.getElementById(id).value="");renderPersonalGlossary();
+}
+function renderPersonalGlossary(){
+ const el=document.getElementById("personalGlossaryList");if(!el)return;
+ const q=(document.getElementById("glossarySearch")?.value||"").trim().toLowerCase();
+ const rows=personalGlossary.filter(x=>[x.term,x.subject,x.meaning].join(" ").toLowerCase().includes(q));
+ el.innerHTML=rows.map(x=>'<details class="dictionary-result"><summary><b>'+escapeHTML(x.term)+'</b> <span class="tool-muted">· '+escapeHTML(x.subject||"General")+'</span></summary><p>'+escapeHTML(x.meaning)+'</p><p class="tool-muted">'+escapeHTML(x.date||"")+'</p><button class="secondary" onclick="deletePersonalGlossary('+x.id+')">Delete</button></details>').join("")||'<p class="tool-muted">No matching terms. Add your first glossary entry above.</p>';
+}
+function deletePersonalGlossary(id){personalGlossary=personalGlossary.filter(x=>x.id!==id);saveJSON("ruchi_personal_glossary",personalGlossary);renderPersonalGlossary()}
+function saveDiagramPractice(){
+ const name=document.getElementById("diagramPracticeName").value.trim(),subject=document.getElementById("diagramPracticeSubject").value.trim(),labels=document.getElementById("diagramPracticeLabels").value.split("\\n").map(x=>x.trim()).filter(Boolean);
+ if(!name||labels.length<2){alert("Enter a diagram name and at least two labels.");return}
+ diagramPracticeSets.unshift({id:Date.now(),name,subject,labels,mastered:false,date:localDateKey()});diagramPracticeSets=diagramPracticeSets.slice(0,250);
+ if(!saveJSON("ruchi_diagram_practice",diagramPracticeSets))return;
+ ["diagramPracticeName","diagramPracticeSubject","diagramPracticeLabels"].forEach(id=>document.getElementById(id).value="");renderDiagramPractice();
+}
+function toggleDiagramMastered(id,checked){const x=diagramPracticeSets.find(v=>v.id===id);if(!x)return;x.mastered=checked;saveJSON("ruchi_diagram_practice",diagramPracticeSets);renderDiagramPractice()}
+function deleteDiagramPractice(id){diagramPracticeSets=diagramPracticeSets.filter(x=>x.id!==id);saveJSON("ruchi_diagram_practice",diagramPracticeSets);renderDiagramPractice()}
+function renderDiagramPractice(){
+ const el=document.getElementById("diagramPracticeList");if(!el)return;
+ el.innerHTML=diagramPracticeSets.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.name)+'</b><p class="tool-muted">'+escapeHTML(x.subject||"General")+' · '+x.labels.length+' labels</p><details><summary>Reveal labels after self-practice</summary><ol>'+x.labels.map(v=>'<li>'+escapeHTML(v)+'</li>').join("")+'</ol></details><label><input type="checkbox" '+(x.mastered?'checked':'')+' onchange="toggleDiagramMastered('+x.id+',this.checked)"> I can recall these labels</label><button class="secondary" onclick="deleteDiagramPractice('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No diagram label sets saved yet.</p>';
+}
+function saveLearningExitTicket(){
+ const subject=document.getElementById("exitTicketSubject").value.trim(),topic=document.getElementById("exitTicketTopic").value.trim(),learned=document.getElementById("exitTicketLearned").value.trim(),doubt=document.getElementById("exitTicketDoubt").value.trim(),next=document.getElementById("exitTicketNext").value.trim();
+ if(!subject||!topic||!learned){alert("Enter subject, topic and at least one thing you learned.");return}
+ learningExitTickets.unshift({id:Date.now(),subject,topic,learned,doubt,next,date:localDateKey()});learningExitTickets=learningExitTickets.slice(0,300);
+ if(!saveJSON("ruchi_exit_tickets",learningExitTickets))return;
+ ["exitTicketSubject","exitTicketTopic","exitTicketLearned","exitTicketDoubt","exitTicketNext"].forEach(id=>document.getElementById(id).value="");renderLearningExitTickets();
+}
+function deleteLearningExitTicket(id){learningExitTickets=learningExitTickets.filter(x=>x.id!==id);saveJSON("ruchi_exit_tickets",learningExitTickets);renderLearningExitTickets()}
+function renderLearningExitTickets(){
+ const el=document.getElementById("learningExitTicketList");if(!el)return;
+ el.innerHTML=learningExitTickets.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.topic)+'</b><p>'+escapeHTML(x.subject)+' · '+escapeHTML(x.date)+'</p><p><b>Learned:</b> '+escapeHTML(x.learned)+'</p>'+(x.doubt?'<p><b>Still unclear:</b> '+escapeHTML(x.doubt)+'</p>':'')+(x.next?'<p><b>Next step:</b> '+escapeHTML(x.next)+'</p>':'')+'</div><button class="secondary" onclick="deleteLearningExitTicket('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No reflections saved yet.</p>';
+}
 
 </script>
 </body>
