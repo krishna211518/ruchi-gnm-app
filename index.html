@@ -457,6 +457,21 @@ hr{border-color:rgba(153,190,226,.2)!important}
 
 /* Student Toolkit */
 .tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.tool-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tool-form .full{grid-column:1/-1}.tool-list{display:grid;gap:8px}.tool-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel, var(--white))}.tool-row p{margin:4px 0 0;color:var(--muted);font-size:12px}.tool-row button{flex:none}.tool-muted{color:var(--muted);font-size:12px}.tool-stat{font-size:24px;font-weight:800;color:var(--blue)}.tool-table{width:100%;border-collapse:collapse;font-size:13px}.tool-table th,.tool-table td{padding:9px;border-bottom:1px solid var(--line);text-align:left}.tool-table th{color:var(--muted)}.tool-table select{min-width:95px}.dictionary-result{padding:12px;border:1px solid var(--line);border-radius:12px;margin-top:8px}.dictionary-result strong{color:var(--blue)}@media(max-width:650px){.tool-grid,.tool-form{grid-template-columns:1fr}.tool-form .full{grid-column:auto}.tool-row{flex-direction:column}.tool-row button{align-self:flex-start}}
+
+/* RUCHI AI chat interface */
+.ruchi-ai-shell{max-width:900px;margin:0 auto;background:var(--white);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 16px 42px rgba(18,54,91,.08);min-height:68vh;display:flex;flex-direction:column}
+.ruchi-ai-top{display:flex;align-items:center;gap:13px;padding:17px 20px;border-bottom:1px solid var(--line);background:linear-gradient(120deg,#102c4c,#164e83);color:#fff}
+.ruchi-ai-avatar{width:46px;height:46px;flex:0 0 46px;border-radius:15px;display:grid;place-items:center;background:#ffffff20;font-size:25px;border:1px solid #ffffff35}
+.ruchi-ai-top h2{margin:0;color:#fff;font-size:20px}.ruchi-ai-top p{margin:2px 0 0;color:#d9eaff;font-size:12px}
+.ruchi-new-chat{margin-left:auto;background:#ffffff20!important;color:#fff!important;border-color:#ffffff45!important;white-space:nowrap}
+.ruchi-ai-status{padding:8px 18px;color:var(--muted);font-size:11px;border-bottom:1px solid var(--line)}
+.ruchi-chat-messages{padding:20px;display:flex;flex-direction:column;gap:14px;flex:1;min-height:340px;max-height:58vh;overflow-y:auto;scroll-behavior:smooth}
+.ruchi-welcome{text-align:center;max-width:470px;margin:auto;padding:20px 8px}.ruchi-welcome-icon{width:58px;height:58px;border-radius:20px;margin:0 auto 12px;display:grid;place-items:center;background:#eaf3ff;color:#1976d2;font-size:28px}.ruchi-welcome h3{font-size:21px;color:var(--navy)}.ruchi-welcome p{color:var(--muted);font-size:13px}
+.ruchi-suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:17px}.ruchi-suggestions button{font-size:12px}
+.ruchi-chat-row{display:flex;gap:9px;align-items:flex-start}.ruchi-chat-row.user{justify-content:flex-end}.ruchi-chat-avatar{width:30px;height:30px;flex:0 0 30px;border-radius:10px;display:grid;place-items:center;background:#eaf3ff;font-size:16px}.ruchi-chat-bubble{max-width:min(82%,680px);padding:12px 15px;border-radius:16px;background:#f1f5fa;color:var(--text);font-size:14px;overflow-wrap:anywhere;white-space:pre-wrap}.ruchi-chat-row.user .ruchi-chat-bubble{background:linear-gradient(120deg,#12365b,#1976d2);color:#fff;border-bottom-right-radius:5px}.ruchi-chat-row.assistant .ruchi-chat-bubble{border-bottom-left-radius:5px}.ruchi-chat-meta{font-size:10px;color:var(--muted);margin:3px 2px 0}
+.ruchi-chat-composer{display:flex;align-items:flex-end;gap:9px;padding:13px 15px;border-top:1px solid var(--line);background:var(--white)}.ruchi-chat-composer textarea{flex:1;min-height:45px;max-height:130px;resize:vertical;margin:0;border-radius:16px;padding:12px 14px}.ruchi-chat-composer button{width:47px;height:45px;padding:0;border-radius:15px;font-size:20px;flex:0 0 47px}.ruchi-ai-footnote{text-align:center;color:var(--muted);font-size:10px;padding:0 16px 13px;margin:0}.ruchi-extra-tools{max-width:900px;margin:14px auto}.ruchi-extra-tools summary{cursor:pointer;font-weight:750;color:var(--navy)}
+.dark .ruchi-ai-shell,.dark .ruchi-extra-tools{background:var(--white);border-color:var(--line)}.dark .ruchi-chat-bubble{background:#20354b;color:var(--text)}.dark .ruchi-welcome-icon,.dark .ruchi-chat-avatar{background:#20354b}.dark .ruchi-welcome h3,.dark .ruchi-extra-tools summary{color:#d7eaff}
+@media(max-width:600px){.ruchi-ai-shell{min-height:70vh;border-radius:17px;margin:0 -2px}.ruchi-ai-top{padding:14px 12px;gap:9px}.ruchi-ai-avatar{width:40px;height:40px;flex-basis:40px}.ruchi-ai-top h2{font-size:18px}.ruchi-ai-top p{font-size:10px}.ruchi-new-chat{font-size:11px;padding:9px 10px}.ruchi-chat-messages{padding:14px 11px;min-height:360px;max-height:57vh}.ruchi-chat-bubble{max-width:88%;font-size:13px}.ruchi-chat-composer{padding:10px}.ruchi-chat-composer textarea{font-size:14px}.ruchi-suggestions button{font-size:11px;padding:9px}}
 </style>
 </head>
 <body>
@@ -668,47 +683,36 @@ infection-control policies and supervisor's instructions during actual patient c
 </section>
 
 <section id="ai-hub" class="section">
- <h2>🤖 RUCHI AI Study Hub</h2>
- <p class="small">Your central place for AI-assisted study tools and learning support.</p>
- <div class="tool-grid">
- <div class="card" id="ruchiSmartAssistant">
-  <h3>🤖 RUCHI Smart Study Assistant</h3>
-  <p class="tool-muted">Apna nursing ya study topic poochho. Assistant app ki study library aur medical dictionary mein relevant content dhoondhega.</p>
-  <input id="ruchiAssistantQuestion" type="text" placeholder="Example: What is the function of the skeletal system?">
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px">
-   <button onclick="askRuchiAssistant()">Ask RUCHI</button>
-   <button class="secondary" onclick="searchRuchiAssistantWeb()">Search on web</button>
-   <button class="secondary" onclick="clearRuchiAssistant()">Clear</button>
+ <div class="ruchi-ai-shell">
+  <div class="ruchi-ai-top">
+   <div class="ruchi-ai-avatar">🤖</div>
+   <div><h2>RUCHI AI</h2><p>Your study companion · Nursing, school subjects & everyday questions</p></div>
+   <button class="secondary ruchi-new-chat" onclick="startNewRuchiChat()">＋ New chat</button>
   </div>
-  <div id="ruchiAssistantStatus" class="tool-muted" style="margin-top:10px" aria-live="polite">Ready — ask a question to search your saved study library.</div>
-  <div id="ruchiAssistantResults" class="tool-list" style="margin-top:10px"></div>
-  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
-   <button class="secondary" onclick="useRuchiPrompt('Explain the topic in simple words: ')">Simple explanation</button>
-   <button class="secondary" onclick="useRuchiPrompt('Give me revision points about: ')">Revision points</button>
-   <button class="secondary" onclick="useRuchiPrompt('Find study references for: ')">Find references</button>
+  <div id="ruchiAssistantStatus" class="ruchi-ai-status" aria-live="polite">Ready when you are. Ask me anything you’re studying.</div>
+  <div id="ruchiAssistantResults" class="ruchi-chat-messages" aria-live="polite">
+   <div class="ruchi-welcome"><div class="ruchi-welcome-icon">✦</div><h3>Hi! I’m RUCHI AI</h3><p>Ask a question, get a simple explanation, or revise a topic step by step.</p><div class="ruchi-suggestions"><button class="secondary" onclick="useRuchiPrompt('Explain the human heart in simple words')">❤️ Explain the human heart</button><button class="secondary" onclick="useRuchiPrompt('Give me 5 revision points on hand hygiene')">📘 Revision points</button><button class="secondary" onclick="useRuchiPrompt('Create a short quiz on the skeletal system')">🧠 Make a quick quiz</button></div></div>
   </div>
-  <div class="card" style="margin-top:12px">
-   <h4>🗂️ RUCHI Study Tools</h4>
-   <label for="ruchiNotesInput">Notes summarizer (offline)</label>
-   <textarea id="ruchiNotesInput" rows="4" placeholder="Paste your own notes here to extract key sentences..."></textarea>
-   <button onclick="summarizeRuchiNotes()">Create short revision summary</button>
-   <div id="ruchiNotesSummary" class="tool-list" style="margin-top:8px"></div>
-   <label for="ruchiFlashcardTopic" style="display:block;margin-top:12px">Flashcard maker from app library</label>
-   <input id="ruchiFlashcardTopic" placeholder="Enter a topic, e.g. skeletal system">
-   <button onclick="makeRuchiFlashcards()">Make revision flashcards</button>
-   <div id="ruchiFlashcardResults" class="tool-list" style="margin-top:8px"></div>
+  <div class="ruchi-chat-composer">
+   <textarea id="ruchiAssistantQuestion" rows="1" aria-label="Message RUCHI AI" placeholder="Message RUCHI AI..." onkeydown="handleRuchiChatKey(event)"></textarea>
+   <button id="ruchiSendButton" onclick="askRuchiAssistant()" aria-label="Send message">➤</button>
   </div>
-  <div class="card" style="margin-top:12px">
-   <h4>💬 Recent Study Chat</h4>
-   <p class="tool-muted">Recent questions and local study matches are saved only on this device.</p>
-   <button class="secondary" onclick="renderRuchiChatHistory()">Show chat history</button>
-   <button class="secondary" onclick="clearRuchiChatHistory()">Clear history</button>
-   <div id="ruchiChatHistory" class="tool-list" style="margin-top:8px"></div>
-  </div>
-  <p class="tool-muted" style="margin-top:10px"> Medical topics are for learning, not diagnosis or treatment. Verify important information with your textbook and teacher. Do not enter real patient details.</p>
+  <p class="ruchi-ai-footnote">RUCHI AI can make mistakes. For nursing and medical learning, verify important information with your textbook and teacher. Never enter real patient details.</p>
  </div>
-
- </div>
+ <details class="card ruchi-extra-tools">
+  <summary>🗂️ Study tools</summary>
+  <label for="ruchiNotesInput">Summarize your notes</label>
+  <textarea id="ruchiNotesInput" rows="4" placeholder="Paste your own notes here..."></textarea>
+  <button onclick="summarizeRuchiNotes()">Create revision summary</button>
+  <div id="ruchiNotesSummary" class="tool-list" style="margin-top:8px"></div>
+  <label for="ruchiFlashcardTopic" style="display:block;margin-top:12px">Find flashcards from study library</label>
+  <input id="ruchiFlashcardTopic" placeholder="Enter a topic">
+  <button onclick="makeRuchiFlashcards()">Find flashcards</button>
+  <div id="ruchiFlashcardResults" class="tool-list" style="margin-top:8px"></div>
+  <button class="secondary" onclick="renderRuchiChatHistory()">Show saved chats</button>
+  <button class="secondary" onclick="clearRuchiChatHistory()">Clear saved chats</button>
+  <div id="ruchiChatHistory" class="tool-list" style="margin-top:8px"></div>
+ </details>
 </section>
 
 <section id="tools" class="section">
@@ -2895,28 +2899,60 @@ function saveCommunicationRoleplay(){const scenario=document.getElementById("rol
 function deleteCommunicationRoleplay(id){communicationRoleplays=communicationRoleplays.filter(x=>x.id!==id);saveJSON("ruchi_communication_roleplays",communicationRoleplays);renderCommunicationRoleplays()}
 function renderCommunicationRoleplays(){const el=document.getElementById("communicationRoleplayList");if(!el)return;el.innerHTML=communicationRoleplays.map(x=>'<div class="dictionary-result"><b>'+escapeHTML(x.scenario)+'</b><p>'+escapeHTML(x.date)+(x.goal?' · '+escapeHTML(x.goal):'')+'</p><p><b>Opening:</b> '+escapeHTML(x.opening)+'</p>'+(x.listening?'<p><b>Listening / clarification:</b> '+escapeHTML(x.listening)+'</p>':'')+(x.reflection?'<p><b>Reflection:</b> '+escapeHTML(x.reflection)+'</p>':'')+'<button class="secondary" onclick="deleteCommunicationRoleplay('+x.id+')">Delete</button></div>').join("")||'<p class="tool-muted">No roleplay entries yet.</p>'}
 
-function askRuchiAssistant(){
- const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),out=document.getElementById("ruchiAssistantResults");
- if(!input||!status||!out)return;
- const query=input.value.trim().toLowerCase();
- if(!query){status.textContent="Pehle apna question type karo.";out.innerHTML="";return}
- const words=query.split(/[^a-z0-9]+/).filter(w=>w.length>2),matches=[];
- (Array.isArray(quickReferenceData)?quickReferenceData:[]).forEach(x=>{
-  const hay=(x.topic+" "+x.subject+" "+x.detail).toLowerCase(),score=words.reduce((n,w)=>n+(hay.includes(w)?1:0),0);
-  if(score)matches.push({score,title:x.topic,group:x.subject,detail:x.detail,kind:"Study reference"});
- });
- (Array.isArray(medicalReference)?medicalReference:[]).forEach(x=>{
-  const hay=x.join(" ").toLowerCase(),score=words.reduce((n,w)=>n+(hay.includes(w)?1:0),0);
-  if(score)matches.push({score,title:x[0]+" · "+x[1],group:x[3]||"Medical dictionary",detail:x[2],kind:"Dictionary"});
- });
- matches.sort((a,b)=>b.score-a.score);
- const best=matches.slice(0,6);
- if(!best.length){status.textContent="Is question ka direct match app ki offline study library mein nahi mila. Web search se extra information dekh sakte ho.";out.innerHTML='<p class="tool-muted">No local match found. Try a shorter topic name or use Search on web.</p>';return}
- status.textContent="App library mein "+matches.length+" relevant match mile. Best matches:";
- const historyText=best.map(x=>x.title+": "+x.detail).join("\n");saveRuchiChatEntry(input.value,historyText);
- out.innerHTML=best.map(x=>'<div class="dictionary-result"><strong>'+escapeHTML(x.title)+'</strong><p class="tool-muted">'+escapeHTML(x.group)+' · '+escapeHTML(x.kind)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join("");
+// Optional secure backend. Leave blank until a trusted server endpoint is deployed.
+// The server should call the AI model and, when needed, search the web automatically.
+// Never place private API keys in this public GitHub Pages file.
+const RUCHI_AI_API_URL = "";
+let ruchiChatMessages = [];
+function loadRuchiChatMessages(){
+ try{const saved=JSON.parse(localStorage.getItem("ruchi_ai_chat_history")||"[]");ruchiChatMessages=Array.isArray(saved)?saved.filter(x=>x&&x.role&&x.content).slice(0,80):[]}catch(e){ruchiChatMessages=[]}
 }
-
+function persistRuchiChatMessages(){try{localStorage.setItem("ruchi_ai_chat_history",JSON.stringify(ruchiChatMessages.slice(-80)))}catch(e){}}
+function addRuchiChatMessage(role,content){
+ ruchiChatMessages.push({role,content:String(content||"").slice(0,8000),time:new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})});
+ ruchiChatMessages=ruchiChatMessages.slice(-80);persistRuchiChatMessages();renderRuchiChatMessages();
+}
+function renderRuchiChatMessages(){
+ const out=document.getElementById("ruchiAssistantResults");if(!out)return;
+ if(!ruchiChatMessages.length){out.innerHTML='<div class="ruchi-welcome"><div class="ruchi-welcome-icon">✦</div><h3>Hi! I’m RUCHI AI</h3><p>Ask a question, get a simple explanation, or revise a topic step by step.</p><div class="ruchi-suggestions"><button class="secondary" onclick="useRuchiPrompt(\'Explain the human heart in simple words\')">❤️ Explain the human heart</button><button class="secondary" onclick="useRuchiPrompt(\'Give me 5 revision points on hand hygiene\')">📘 Revision points</button></div></div>';return}
+ out.innerHTML=ruchiChatMessages.map(m=>'<div class="ruchi-chat-row '+(m.role==="user"?"user":"assistant")+'">'+(m.role==="assistant"?'<div class="ruchi-chat-avatar">🤖</div>':'')+'<div><div class="ruchi-chat-bubble">'+escapeHTML(m.content)+'</div><div class="ruchi-chat-meta">'+(m.role==="user"?"You":"RUCHI AI")+' · '+escapeHTML(m.time||"")+'</div></div></div>').join("");
+ out.scrollTop=out.scrollHeight;
+}
+function handleRuchiChatKey(event){if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();askRuchiAssistant()}}
+function startNewRuchiChat(){ruchiChatMessages=[];persistRuchiChatMessages();renderRuchiChatMessages();const input=document.getElementById("ruchiAssistantQuestion");if(input){input.value="";input.focus()}const status=document.getElementById("ruchiAssistantStatus");if(status)status.textContent="New chat started."}
+function getRuchiLocalAnswer(question){
+ const query=String(question||"").toLowerCase(),words=query.split(/[^a-z0-9]+/).filter(w=>w.length>2),matches=[];
+ (Array.isArray(quickReferenceData)?quickReferenceData:[]).forEach(x=>{const hay=(x.topic+" "+x.subject+" "+x.detail).toLowerCase(),score=words.reduce((n,w)=>n+(hay.includes(w)?1:0),0);if(score)matches.push({score,title:x.topic,group:x.subject,detail:x.detail})});
+ (Array.isArray(medicalReference)?medicalReference:[]).forEach(x=>{const hay=x.join(" ").toLowerCase(),score=words.reduce((n,w)=>n+(hay.includes(w)?1:0),0);if(score)matches.push({score,title:x[0]+" · "+x[1],group:x[3]||"Medical dictionary",detail:x[2]})});
+ matches.sort((a,b)=>b.score-a.score);
+ return matches.slice(0,5);
+}
+async function askRuchiAssistant(){
+ const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),send=document.getElementById("ruchiSendButton");
+ if(!input||!status)return;const question=input.value.trim();if(!question)return;
+ input.value="";addRuchiChatMessage("user",question);status.textContent="RUCHI is thinking…";if(send)send.disabled=true;
+ try{
+  if(RUCHI_AI_API_URL){
+   const response=await fetch(RUCHI_AI_API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:question,history:ruchiChatMessages.slice(-12).map(x=>({role:x.role,content:x.content}))})});
+   if(!response.ok)throw new Error("AI service unavailable");
+   const data=await response.json();if(!data||typeof data.reply!=="string"||!data.reply.trim())throw new Error("No answer received");
+   addRuchiChatMessage("assistant",data.reply.trim());status.textContent=data.sources&&data.sources.length?"Answered with checked online references.":"Answered by RUCHI AI.";
+  }else{
+   const matches=getRuchiLocalAnswer(question);
+   if(matches.length){
+    const answer=matches.map((x,i)=>(i+1)+". "+x.title+" ("+x.group+")\n"+x.detail).join("\n\n")+"\n\nThis answer is from the app’s saved study library.";
+    addRuchiChatMessage("assistant",answer);status.textContent="Answered from the saved study library. Online AI/web research is not connected yet.";
+   }else{
+    addRuchiChatMessage("assistant","I couldn’t find a reliable answer in my saved study library yet. The online AI and automatic web-research service has not been connected, so I don’t want to guess. Please check your textbook or teacher for now.");
+    status.textContent="No reliable local match. Online AI/web research is not connected yet.";
+   }
+  }
+ }catch(error){addRuchiChatMessage("assistant","Sorry, I couldn’t reach the AI service just now. Please try again later.");status.textContent="AI service connection failed."}
+ finally{if(send)send.disabled=false;input.focus()}
+}
+function saveRuchiChatEntry(question,results){addRuchiChatMessage("user",question);addRuchiChatMessage("assistant",results)}
+function renderRuchiChatHistory(){renderRuchiChatMessages()}
+function clearRuchiChatHistory(){if(!confirm("Clear all saved RUCHI AI chat messages from this device?"))return; ruchiChatMessages=[];persistRuchiChatMessages();renderRuchiChatMessages()}
 function useRuchiPrompt(prefix){
  const input=document.getElementById("ruchiAssistantQuestion");if(!input)return;
  input.value=prefix;input.focus();
@@ -2957,19 +2993,16 @@ function makeRuchiFlashcards(){
  out.innerHTML=matches.length?matches.map((x,i)=>'<div class="dictionary-result"><strong>Card '+(i+1)+': '+escapeHTML(x.topic)+'</strong><p class="tool-muted">'+escapeHTML(x.subject)+'</p><div>'+escapeHTML(x.detail)+'</div></div>').join(""):'<p class="tool-muted">No matching library cards found. Try a topic name used in Study Library.</p>';
 }
 
-function searchRuchiAssistantWeb(){
- const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),q=input?input.value.trim():"";
- if(!q){if(status)status.textContent="Pehle apna question type karo.";return}
- window.open("https://www.google.com/search?q="+encodeURIComponent(q+" nursing study"),"_blank","noopener,noreferrer");
- if(status)status.textContent="Browser mein web search khol diya. Sources ko textbook aur teacher se verify karna.";
-}
 function clearRuchiAssistant(){
  const input=document.getElementById("ruchiAssistantQuestion"),status=document.getElementById("ruchiAssistantStatus"),out=document.getElementById("ruchiAssistantResults");
  if(input)input.value="";
- if(status)status.textContent="Ready — ask a question to search your saved study library.";
+ if(status)status.textContent="Ready when you are. Ask me anything you’re studying.";
  if(out)out.innerHTML="";
  const summary=document.getElementById("ruchiNotesSummary"),cards=document.getElementById("ruchiFlashcardResults");if(summary)summary.innerHTML="";if(cards)cards.innerHTML="";
 }
+
+loadRuchiChatMessages();
+
 
 </script>
 </body>
