@@ -1605,7 +1605,7 @@ function renderStudyResources(){
  el.innerHTML=rows.map(x=>'<div class="tool-row"><div><b>'+escapeHTML(x.title)+'</b><p>'+escapeHTML(x.subject||"General")+' · '+escapeHTML(x.added)+'</p><p><a href="'+escapeHTML(x.url)+'" target="_blank" rel="noopener noreferrer">Open saved resource ↗</a></p></div><button class="secondary" onclick="deleteStudyResource('+x.id+')">Remove</button></div>').join("")||'<p class="tool-muted">No saved resources yet.</p>';
 }
 function deleteStudyResource(id){studyResources=studyResources.filter(x=>x.id!==id);saveJSON("ruchi_study_resources",studyResources);renderStudyResources()}
-\nfunction saveVaultNote(){
+function saveVaultNote(){
  const title=document.getElementById("vaultTitle").value.trim(),subject=document.getElementById("vaultSubject").value.trim(),tags=document.getElementById("vaultTags").value.split(",").map(x=>x.trim()).filter(Boolean),body=document.getElementById("vaultBody").value.trim();
  if(!title||!body){alert("Enter a note title and note content.");return}
  vaultNotes.unshift({id:Date.now(),title,subject,tags,body,date:localDateKey()});vaultNotes=vaultNotes.slice(0,300);saveJSON("ruchi_vault_notes",vaultNotes);
@@ -1640,7 +1640,7 @@ function renderStudyStreak(){
  const today=studyLogs.filter(x=>x.date===localDateKey()).reduce((a,x)=>a+(Number(x.minutes)||0),0);
  el.innerHTML='<div class="tool-row"><div><span class="tool-stat">'+current+'</span><p>Current streak (days)</p></div><div><span class="tool-stat">'+best+'</span><p>Best streak</p></div><div><span class="tool-stat">'+today+'</span><p>Minutes logged today</p></div></div><p class="tool-muted">Log at least one study session each day to keep your record accurate.</p>';
 }
-\nfunction renderStudentToolkit(){
+function renderStudentToolkit(){
  renderStudentTasks();renderTimetable();renderAttendance();renderPracticalChecklist();renderClinicalDiary();renderSyllabusTracker();renderExamCountdown();renderAnswerDrafts();renderStudyLog();renderRevisionQueue();renderProjects();renderPostingLogs();renderCaseStudies();renderWeeklyGoals();initBodySystemExplorer();renderInstrumentLibrary();renderVitalLearning();renderInfectionTopics();searchMedicalReference();renderVaultNotes();renderWeakTopics();renderStudyStreak();renderWrongNotebook();renderStudyResources();
  const dd=document.getElementById("diaryDate");if(dd&&!dd.value)dd.value=localDateKey();
  const d=document.getElementById("attDate");if(d&&!d.value)d.value=localDateKey();
