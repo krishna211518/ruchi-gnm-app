@@ -516,6 +516,49 @@ body.ruchi-ai-standalone .ruchi-ai-top p{font-size:11px}
  body.ruchi-ai-standalone .ruchi-accuracy-indicator{display:none}
 }
 
+
+/* Clean, minimal AI chat styling */
+body.ruchi-ai-standalone .ruchi-ai-shell{background:var(--white);border:0;box-shadow:none}
+body.ruchi-ai-standalone .ruchi-ai-top{background:var(--white);color:var(--text);border-bottom:1px solid var(--line);padding:13px clamp(12px,3vw,28px);gap:12px}
+body.ruchi-ai-standalone .ruchi-ai-top h2{color:var(--text);font-size:17px;font-weight:750;letter-spacing:-.02em}
+body.ruchi-ai-standalone .ruchi-ai-top p{color:var(--muted);font-size:11px}
+body.ruchi-ai-standalone .ruchi-ai-avatar{width:36px;height:36px;flex-basis:36px;border-radius:12px;background:#eaf2fb;color:#24527c;border:0;font-size:20px}
+body.ruchi-ai-standalone .ruchi-back-app{margin:0;background:transparent!important;color:var(--muted)!important;border:1px solid var(--line)!important;padding:7px 10px}
+body.ruchi-ai-standalone .ruchi-new-chat{margin-left:auto;background:var(--light)!important;color:var(--text)!important;border:1px solid var(--line)!important;padding:8px 11px}
+body.ruchi-ai-standalone .ruchi-ai-modes{padding:9px clamp(12px,3vw,28px);gap:6px;border-bottom:1px solid var(--line);background:var(--white);scrollbar-width:none}
+body.ruchi-ai-standalone .ruchi-ai-modes::-webkit-scrollbar{display:none}
+body.ruchi-ai-standalone .ruchi-mode{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:600;padding:7px 11px;font-size:11px}
+body.ruchi-ai-standalone .ruchi-mode.active{background:var(--light);color:var(--text);border-color:#b9cde2;box-shadow:none}
+body.ruchi-ai-standalone .ruchi-ai-preferences{margin:0;padding:7px clamp(12px,3vw,28px);border:0;border-bottom:1px solid var(--line);border-radius:0;background:var(--white)}
+body.ruchi-ai-standalone .ruchi-language-toggle{flex:0 1 auto;font-size:11px;color:var(--muted)}
+body.ruchi-ai-standalone .ruchi-language-toggle small{font-size:10px}
+body.ruchi-ai-standalone .ruchi-ai-status{padding:6px clamp(12px,3vw,28px);font-size:10px;border:0;background:var(--white);color:var(--muted)}
+body.ruchi-ai-standalone .ruchi-chat-messages{padding:clamp(14px,3vw,28px);gap:16px;background:var(--white)}
+body.ruchi-ai-standalone .ruchi-welcome{padding:18px 8px}
+body.ruchi-ai-standalone .ruchi-welcome-icon{width:44px;height:44px;border-radius:14px;margin-bottom:12px;background:var(--light);font-size:22px}
+body.ruchi-ai-standalone .ruchi-welcome h3{font-size:20px;letter-spacing:-.03em;color:var(--text)}
+body.ruchi-ai-standalone .ruchi-welcome p{font-size:13px;color:var(--muted)}
+body.ruchi-ai-standalone .ruchi-suggestions{gap:8px;margin-top:18px}
+body.ruchi-ai-standalone .ruchi-suggestions button{background:var(--white);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:12px;padding:10px 13px;box-shadow:none}
+body.ruchi-ai-standalone .ruchi-chat-composer{margin:0 auto 8px;width:min(850px,calc(100% - 28px));padding:8px 10px;border:1px solid var(--line);border-radius:18px;background:var(--white);box-shadow:0 4px 18px rgba(18,54,91,.06);gap:8px}
+body.ruchi-ai-standalone .ruchi-chat-composer textarea{border:0!important;box-shadow:none!important;background:transparent;margin:0;padding:9px 7px;min-height:40px;max-height:120px;font-size:14px}
+body.ruchi-ai-standalone .ruchi-chat-composer button{width:38px;height:38px;flex:0 0 38px;border-radius:12px}
+body.ruchi-ai-standalone .ruchi-ai-footnote{color:var(--muted);font-size:9px;text-align:center;padding:3px 10px 7px}
+@media(max-width:650px){
+ body.ruchi-ai-standalone .ruchi-ai-top{gap:8px;padding:10px}
+ body.ruchi-ai-standalone .ruchi-back-app{font-size:0;width:34px;height:34px;padding:0}
+ body.ruchi-ai-standalone .ruchi-back-app:first-letter{font-size:15px}
+ body.ruchi-ai-standalone .ruchi-ai-top p{display:none}
+ body.ruchi-ai-standalone .ruchi-ai-avatar{width:32px;height:32px;flex-basis:32px}
+ body.ruchi-ai-standalone .ruchi-new-chat{font-size:11px;padding:8px}
+ body.ruchi-ai-standalone .ruchi-ai-modes{padding:8px 10px}
+ body.ruchi-ai-standalone .ruchi-mode{padding:7px 10px;font-size:10px}
+ body.ruchi-ai-standalone .ruchi-language-toggle small{display:none}
+ body.ruchi-ai-standalone .ruchi-chat-messages{padding:14px 12px}
+ body.ruchi-ai-standalone .ruchi-suggestions{display:grid;grid-template-columns:1fr;max-width:280px;margin:14px auto 0}
+ body.ruchi-ai-standalone .ruchi-suggestions button{text-align:left}
+}
+
 </style>
 </head>
 <body>
@@ -744,11 +787,10 @@ infection-control policies and supervisor's instructions during actual patient c
   </div>
   <div class="ruchi-ai-preferences">
    <label class="ruchi-language-toggle"><input id="ruchiSimpleHinglish" type="checkbox" checked onchange="saveRuchiAIPreferences()"> <span><strong>Simple Hinglish Mode</strong><small>Easy words + correct English medical terms</small></span></label>
-   <div class="ruchi-accuracy-indicator" role="status"><span>✓</span><span><strong>Medical terminology check</strong><small>Always ON for nursing topics</small></span></div>
   </div>
   <div id="ruchiAssistantStatus" class="ruchi-ai-status" aria-live="polite">Ready when you are. Ask me anything you’re studying.</div>
   <div id="ruchiAssistantResults" class="ruchi-chat-messages" aria-live="polite">
-   <div class="ruchi-welcome"><div class="ruchi-welcome-icon">✦</div><h3>Hi! I’m RUCHI AI</h3><p>Ask a question, get a simple explanation, or revise a topic step by step.</p><div class="ruchi-suggestions"><button class="secondary" onclick="useRuchiPrompt('Explain the human heart in simple words')">❤️ Explain the human heart</button><button class="secondary" onclick="useRuchiPrompt('Give me 5 revision points on hand hygiene')">📘 Revision points</button><button class="secondary" onclick="useRuchiPrompt('Create a short quiz on the skeletal system')">🧠 Make a quick quiz</button></div></div>
+   <div class="ruchi-welcome"><div class="ruchi-welcome-icon">✦</div><h3>What can I help with?</h3><p>Ask anything. I can explain, help you revise, or practise with you.</p><div class="ruchi-suggestions"><button class="secondary" onclick="useRuchiPrompt('Explain the human heart in simple words')">Explain a topic</button><button class="secondary" onclick="useRuchiPrompt('Give me 5 revision points on hand hygiene')">Revision notes</button><button class="secondary" onclick="useRuchiPrompt('Create a short quiz on the skeletal system')">Quick quiz</button></div></div>
   </div>
   <div class="ruchi-chat-composer">
    <textarea id="ruchiAssistantQuestion" rows="1" aria-label="Message RUCHI AI" placeholder="Message RUCHI AI..." onkeydown="handleRuchiChatKey(event)"></textarea>
