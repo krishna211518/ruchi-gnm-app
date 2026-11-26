@@ -482,6 +482,40 @@ hr{border-color:rgba(153,190,226,.2)!important}
 .ruchi-accuracy-indicator>span:first-child{display:grid;place-items:center;width:23px;height:23px;flex:0 0 auto;border-radius:50%;background:#e3f7ed;color:#16845b;font-weight:900}
 .dark .ruchi-ai-preferences{background:var(--white);border-color:var(--line)}
 .dark .ruchi-accuracy-indicator>span:first-child{background:#183e37;color:#75ddb2}
+
+/* Standalone RUCHI AI workspace */
+body.ruchi-ai-standalone{height:100dvh;min-height:100dvh;overflow:hidden;background:var(--bg)}
+body.ruchi-ai-standalone .app{display:block;min-height:100dvh;height:100dvh}
+body.ruchi-ai-standalone .sidebar,
+body.ruchi-ai-standalone .krx-mobile-nav,
+body.ruchi-ai-standalone .ruchi-more-menu,
+body.ruchi-ai-standalone .workspace>.topbar{display:none!important}
+body.ruchi-ai-standalone .workspace{height:100dvh;min-height:0;overflow:hidden}
+body.ruchi-ai-standalone .workspace>.container{height:100dvh;max-width:none;margin:0;padding:0;overflow:hidden}
+body.ruchi-ai-standalone #ai-hub{height:100dvh;min-height:0;overflow:hidden;padding:0}
+body.ruchi-ai-standalone .ruchi-ai-shell{width:100%;max-width:none;height:100dvh;min-height:0;max-height:100dvh;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+body.ruchi-ai-standalone .ruchi-ai-top{flex:0 0 auto;padding:12px 18px}
+body.ruchi-ai-standalone .ruchi-ai-modes{flex:0 0 auto;padding:7px 14px}
+body.ruchi-ai-standalone .ruchi-ai-preferences{flex:0 0 auto;margin:5px 14px;padding:8px 10px}
+body.ruchi-ai-standalone .ruchi-ai-status{flex:0 0 auto}
+body.ruchi-ai-standalone .ruchi-chat-messages{flex:1 1 auto;min-height:0;max-height:none;height:auto;overflow-y:auto;overscroll-behavior:contain}
+body.ruchi-ai-standalone .ruchi-chat-composer{flex:0 0 auto;position:relative;bottom:auto;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+body.ruchi-ai-standalone .ruchi-ai-footnote{flex:0 0 auto;margin:0;padding:4px 14px 8px;font-size:10px}
+body.ruchi-ai-standalone .ruchi-back-app{margin-left:auto;white-space:nowrap;padding:8px 11px}
+body.ruchi-ai-standalone .ruchi-new-chat{margin-left:0}
+body.ruchi-ai-standalone .ruchi-ai-top h2{font-size:18px}
+body.ruchi-ai-standalone .ruchi-ai-top p{font-size:11px}
+@media(max-width:650px){
+ body.ruchi-ai-standalone .ruchi-ai-top{gap:9px;padding:10px 12px}
+ body.ruchi-ai-standalone .ruchi-ai-avatar{width:38px;height:38px;flex-basis:38px;font-size:21px}
+ body.ruchi-ai-standalone .ruchi-ai-top h2{font-size:16px}
+ body.ruchi-ai-standalone .ruchi-ai-top p{max-width:155px;font-size:10px}
+ body.ruchi-ai-standalone .ruchi-new-chat,body.ruchi-ai-standalone .ruchi-back-app{padding:8px 9px;font-size:11px}
+ body.ruchi-ai-standalone .ruchi-chat-messages{padding:14px 12px}
+ body.ruchi-ai-standalone .ruchi-ai-preferences{margin:4px 10px;gap:7px}
+ body.ruchi-ai-standalone .ruchi-accuracy-indicator{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -695,6 +729,7 @@ infection-control policies and supervisor's instructions during actual patient c
 <section id="ai-hub" class="section">
  <div class="ruchi-ai-shell">
   <div class="ruchi-ai-top">
+   <button type="button" class="secondary ruchi-back-app" onclick="go('home')">← Back</button>
    <div class="ruchi-ai-avatar">🤖</div>
    <div><h2>RUCHI AI</h2><p>Your study companion · Nursing, school subjects & everyday questions</p></div>
    <button class="secondary ruchi-new-chat" onclick="startNewRuchiChat()">＋ New chat</button>
@@ -721,20 +756,7 @@ infection-control policies and supervisor's instructions during actual patient c
   </div>
   <p class="ruchi-ai-footnote">RUCHI AI can make mistakes. For nursing and medical learning, verify important information with your textbook and teacher. Never enter real patient details.</p>
  </div>
- <details class="card ruchi-extra-tools">
-  <summary>🗂️ Study tools</summary>
-  <label for="ruchiNotesInput">Summarize your notes</label>
-  <textarea id="ruchiNotesInput" rows="4" placeholder="Paste your own notes here..."></textarea>
-  <button onclick="summarizeRuchiNotes()">Create revision summary</button>
-  <div id="ruchiNotesSummary" class="tool-list" style="margin-top:8px"></div>
-  <label for="ruchiFlashcardTopic" style="display:block;margin-top:12px">Find flashcards from study library</label>
-  <input id="ruchiFlashcardTopic" placeholder="Enter a topic">
-  <button onclick="makeRuchiFlashcards()">Find flashcards</button>
-  <div id="ruchiFlashcardResults" class="tool-list" style="margin-top:8px"></div>
-  <button class="secondary" onclick="renderRuchiChatHistory()">Show saved chats</button>
-  <button class="secondary" onclick="clearRuchiChatHistory()">Clear saved chats</button>
-  <div id="ruchiChatHistory" class="tool-list" style="margin-top:8px"></div>
- </details>
+
 </section>
 
 <section id="tools" class="section">
@@ -1389,6 +1411,7 @@ let examScores=loadJSON("ruchi_exam_scores",[]);
 
 function allQuestions(){return questions.concat(extraQuestions)}
 function show(id,btn){
+ document.body.classList.toggle("ruchi-ai-standalone",id==="ai-hub");
  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
  const target=document.getElementById(id);if(!target)return;
  target.classList.add("active");
